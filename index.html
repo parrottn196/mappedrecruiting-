@@ -21,7 +21,8 @@
     h1 { font-size:1.45rem; margin:.35rem 0 .5rem; }
     .meta { color:var(--muted); font-size:.95rem; line-height:1.45; margin-bottom:.4rem; }
     .hint { color:var(--muted); font-size:.8rem; margin-top:1.25rem; }
-    .map-label { background:none; border:none; }
+    .map-label,
+    .leaflet-marker-icon.map-label { background:none; border:none; pointer-events:none !important; }
     .city-lab { color:#8a6d12; font:700 12px Georgia,serif; text-shadow:0 0 4px #fff,0 0 4px #fff; white-space:nowrap; }
     .state-lab { color:#8a6d12; font:700 11px Georgia,serif; letter-spacing:.12em; opacity:.8; text-shadow:0 0 4px #fff; white-space:nowrap; }
     @media (max-width:900px){ .layout{grid-template-columns:1fr;} .drawer{border-left:0;border-top:1px solid rgba(201,162,39,.28);} }
@@ -119,7 +120,7 @@
         <h1>${s.name}</h1>
         <p class="meta">${s.address}</p>
         <p class="meta">${s.city}, Georgia</p>
-        <p class="hint">Click another pin for that school's name and address. Recruits will be added later.</p>
+        <p class="hint">Click another pin for that school's name and address.</p>
       `;
     }
 
@@ -132,6 +133,7 @@
       .then((r) => r.json())
       .then((geo) => {
         L.geoJSON(geo, {
+          interactive: false,
           style: { color:"#c9a227", weight:3, fillColor:"#c9a227", fillOpacity:0.07 }
         }).addTo(map);
       });
@@ -153,16 +155,22 @@
       { name:"S. CAROLINA", lat:33.4, lng:-81.4, state:true }
     ].forEach((c) => {
       L.marker([c.lat, c.lng], {
+        interactive: false,
+        keyboard: false,
         icon: L.divIcon({
           className: "map-label",
-          html: `<div class="${c.state ? "state-lab" : "city-lab"}">${c.name}</div>`
+          html: `<div class="${c.state ? "state-lab" : "city-lab"}">${c.name}</div>`,
+          iconSize: [0, 0]
         })
       }).addTo(map);
     });
 
     schools.forEach((s) => {
       L.circleMarker([s.lat, s.lng], {
-        radius: 7, color:"#1f3d28", fillColor:"#2f5d3a", fillOpacity:0.95
+        radius: 7,
+        color: "#1f3d28",
+        fillColor: "#2f5d3a",
+        fillOpacity: 0.95
       }).addTo(map).bindTooltip(s.name).on("click", () => showSchool(s));
     });
 
