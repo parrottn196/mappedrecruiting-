@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MappedRecruiting — Georgia high school football</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --bg: #0b100c;
+      --panel: #121a14;
+      --line: #c9a227;
+      --text: #f3ead1;
+      --muted: #b7b09a;
+      --green: #1f3d28;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(201,162,39,.35);
+    }
+    .brand { letter-spacing: .12em; font-size: .95rem; }
+    .brand span { color: var(--line); }
+    .tag { font-size: .75rem; color: var(--muted); letter-spacing: .04em; }
+    .staff {
+      border: 1px solid var(--line);
+      color: var(--line);
+      background: transparent;
+      padding: .55rem .9rem;
+      cursor: pointer;
+      letter-spacing: .08em;
+      font-size: .72rem;
+      text-transform: uppercase;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      min-height: calc(100vh - 64px);
+    }
+    #map { min-height: 520px; background: #0e1610; }
+    .drawer {
+      border-left: 1px solid rgba(201,162,39,.28);
+      padding: 1.25rem;
+      background: linear-gradient(180deg, #101710, #0b100c);
+    }
+    .kicker { color: var(--line); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { font-size: 1.55rem; margin: .35rem 0 .2rem; }
+    .meta { color: var(--muted); font-size: .9rem; margin-bottom: 1rem; }
+    .card {
+      border: 1px solid rgba(201,162,39,.35);
+      padding: 1rem;
+      background: var(--panel);
+    }
+    .player-top { display: flex; justify-content: space-between; gap: 1rem; }
+    .pos { color: var(--line); font-size: .8rem; letter-spacing: .08em; }
+    .row { display: flex; justify-content: space-between; padding: .45rem 0; border-bottom: 1px solid rgba(243,234,209,.08); font-size: .92rem; }
+    .lock {
+      margin-top: .8rem;
+      padding: .85rem;
+      border: 1px dashed rgba(201,162,39,.45);
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .lock strong { color: var(--line); }
+    .hint { margin-top: 1rem; color: var(--muted); font-size: .8rem; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .drawer { border-left: 0; border-top: 1px solid rgba(201,162,39,.28); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="brand">MAPPED<span>RECRUITING</span></div>
+      <div class="tag">Georgia high school football. Mapped for college staffs. Players listed free.</div>
+    </div>
+    <button class="staff" id="staffBtn">Program access</button>
+  </header>
+
+  <div class="layout">
+    <div id="map"></div>
+    <aside class="drawer" id="drawer">
+      <div class="kicker">Sample school</div>
+      <h1>Mountain View High School</h1>
+      <p class="meta">Bears · Lawrenceville, GA · Gwinnett County · Class 6A</p>
+      <p class="meta">2351 Sunny Hill Rd, Lawrenceville, GA 30043</p>
+
+      <div class="card">
+        <div class="player-top">
+          <div>
+            <div class="pos">#75 · OL · Class of 2027</div>
+            <h2>Jostin Almazan</h2>
+          </div>
+        </div>
+        <div class="row"><span>Height / Weight</span><span>6'4 / 275</span></div>
+        <div class="row"><span>GPA</span><span>3.91</span></div>
+        <div class="row"><span>X</span><span>@jostinalmazan</span></div>
+        <div class="lock" id="locked">
+          <strong>Hudl, offers, testing, and contact</strong> are available to college programs with a membership. Athletes are listed free.
+        </div>
+      </div>
+      <p class="hint">Click the Mountain View pin on the map. More Georgia schools will be added as players are verified.</p>
+    </aside>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map("map", { scrollWheelZoom: true }).setView([32.7, -83.5], 7);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: "&copy; OpenStreetMap &copy; CARTO"
+    }).addTo(map);
+
+    const mountainView = L.circleMarker([34.066, -83.981], {
+      radius: 9,
+      color: "#c9a227",
+      fillColor: "#c9a227",
+      fillOpacity: 0.95
+    }).addTo(map).bindTooltip("Mountain View HS");
+
+    mountainView.on("click", () => {
+      document.getElementById("drawer").scrollIntoView({ behavior: "smooth" });
+    });
+
+    [
+      [34.12, -83.99],
+      [30.83, -83.28],
+      [32.46, -84.99],
+      [33.75, -84.39],
+      [32.08, -81.09]
+    ].forEach(([lat, lng]) => {
+      L.circleMarker([lat, lng], {
+        radius: 5,
+        color: "#7d9a6a",
+        fillColor: "#7d9a6a",
+        fillOpacity: 0.7
+      }).addTo(map);
+    });
+
+    document.getElementById("staffBtn").onclick = () => {
+      alert("Program membership comes next. Players stay free. Staff login will unlock Hudl, offers, and contact request.");
+    };
+  </script>
+</body>
+</html>
