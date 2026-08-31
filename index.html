@@ -3,178 +3,272 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MappedRecruiting — Georgia high school football</title>
+  <title>MappedRecruiting — Georgia Football Recruiting</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <style>
-    :root { --bg:#0b100c; --panel:#121a14; --line:#c9a227; --text:#f3ead1; --muted:#b7b09a; }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:Georgia, serif; background:var(--bg); color:var(--text); }
-    header { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem 1.25rem; border-bottom:1px solid rgba(201,162,39,.35); }
-    .brand { letter-spacing:.12em; font-size:.95rem; }
-    .brand span { color:var(--line); }
-    .tag { font-size:.75rem; color:var(--muted); }
-    .staff { border:1px solid var(--line); color:var(--line); background:transparent; padding:.55rem .9rem; letter-spacing:.08em; font-size:.72rem; text-transform:uppercase; }
-    .layout { display:grid; grid-template-columns:1.2fr .8fr; min-height:calc(100vh - 64px); }
-    #map { min-height:560px; }
-    .drawer { border-left:1px solid rgba(201,162,39,.28); padding:1.25rem; background:linear-gradient(180deg,#101710,#0b100c); }
-    .kicker { color:var(--line); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; }
-    h1 { font-size:1.45rem; margin:.35rem 0 .5rem; }
-    .meta { color:var(--muted); font-size:.95rem; line-height:1.45; margin-bottom:.4rem; }
-    .hint { color:var(--muted); font-size:.8rem; margin-top:1.25rem; }
-    .map-label,
-    .leaflet-marker-icon.map-label { background:none; border:none; pointer-events:none !important; }
-    .city-lab { color:#8a6d12; font:700 12px Georgia,serif; text-shadow:0 0 4px #fff,0 0 4px #fff; white-space:nowrap; }
-    .state-lab { color:#8a6d12; font:700 11px Georgia,serif; letter-spacing:.12em; opacity:.8; text-shadow:0 0 4px #fff; white-space:nowrap; }
-    @media (max-width:900px){ .layout{grid-template-columns:1fr;} .drawer{border-left:0;border-top:1px solid rgba(201,162,39,.28);} }
+    :root {
+      --bg: #070907;
+      --panel: #101410;
+      --line: #d4af37;
+      --text: #f3ead1;
+      --muted: #9a9178;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, "Times New Roman", serif; background: var(--bg); color: var(--text); }
+    header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: .85rem 1.1rem;
+      border-bottom: 1px solid rgba(212,175,55,.25);
+    }
+    .logo { display: flex; align-items: center; gap: .65rem; white-space: nowrap; }
+    .ga {
+      width: 36px; height: 36px; border: 1.5px solid var(--line); border-radius: 50%;
+      display: grid; place-items: center; color: var(--line); font-size: .72rem; letter-spacing: .04em;
+    }
+    .logo h1 { font-size: .78rem; letter-spacing: .16em; color: var(--line); font-weight: 600; }
+    .logo p { font-size: .62rem; letter-spacing: .08em; color: var(--muted); }
+    .search {
+      width: 100%; max-width: 420px;
+      background: #0c100c; border: 1px solid rgba(212,175,55,.35); color: var(--text);
+      padding: .55rem .8rem .55rem 2rem; border-radius: 4px; font: inherit;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap:before { content: "⌕"; position: absolute; left: .6rem; top: .42rem; color: var(--line); }
+    .filters { display: flex; gap: .7rem; align-items: end; font-size: .68rem; color: var(--muted); letter-spacing: .06em; }
+    .filters label { display: grid; gap: .2rem; }
+    .filters select {
+      background: transparent; color: var(--text); border: 0; border-bottom: 1px solid rgba(212,175,55,.35);
+      padding: .2rem 1.1rem .2rem 0; font: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 1.15fr .85fr; min-height: calc(100vh - 68px); }
+    #map { background: #070907; min-height: 560px; }
+    .leaflet-container { background: #070907; }
+    .hint-map { position: absolute; left: 14px; bottom: 12px; z-index: 500; color: var(--muted); font-size: .72rem; }
+    .drawer { padding: 1rem; }
+    .card {
+      background: #0e130e; border: 1px solid rgba(212,175,55,.28); border-radius: 10px; padding: 1rem;
+      min-height: calc(100vh - 100px);
+    }
+    .top { display: grid; grid-template-columns: 92px 1fr; gap: .85rem; }
+    .photo {
+      height: 92px; border: 1px solid rgba(212,175,55,.3); border-radius: 8px;
+      display: grid; place-items: center; color: var(--muted); font-size: .62rem; letter-spacing: .08em; text-align: center;
+    }
+    .badge { display: inline-block; border: 1px solid var(--line); color: var(--line); font-size: .62rem; padding: .15rem .4rem; margin-top: .35rem; }
+    .loc { color: var(--muted); font-size: .82rem; margin-top: .35rem; }
+    .block { margin-top: 1rem; color: var(--muted); font-size: .86rem; }
+    .block b { display: block; color: var(--text); font-weight: 500; }
+    .recruits { margin-top: 1.1rem; border-top: 1px solid rgba(212,175,55,.2); padding-top: .8rem; }
+    .recruits h3 { font-size: .72rem; letter-spacing: .14em; color: var(--line); }
+    .empty { color: var(--muted); font-size: .85rem; margin-top: .5rem; }
+    .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+      background: rgba(212,175,55,.18) !important;
+    }
+    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+      background: #d4af37 !important; color: #111 !important; font-weight: 700;
+    }
+    .city-pin {
+      background: #1c3a22; border: 2px solid #d4af37; color: #d4af37;
+      width: 28px; height: 28px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+      display: grid; place-items: center; font-size: .7rem;
+    }
+    .city-pin span { transform: rotate(45deg); }
+    .leaflet-tooltip { background: #0e130e; color: var(--text); border: 1px solid var(--line); }
+    @media (max-width: 980px) { header, .layout { display: block; } .filters { margin-top: .6rem; flex-wrap: wrap; } }
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <div class="brand">MAPPED<span>RECRUITING</span></div>
-      <div class="tag">Georgia high school football programs. Name and address.</div>
+    <div class="logo">
+      <div class="ga">GA</div>
+      <div>
+        <h1>GEORGIA</h1>
+        <p>FOOTBALL RECRUITING</p>
+      </div>
     </div>
-    <button class="staff" type="button">Program access</button>
+    <div class="search-wrap">
+      <input class="search" id="q" type="search" placeholder="Search Georgia high schools" />
+    </div>
+    <div class="filters">
+      <label>Classification
+        <select id="cls"><option value="">All</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option></select>
+      </label>
+      <label>Region
+        <select id="reg"><option value="">All</option></select>
+      </label>
+      <label>County
+        <select id="cty"><option value="">All</option></select>
+      </label>
+    </div>
   </header>
   <div class="layout">
-    <div id="map"></div>
-    <aside class="drawer" id="drawer"></aside>
+    <div style="position:relative">
+      <div id="map"></div>
+      <div class="hint-map">Drag to pan • Scroll to zoom</div>
+    </div>
+    <aside class="drawer"><div class="card" id="panel"></div></aside>
   </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script>
     const schools = [
-      { name:"Mountain View High School", city:"Lawrenceville", address:"2351 Sunny Hill Rd, Lawrenceville, GA 30043", cls:"6A", lat:34.066, lng:-83.981 },
-      { name:"Grayson High School", city:"Loganville", address:"50 Hope Hollow Rd, Loganville, GA 30052", cls:"6A", lat:33.874, lng:-83.961 },
-      { name:"Mill Creek High School", city:"Hoschton", address:"4400 Braselton Hwy, Hoschton, GA 30548", cls:"6A", lat:34.114, lng:-83.850 },
-      { name:"Collins Hill High School", city:"Suwanee", address:"50 Taylor Rd, Suwanee, GA 30024", cls:"6A", lat:34.051, lng:-84.026 },
-      { name:"Brookwood High School", city:"Snellville", address:"1255 Dogwood Rd, Snellville, GA 30078", cls:"6A", lat:33.877, lng:-84.067 },
-      { name:"North Gwinnett High School", city:"Suwanee", address:"20 Level Creek Rd, Suwanee, GA 30024", cls:"6A", lat:34.061, lng:-84.071 },
-      { name:"Peachtree Ridge High School", city:"Suwanee", address:"1555 Old Peachtree Rd NW, Suwanee, GA 30024", cls:"6A", lat:34.038, lng:-84.101 },
-      { name:"Dacula High School", city:"Dacula", address:"123 Broad St, Dacula, GA 30019", cls:"6A", lat:33.988, lng:-83.898 },
-      { name:"Archer High School", city:"Lawrenceville", address:"2255 New Hope Rd, Lawrenceville, GA 30045", cls:"6A", lat:33.909, lng:-83.950 },
-      { name:"Buford High School", city:"Buford", address:"2750 Sawnee Ave, Buford, GA 30518", cls:"6A", lat:34.121, lng:-83.999 },
-      { name:"Norcross High School", city:"Norcross", address:"5300 Spalding Dr, Norcross, GA 30092", cls:"6A", lat:33.941, lng:-84.213 },
-      { name:"Parkview High School", city:"Lilburn", address:"998 Cole Dr, Lilburn, GA 30047", cls:"6A", lat:33.888, lng:-84.114 },
-      { name:"Central Gwinnett High School", city:"Lawrenceville", address:"564 W Crogan St, Lawrenceville, GA 30046", cls:"6A", lat:33.956, lng:-83.988 },
-      { name:"Discovery High School", city:"Lawrenceville", address:"1335 Old Norcross Rd, Lawrenceville, GA 30046", cls:"6A", lat:33.929, lng:-84.027 },
-      { name:"South Gwinnett High School", city:"Snellville", address:"2288 E Main St, Snellville, GA 30078", cls:"6A", lat:33.858, lng:-84.019 },
-      { name:"Lambert High School", city:"Suwanee", address:"805 Nichols Rd, Suwanee, GA 30024", cls:"6A", lat:34.101, lng:-84.139 },
-      { name:"South Forsyth High School", city:"Cumming", address:"585 Peachtree Pkwy, Cumming, GA 30041", cls:"6A", lat:34.148, lng:-84.146 },
-      { name:"West Forsyth High School", city:"Cumming", address:"4155 Drew Rd, Cumming, GA 30040", cls:"6A", lat:34.207, lng:-84.224 },
-      { name:"North Forsyth High School", city:"Cumming", address:"3635 Coal Mountain Dr, Cumming, GA 30028", cls:"6A", lat:34.287, lng:-84.132 },
-      { name:"Milton High School", city:"Milton", address:"13025 Birmingham Hwy, Milton, GA 30004", cls:"5A", lat:34.132, lng:-84.316 },
-      { name:"Roswell High School", city:"Roswell", address:"11595 King Rd, Roswell, GA 30075", cls:"5A", lat:34.025, lng:-84.339 },
-      { name:"Alpharetta High School", city:"Alpharetta", address:"3595 Webb Bridge Rd, Alpharetta, GA 30005", cls:"6A", lat:34.070, lng:-84.280 },
-      { name:"Walton High School", city:"Marietta", address:"1590 Bill Murdock Rd, Marietta, GA 30062", cls:"6A", lat:34.014, lng:-84.463 },
-      { name:"Wheeler High School", city:"Marietta", address:"375 Holt Rd, Marietta, GA 30068", cls:"6A", lat:33.984, lng:-84.478 },
-      { name:"Marietta High School", city:"Marietta", address:"1171 Whitlock Ave SW, Marietta, GA 30064", cls:"6A", lat:33.953, lng:-84.546 },
-      { name:"Hillgrove High School", city:"Powder Springs", address:"4165 Luther Ward Rd, Powder Springs, GA 30127", cls:"6A", lat:33.909, lng:-84.703 },
-      { name:"McEachern High School", city:"Powder Springs", address:"2400 New Macland Rd, Powder Springs, GA 30127", cls:"6A", lat:33.865, lng:-84.687 },
-      { name:"Harrison High School", city:"Kennesaw", address:"4500 Due West Rd NW, Kennesaw, GA 30152", cls:"6A", lat:34.019, lng:-84.727 },
-      { name:"North Cobb High School", city:"Kennesaw", address:"3400 Old 41 Hwy NW, Kennesaw, GA 30144", cls:"6A", lat:34.037, lng:-84.637 },
-      { name:"Cherokee High School", city:"Canton", address:"930 Marietta Hwy, Canton, GA 30114", cls:"6A", lat:34.239, lng:-84.490 },
-      { name:"Etowah High School", city:"Woodstock", address:"6565 Putnam Ford Dr, Woodstock, GA 30189", cls:"6A", lat:34.126, lng:-84.523 },
-      { name:"Valdosta High School", city:"Valdosta", address:"4590 Inner Perimeter Rd, Valdosta, GA 31602", cls:"7A", lat:30.833, lng:-83.278 },
-      { name:"Lowndes High School", city:"Valdosta", address:"1606 Norman Dr, Valdosta, GA 31601", cls:"7A", lat:30.848, lng:-83.287 },
-      { name:"Colquitt County High School", city:"Moultrie", address:"105 Darbyshire Rd, Moultrie, GA 31788", cls:"7A", lat:31.180, lng:-83.789 },
-      { name:"Camden County High School", city:"Kingsland", address:"6300 Laurel Island Pkwy, Kingsland, GA 31548", cls:"7A", lat:30.800, lng:-81.670 },
-      { name:"Richmond Hill High School", city:"Richmond Hill", address:"1 Wildcat Dr, Richmond Hill, GA 31324", cls:"7A", lat:31.938, lng:-81.304 },
-      { name:"Tift County High School", city:"Tifton", address:"1 Blue Devil Way, Tifton, GA 31794", cls:"6A", lat:31.450, lng:-83.508 },
-      { name:"Coffee High School", city:"Douglas", address:"159 Trojan Way, Douglas, GA 31533", cls:"6A", lat:31.509, lng:-82.850 },
-      { name:"Lee County High School", city:"Leesburg", address:"1 Trojan Way, Leesburg, GA 31763", cls:"6A", lat:31.733, lng:-84.171 },
-      { name:"Thomas County Central High School", city:"Thomasville", address:"4686 US-84, Thomasville, GA 31792", cls:"6A", lat:30.869, lng:-83.978 },
-      { name:"Brunswick High School", city:"Brunswick", address:"3885 Altama Ave, Brunswick, GA 31520", cls:"6A", lat:31.150, lng:-81.491 },
-      { name:"Glynn Academy", city:"Brunswick", address:"1001 Mansfield St, Brunswick, GA 31520", cls:"6A", lat:31.151, lng:-81.491 },
-      { name:"Statesboro High School", city:"Statesboro", address:"10 Lester Rd, Statesboro, GA 30458", cls:"5A", lat:32.449, lng:-81.783 },
-      { name:"Ware County High School", city:"Waycross", address:"700 Victory Dr, Waycross, GA 31503", cls:"5A", lat:31.213, lng:-82.354 },
-      { name:"Benedictine Military School", city:"Savannah", address:"6502 Seawright Dr, Savannah, GA 31406", cls:"5A", lat:32.029, lng:-81.080 },
-      { name:"Clarke Central High School", city:"Athens", address:"350 S Milledge Ave, Athens, GA 30605", cls:"5A", lat:33.951, lng:-83.394 },
-      { name:"Cedar Shoals High School", city:"Athens", address:"1300 Cedar Shoals Dr, Athens, GA 30605", cls:"4A", lat:33.939, lng:-83.337 },
-      { name:"North Oconee High School", city:"Bogart", address:"1081 Rocky Branch Rd, Bogart, GA 30622", cls:"4A", lat:33.905, lng:-83.522 },
-      { name:"Gainesville High School", city:"Gainesville", address:"830 Century Pl, Gainesville, GA 30501", cls:"5A", lat:34.298, lng:-83.824 },
-      { name:"Carrollton High School", city:"Carrollton", address:"202 Trojan Dr, Carrollton, GA 30117", cls:"6A", lat:33.580, lng:-85.077 },
-      { name:"Rome High School", city:"Rome", address:"1000 Veterans Memorial Hwy, Rome, GA 30161", cls:"5A", lat:34.257, lng:-85.165 },
-      { name:"Dalton High School", city:"Dalton", address:"1500 N Thornton Ave, Dalton, GA 30720", cls:"4A", lat:34.779, lng:-84.985 },
-      { name:"Calhoun High School", city:"Calhoun", address:"335 S River St, Calhoun, GA 30701", cls:"", lat:34.503, lng:-84.951 },
-      { name:"Cartersville High School", city:"Cartersville", address:"320 E Church St, Cartersville, GA 30120", cls:"4A", lat:34.165, lng:-84.800 },
-      { name:"East Coweta High School", city:"Sharpsburg", address:"400 Hwy 154, Sharpsburg, GA 30277", cls:"6A", lat:33.397, lng:-84.677 },
-      { name:"Westlake High School", city:"Atlanta", address:"2400 Union Rd SW, Atlanta, GA 30331", cls:"6A", lat:33.618, lng:-84.617 },
-      { name:"Campbell High School", city:"Smyrna", address:"3295 S Atlanta Rd SE, Smyrna, GA 30080", cls:"6A", lat:33.861, lng:-84.517 },
-      { name:"North Atlanta High School", city:"Atlanta", address:"4111 Northside Pkwy NW, Atlanta, GA 30327", cls:"6A", lat:33.810, lng:-84.393 },
-      { name:"Decatur High School", city:"Decatur", address:"310 N McDonough St, Decatur, GA 30030", cls:"5A", lat:33.775, lng:-84.295 },
-      { name:"Marist School", city:"Brookhaven", address:"3790 Ashford Dunwoody Rd NE, Atlanta, GA 30319", cls:"4A", lat:33.874, lng:-84.341 },
-      { name:"Newton High School", city:"Covington", address:"140 Ram Dr, Covington, GA 30014", cls:"6A", lat:33.597, lng:-83.860 },
-      { name:"Houston County High School", city:"Warner Robins", address:"920 Highway 96, Warner Robins, GA 31088", cls:"5A", lat:32.607, lng:-83.694 },
-      { name:"Warner Robins High School", city:"Warner Robins", address:"401 S Davis Dr, Warner Robins, GA 31088", cls:"4A", lat:32.595, lng:-83.624 },
-      { name:"Columbus High School", city:"Columbus", address:"1700 Champion Dr, Columbus, GA 31906", cls:"", lat:32.460, lng:-84.988 },
-      { name:"LaGrange High School", city:"LaGrange", address:"516 N Greenwood St, LaGrange, GA 30240", cls:"3A", lat:33.037, lng:-85.031 },
-      { name:"Griffin High School", city:"Griffin", address:"1617 W Poplar St, Griffin, GA 30224", cls:"4A", lat:33.247, lng:-84.264 },
-      { name:"Sandy Creek High School", city:"Tyrone", address:"360 Jenkins Rd, Tyrone, GA 30290", cls:"3A", lat:33.472, lng:-84.591 },
-      { name:"Creekside High School", city:"Fairburn", address:"5445 Mitchell St, Fairburn, GA 30213", cls:"4A", lat:33.567, lng:-84.581 }
+      { name:"Mountain View High School", city:"Lawrenceville", county:"Gwinnett", address:"2351 Sunny Hill Rd, Lawrenceville, GA 30043", stadium:"Mountain View", cls:"6A", coach:"To be listed", lat:34.066, lng:-83.981 },
+      { name:"Grayson High School", city:"Loganville", county:"Gwinnett", address:"50 Hope Hollow Rd, Loganville, GA 30052", stadium:"Grayson Stadium", cls:"6A", coach:"To be listed", lat:33.874, lng:-83.961 },
+      { name:"Mill Creek High School", city:"Hoschton", county:"Gwinnett", address:"4400 Braselton Hwy, Hoschton, GA 30548", stadium:"Mill Creek", cls:"6A", coach:"To be listed", lat:34.114, lng:-83.850 },
+      { name:"Collins Hill High School", city:"Suwanee", county:"Gwinnett", address:"50 Taylor Rd, Suwanee, GA 30024", stadium:"Collins Hill", cls:"6A", coach:"To be listed", lat:34.051, lng:-84.026 },
+      { name:"Brookwood High School", city:"Snellville", county:"Gwinnett", address:"1255 Dogwood Rd, Snellville, GA 30078", stadium:"Brookwood", cls:"6A", coach:"To be listed", lat:33.877, lng:-84.067 },
+      { name:"North Gwinnett High School", city:"Suwanee", county:"Gwinnett", address:"20 Level Creek Rd, Suwanee, GA 30024", stadium:"North Gwinnett", cls:"6A", coach:"To be listed", lat:34.061, lng:-84.071 },
+      { name:"Peachtree Ridge High School", city:"Suwanee", county:"Gwinnett", address:"1555 Old Peachtree Rd NW, Suwanee, GA 30024", stadium:"Peachtree Ridge", cls:"6A", coach:"To be listed", lat:34.038, lng:-84.101 },
+      { name:"Dacula High School", city:"Dacula", county:"Gwinnett", address:"123 Broad St, Dacula, GA 30019", stadium:"Dacula", cls:"6A", coach:"To be listed", lat:33.988, lng:-83.898 },
+      { name:"Archer High School", city:"Lawrenceville", county:"Gwinnett", address:"2255 New Hope Rd, Lawrenceville, GA 30045", stadium:"Archer", cls:"6A", coach:"To be listed", lat:33.909, lng:-83.950 },
+      { name:"Buford High School", city:"Buford", county:"Gwinnett", address:"2750 Sawnee Ave, Buford, GA 30518", stadium:"Buford", cls:"6A", coach:"To be listed", lat:34.121, lng:-83.999 },
+      { name:"Norcross High School", city:"Norcross", county:"Gwinnett", address:"5300 Spalding Dr, Norcross, GA 30092", stadium:"Norcross", cls:"6A", coach:"To be listed", lat:33.941, lng:-84.213 },
+      { name:"Parkview High School", city:"Lilburn", county:"Gwinnett", address:"998 Cole Dr, Lilburn, GA 30047", stadium:"Parkview", cls:"6A", coach:"To be listed", lat:33.888, lng:-84.114 },
+      { name:"Central Gwinnett High School", city:"Lawrenceville", county:"Gwinnett", address:"564 W Crogan St, Lawrenceville, GA 30046", stadium:"Central Gwinnett", cls:"6A", coach:"To be listed", lat:33.956, lng:-83.988 },
+      { name:"Discovery High School", city:"Lawrenceville", county:"Gwinnett", address:"1335 Old Norcross Rd, Lawrenceville, GA 30046", stadium:"Discovery", cls:"6A", coach:"To be listed", lat:33.929, lng:-84.027 },
+      { name:"South Gwinnett High School", city:"Snellville", county:"Gwinnett", address:"2288 E Main St, Snellville, GA 30078", stadium:"South Gwinnett", cls:"6A", coach:"To be listed", lat:33.858, lng:-84.019 },
+      { name:"Lambert High School", city:"Suwanee", county:"Forsyth", address:"805 Nichols Rd, Suwanee, GA 30024", stadium:"Lambert", cls:"6A", coach:"To be listed", lat:34.101, lng:-84.139 },
+      { name:"South Forsyth High School", city:"Cumming", county:"Forsyth", address:"585 Peachtree Pkwy, Cumming, GA 30041", stadium:"South Forsyth", cls:"6A", coach:"To be listed", lat:34.148, lng:-84.146 },
+      { name:"West Forsyth High School", city:"Cumming", county:"Forsyth", address:"4155 Drew Rd, Cumming, GA 30040", stadium:"West Forsyth", cls:"6A", coach:"To be listed", lat:34.207, lng:-84.224 },
+      { name:"North Forsyth High School", city:"Cumming", county:"Forsyth", address:"3635 Coal Mountain Dr, Cumming, GA 30028", stadium:"North Forsyth", cls:"6A", coach:"To be listed", lat:34.287, lng:-84.132 },
+      { name:"Milton High School", city:"Milton", county:"Fulton", address:"13025 Birmingham Hwy, Milton, GA 30004", stadium:"Milton", cls:"5A", coach:"To be listed", lat:34.132, lng:-84.316 },
+      { name:"Roswell High School", city:"Roswell", county:"Fulton", address:"11595 King Rd, Roswell, GA 30075", stadium:"Roswell", cls:"5A", coach:"To be listed", lat:34.025, lng:-84.339 },
+      { name:"Alpharetta High School", city:"Alpharetta", county:"Fulton", address:"3595 Webb Bridge Rd, Alpharetta, GA 30005", stadium:"Alpharetta", cls:"6A", coach:"To be listed", lat:34.070, lng:-84.280 },
+      { name:"Walton High School", city:"Marietta", county:"Cobb", address:"1590 Bill Murdock Rd, Marietta, GA 30062", stadium:"Walton", cls:"6A", coach:"To be listed", lat:34.014, lng:-84.463 },
+      { name:"Wheeler High School", city:"Marietta", county:"Cobb", address:"375 Holt Rd, Marietta, GA 30068", stadium:"Wheeler", cls:"6A", coach:"To be listed", lat:33.984, lng:-84.478 },
+      { name:"Marietta High School", city:"Marietta", county:"Cobb", address:"1171 Whitlock Ave SW, Marietta, GA 30064", stadium:"Marietta", cls:"6A", coach:"To be listed", lat:33.953, lng:-84.546 },
+      { name:"Hillgrove High School", city:"Powder Springs", county:"Cobb", address:"4165 Luther Ward Rd, Powder Springs, GA 30127", stadium:"Hillgrove", cls:"6A", coach:"To be listed", lat:33.909, lng:-84.703 },
+      { name:"McEachern High School", city:"Powder Springs", county:"Cobb", address:"2400 New Macland Rd, Powder Springs, GA 30127", stadium:"McEachern", cls:"6A", coach:"To be listed", lat:33.865, lng:-84.687 },
+      { name:"Harrison High School", city:"Kennesaw", county:"Cobb", address:"4500 Due West Rd NW, Kennesaw, GA 30152", stadium:"Harrison", cls:"6A", coach:"To be listed", lat:34.019, lng:-84.727 },
+      { name:"North Cobb High School", city:"Kennesaw", county:"Cobb", address:"3400 Old 41 Hwy NW, Kennesaw, GA 30144", stadium:"North Cobb", cls:"6A", coach:"To be listed", lat:34.037, lng:-84.637 },
+      { name:"Cherokee High School", city:"Canton", county:"Cherokee", address:"930 Marietta Hwy, Canton, GA 30114", stadium:"Cherokee", cls:"6A", coach:"To be listed", lat:34.239, lng:-84.490 },
+      { name:"Etowah High School", city:"Woodstock", county:"Cherokee", address:"6565 Putnam Ford Dr, Woodstock, GA 30189", stadium:"Etowah", cls:"6A", coach:"To be listed", lat:34.126, lng:-84.523 },
+      { name:"Valdosta High School", city:"Valdosta", county:"Lowndes", address:"4590 Inner Perimeter Rd, Valdosta, GA 31602", stadium:"Bazemore-Hyder Stadium", cls:"7A", coach:"To be listed", lat:30.833, lng:-83.278 },
+      { name:"Lowndes High School", city:"Valdosta", county:"Lowndes", address:"1606 Norman Dr, Valdosta, GA 31601", stadium:"Martin Stadium", cls:"7A", coach:"To be listed", lat:30.848, lng:-83.287 },
+      { name:"Colquitt County High School", city:"Moultrie", county:"Colquitt", address:"105 Darbyshire Rd, Moultrie, GA 31788", stadium:"Mack Tharpe Stadium", cls:"7A", coach:"To be listed", lat:31.180, lng:-83.789 },
+      { name:"Camden County High School", city:"Kingsland", county:"Camden", address:"6300 Laurel Island Pkwy, Kingsland, GA 31548", stadium:"Chris Gilman Stadium", cls:"7A", coach:"To be listed", lat:30.800, lng:-81.670 },
+      { name:"Richmond Hill High School", city:"Richmond Hill", county:"Bryan", address:"1 Wildcat Dr, Richmond Hill, GA 31324", stadium:"Richmond Hill Stadium", cls:"7A", coach:"To be listed", lat:31.938, lng:-81.304 },
+      { name:"Tift County High School", city:"Tifton", county:"Tift", address:"1 Blue Devil Way, Tifton, GA 31794", stadium:"Tift County", cls:"6A", coach:"To be listed", lat:31.450, lng:-83.508 },
+      { name:"Coffee High School", city:"Douglas", county:"Coffee", address:"159 Trojan Way, Douglas, GA 31533", stadium:"Coffee", cls:"6A", coach:"To be listed", lat:31.509, lng:-82.850 },
+      { name:"Lee County High School", city:"Leesburg", county:"Lee", address:"1 Trojan Way, Leesburg, GA 31763", stadium:"Lee County", cls:"6A", coach:"To be listed", lat:31.733, lng:-84.171 },
+      { name:"Thomas County Central High School", city:"Thomasville", county:"Thomas", address:"4686 US-84, Thomasville, GA 31792", stadium:"TCC", cls:"6A", coach:"To be listed", lat:30.869, lng:-83.978 },
+      { name:"Brunswick High School", city:"Brunswick", county:"Glynn", address:"3885 Altama Ave, Brunswick, GA 31520", stadium:"Glynn County Stadium", cls:"6A", coach:"To be listed", lat:31.150, lng:-81.491 },
+      { name:"Glynn Academy", city:"Brunswick", county:"Glynn", address:"1001 Mansfield St, Brunswick, GA 31520", stadium:"Glynn County Stadium", cls:"6A", coach:"To be listed", lat:31.151, lng:-81.491 },
+      { name:"Statesboro High School", city:"Statesboro", county:"Bulloch", address:"10 Lester Rd, Statesboro, GA 30458", stadium:"Statesboro", cls:"5A", coach:"To be listed", lat:32.449, lng:-81.783 },
+      { name:"Ware County High School", city:"Waycross", county:"Ware", address:"700 Victory Dr, Waycross, GA 31503", stadium:"Ware County", cls:"5A", coach:"To be listed", lat:31.213, lng:-82.354 },
+      { name:"Benedictine Military School", city:"Savannah", county:"Chatham", address:"6502 Seawright Dr, Savannah, GA 31406", stadium:"Memorial Stadium", cls:"5A", coach:"To be listed", lat:32.029, lng:-81.080 },
+      { name:"Clarke Central High School", city:"Athens", county:"Clarke", address:"350 S Milledge Ave, Athens, GA 30605", stadium:"Clarke Central", cls:"5A", coach:"To be listed", lat:33.951, lng:-83.394 },
+      { name:"Cedar Shoals High School", city:"Athens", county:"Clarke", address:"1300 Cedar Shoals Dr, Athens, GA 30605", stadium:"Cedar Shoals", cls:"4A", coach:"To be listed", lat:33.939, lng:-83.337 },
+      { name:"North Oconee High School", city:"Bogart", county:"Oconee", address:"1081 Rocky Branch Rd, Bogart, GA 30622", stadium:"North Oconee", cls:"4A", coach:"To be listed", lat:33.905, lng:-83.522 },
+      { name:"Gainesville High School", city:"Gainesville", county:"Hall", address:"830 Century Pl, Gainesville, GA 30501", stadium:"Gainesville", cls:"5A", coach:"To be listed", lat:34.298, lng:-83.824 },
+      { name:"Carrollton High School", city:"Carrollton", county:"Carroll", address:"202 Trojan Dr, Carrollton, GA 30117", stadium:"Carrollton", cls:"6A", coach:"To be listed", lat:33.580, lng:-85.077 },
+      { name:"Rome High School", city:"Rome", county:"Floyd", address:"1000 Veterans Memorial Hwy, Rome, GA 30161", stadium:"Barron Stadium", cls:"5A", coach:"To be listed", lat:34.257, lng:-85.165 },
+      { name:"Dalton High School", city:"Dalton", county:"Whitfield", address:"1500 N Thornton Ave, Dalton, GA 30720", stadium:"Harmon Field", cls:"4A", coach:"To be listed", lat:34.779, lng:-84.985 },
+      { name:"Calhoun High School", city:"Calhoun", county:"Gordon", address:"335 S River St, Calhoun, GA 30701", stadium:"Calhoun", cls:"", coach:"To be listed", lat:34.503, lng:-84.951 },
+      { name:"Cartersville High School", city:"Cartersville", county:"Bartow", address:"320 E Church St, Cartersville, GA 30120", stadium:"Cartersville", cls:"4A", coach:"To be listed", lat:34.165, lng:-84.800 },
+      { name:"East Coweta High School", city:"Sharpsburg", county:"Coweta", address:"400 Hwy 154, Sharpsburg, GA 30277", stadium:"East Coweta", cls:"6A", coach:"To be listed", lat:33.397, lng:-84.677 },
+      { name:"Westlake High School", city:"Atlanta", county:"Fulton", address:"2400 Union Rd SW, Atlanta, GA 30331", stadium:"Westlake", cls:"6A", coach:"To be listed", lat:33.618, lng:-84.617 },
+      { name:"Campbell High School", city:"Smyrna", county:"Cobb", address:"3295 S Atlanta Rd SE, Smyrna, GA 30080", stadium:"Campbell", cls:"6A", coach:"To be listed", lat:33.861, lng:-84.517 },
+      { name:"North Atlanta High School", city:"Atlanta", county:"Fulton", address:"4111 Northside Pkwy NW, Atlanta, GA 30327", stadium:"North Atlanta", cls:"6A", coach:"To be listed", lat:33.810, lng:-84.393 },
+      { name:"Decatur High School", city:"Decatur", county:"DeKalb", address:"310 N McDonough St, Decatur, GA 30030", stadium:"Decatur", cls:"5A", coach:"To be listed", lat:33.775, lng:-84.295 },
+      { name:"Marist School", city:"Brookhaven", county:"DeKalb", address:"3790 Ashford Dunwoody Rd NE, Atlanta, GA 30319", stadium:"Marist", cls:"4A", coach:"To be listed", lat:33.874, lng:-84.341 },
+      { name:"Newton High School", city:"Covington", county:"Newton", address:"140 Ram Dr, Covington, GA 30014", stadium:"Sharp Stadium", cls:"6A", coach:"To be listed", lat:33.597, lng:-83.860 },
+      { name:"Houston County High School", city:"Warner Robins", county:"Houston", address:"920 Highway 96, Warner Robins, GA 31088", stadium:"Houston County", cls:"5A", coach:"To be listed", lat:32.607, lng:-83.694 },
+      { name:"Warner Robins High School", city:"Warner Robins", county:"Houston", address:"401 S Davis Dr, Warner Robins, GA 31088", stadium:"McConnell-Talbert", cls:"4A", coach:"To be listed", lat:32.595, lng:-83.624 },
+      { name:"Columbus High School", city:"Columbus", county:"Muscogee", address:"1700 Champion Dr, Columbus, GA 31906", stadium:"Memorial Stadium", cls:"", coach:"To be listed", lat:32.460, lng:-84.988 },
+      { name:"LaGrange High School", city:"LaGrange", county:"Troup", address:"516 N Greenwood St, LaGrange, GA 30240", stadium:"Callaway Stadium", cls:"3A", coach:"To be listed", lat:33.037, lng:-85.031 },
+      { name:"Griffin High School", city:"Griffin", county:"Spalding", address:"1617 W Poplar St, Griffin, GA 30224", stadium:"Memorial Stadium", cls:"4A", coach:"To be listed", lat:33.247, lng:-84.264 },
+      { name:"Sandy Creek High School", city:"Tyrone", county:"Fayette", address:"360 Jenkins Rd, Tyrone, GA 30290", stadium:"Sandy Creek", cls:"3A", coach:"To be listed", lat:33.472, lng:-84.591 },
+      { name:"Creekside High School", city:"Fairburn", county:"Fulton", address:"5445 Mitchell St, Fairburn, GA 30213", stadium:"Creekside", cls:"4A", coach:"To be listed", lat:33.567, lng:-84.581 }
     ];
 
-    const drawer = document.getElementById("drawer");
+    const panel = document.getElementById("panel");
+    const cty = document.getElementById("cty");
+    [...new Set(schools.map(s => s.county))].sort().forEach(c => {
+      cty.insertAdjacentHTML("beforeend", `<option>${c}</option>`);
+    });
+
     function showSchool(s) {
-      drawer.innerHTML = `
-        <div class="kicker">${s.cls ? "Class " + s.cls : "GHSA football"}</div>
-        <h1>${s.name}</h1>
-        <p class="meta">${s.address}</p>
-        <p class="meta">${s.city}, Georgia</p>
-        <p class="hint">Click another pin for that school's name and address.</p>
+      panel.innerHTML = `
+        <div class="top">
+          <div class="photo">SCHOOL<br>PHOTO</div>
+          <div>
+            <h2>${s.name}</h2>
+            ${s.cls ? `<div class="badge">Class ${s.cls}</div>` : ""}
+            <div class="loc">${s.city}, GA • ${s.county} County</div>
+          </div>
+        </div>
+        <div class="block">Head Coach<b>${s.coach}</b></div>
+        <div class="block">Stadium / Address<b>${s.stadium}</b>${s.address}</div>
+        <div class="recruits">
+          <h3>RECRUITS</h3>
+          <p class="empty">Recruits will appear here later. This panel is school identity only for now.</p>
+        </div>
       `;
     }
 
-    const map = L.map("map").setView([32.7, -83.5], 7);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-      attribution: "&copy; OpenStreetMap &copy; CARTO"
-    }).addTo(map);
+    const map = L.map("map", { zoomControl: false, attributionControl: false }).setView([32.65, -83.45], 7);
+    L.control.zoom({ position: "bottomleft" }).addTo(map);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { opacity: 0.55 }).addTo(map);
 
     fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
-      .then((r) => r.json())
-      .then((geo) => {
+      .then(r => r.json())
+      .then(geo => {
         L.geoJSON(geo, {
           interactive: false,
-          style: { color:"#c9a227", weight:3, fillColor:"#c9a227", fillOpacity:0.07 }
+          style: { color: "#d4af37", weight: 1.6, fillColor: "#0b1a10", fillOpacity: 0.55 }
         }).addTo(map);
       });
 
-    [
-      { name:"Atlanta", lat:33.75, lng:-84.39 },
-      { name:"Athens", lat:33.95, lng:-83.38 },
-      { name:"Augusta", lat:33.47, lng:-82.01 },
-      { name:"Macon", lat:32.84, lng:-83.63 },
-      { name:"Columbus", lat:32.46, lng:-84.99 },
-      { name:"Savannah", lat:32.08, lng:-81.09 },
-      { name:"Valdosta", lat:30.83, lng:-83.28 },
-      { name:"Albany", lat:31.58, lng:-84.16 },
-      { name:"Rome", lat:34.26, lng:-85.16 },
-      { name:"ALABAMA", lat:32.7, lng:-86.4, state:true },
-      { name:"FLORIDA", lat:30.5, lng:-83.8, state:true },
-      { name:"TENNESSEE", lat:35.15, lng:-84.5, state:true },
-      { name:"N. CAROLINA", lat:35.1, lng:-83.2, state:true },
-      { name:"S. CAROLINA", lat:33.4, lng:-81.4, state:true }
-    ].forEach((c) => {
-      L.marker([c.lat, c.lng], {
-        interactive: false,
-        keyboard: false,
-        icon: L.divIcon({
-          className: "map-label",
-          html: `<div class="${c.state ? "state-lab" : "city-lab"}">${c.name}</div>`,
-          iconSize: [0, 0]
-        })
-      }).addTo(map);
+    const clusters = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 48
     });
 
-    schools.forEach((s) => {
-      L.circleMarker([s.lat, s.lng], {
-        radius: 7,
-        color: "#1f3d28",
-        fillColor: "#2f5d3a",
-        fillOpacity: 0.95
-      }).addTo(map).bindTooltip(s.name).on("click", () => showSchool(s));
-    });
+    const markers = [];
+    function pinFor(s) {
+      const m = L.circleMarker([s.lat, s.lng], {
+        radius: 6, color: "#d4af37", fillColor: "#f0d56a", fillOpacity: 0.95, weight: 1
+      });
+      m.school = s;
+      m.bindTooltip(s.name);
+      m.on("click", () => showSchool(s));
+      return m;
+    }
 
-    showSchool(schools[0]);
+    function render(list) {
+      clusters.clearLayers();
+      markers.length = 0;
+      list.forEach(s => {
+        const m = pinFor(s);
+        markers.push(m);
+        clusters.addLayer(m);
+      });
+    }
+
+    map.addLayer(clusters);
+    render(schools);
+    showSchool(schools.find(s => s.name.startsWith("Grayson")) || schools[0]);
+
+    function applyFilters() {
+      const q = document.getElementById("q").value.toLowerCase();
+      const cl = document.getElementById("cls").value;
+      const co = document.getElementById("cty").value;
+      render(schools.filter(s =>
+        (!q || s.name.toLowerCase().includes(q) || s.city.toLowerCase().includes(q)) &&
+        (!cl || s.cls === cl) &&
+        (!co || s.county === co)
+      ));
+    }
+    ["q","cls","cty"].forEach(id => document.getElementById(id).addEventListener("input", applyFilters));
+    document.getElementById("cls").addEventListener("change", applyFilters);
+    document.getElementById("cty").addEventListener("change", applyFilters);
   </script>
 </body>
 </html>
