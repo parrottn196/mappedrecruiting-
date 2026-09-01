@@ -11,19 +11,23 @@
 :root{--bg:#070907;--panel:#0c110c;--line:#d4af37;--text:#f3ead1;--muted:#9a9178}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:Georgia,serif;background:var(--bg);color:var(--text)}
-header{height:68px;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:0 1.1rem;border-bottom:1px solid rgba(212,175,55,.25)}
+header{min-height:68px;display:grid;grid-template-columns:auto 1fr auto;gap:.75rem;align-items:center;padding:.55rem 1.1rem;border-bottom:1px solid rgba(212,175,55,.25)}
 .logo{display:flex;align-items:center;gap:.65rem}
 .ga{width:36px;height:36px;border:1.5px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--line);font-size:.72rem}
 .logo h1{font-size:.78rem;letter-spacing:.16em;color:var(--line)}
 .logo p{font-size:.62rem;letter-spacing:.08em;color:var(--muted)}
 .search-wrap{position:relative}
-.search-wrap:before{content:"⌕";position:absolute;left:.7rem;top:.4rem;color:var(--line)}
+.search-wrap:before{content:"⌕";position:absolute;left:.7rem;top:.45rem;color:var(--line)}
 .search{width:100%;max-width:420px;background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.5rem .7rem .5rem 2rem;font:inherit}
-select{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.48rem .55rem;font:inherit}
-.filters{display:flex;gap:.5rem;align-items:center}
+select,input[type=number]{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.42rem .5rem;font:inherit;min-width:0}
+.filters{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;justify-content:flex-end}
+.filters label{font-size:.58rem;letter-spacing:.12em;color:var(--muted);display:flex;flex-direction:column;gap:.15rem}
 main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
 #map{height:100%;background:#0a0d0a}
 .drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%)}
+.tabs{display:flex;gap:.4rem;margin-bottom:.85rem}
+.tab{flex:1;text-align:center;border:1px solid rgba(212,175,55,.35);padding:.4rem;font-size:.62rem;letter-spacing:.16em;color:var(--muted);cursor:pointer;background:#101510}
+.tab.on{color:var(--line);border-color:var(--line)}
 .card{position:relative;border:1px solid var(--line);padding:1.15rem 1.05rem 1rem;background:linear-gradient(180deg,rgba(212,175,55,.06),transparent 28%),#0d130d}
 .card:before,.card:after,.card-inner:before,.card-inner:after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--line)}
 .card:before{top:6px;left:6px;border-right:0;border-bottom:0}
@@ -38,11 +42,16 @@ main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
 .row{display:grid;grid-template-columns:18px 1fr;gap:.55rem;align-items:start;margin:.38rem 0;font-size:.84rem;color:#efe6c8}
 .row svg{width:16px;height:16px;margin-top:2px;stroke:var(--line);fill:none;stroke-width:1.6}
 .addr-row{display:flex;justify-content:space-between;gap:.6rem;align-items:flex-end}
-.dir{color:var(--line);text-decoration:none;font-size:.72rem;white-space:nowrap}
+.dir,.link{color:var(--line);text-decoration:none;font-size:.72rem}
 .rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:1rem 0 .8rem}
-.recruits{text-align:center;letter-spacing:.32em;font-size:.62rem;color:var(--line)}
-.slot{border-bottom:1px dashed rgba(212,175,55,.28);padding:.42rem 0;color:var(--muted);font-size:.8rem}
+.recruits{text-align:center;letter-spacing:.32em;font-size:.62rem;color:var(--line);margin-bottom:.35rem}
+.slot,.player{border-bottom:1px dashed rgba(212,175,55,.28);padding:.6rem 0;color:var(--text);font-size:.82rem}
+.player{cursor:pointer}
+.player:hover{color:var(--line)}
+.meta{color:var(--muted);font-size:.72rem;margin-top:.2rem;line-height:1.45}
 .empty{color:var(--muted);padding:1rem .2rem}
+.count{font-size:.62rem;letter-spacing:.14em;color:var(--muted);margin-bottom:.6rem}
+.links{display:flex;gap:.75rem;margin-top:.35rem}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .marker-cluster-small{background-color:rgba(240,213,106,.28)}
 .marker-cluster-small div{background-color:rgba(240,213,106,.85);color:#1a1608}
@@ -52,19 +61,33 @@ main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
 .marker-cluster-large div{background-color:rgba(139,105,20,.95);color:#f3ead1}
 .marker-cluster{border:1px solid rgba(212,175,55,.55)}
 .marker-cluster div{font-family:Georgia,serif;font-weight:700}
-@media(max-width:900px){main{grid-template-columns:1fr}.drawer{height:46%}#map{height:54%}header{grid-template-columns:1fr;height:auto;padding:.7rem}}
+@media(max-width:900px){main{grid-template-columns:1fr}.drawer{height:50%}#map{height:50%}header{grid-template-columns:1fr;height:auto}}
 </style>
 </head>
 <body>
 <header>
   <div class="logo"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></div>
-  <div class="search-wrap"><input id="q" class="search" placeholder="Search school or city"/></div>
+  <div class="search-wrap"><input id="q" class="search" placeholder="Search school, city, or player"/></div>
   <div class="filters">
-    <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
-    <select id="cty"><option value="">All counties</option></select>
+    <label>Class<select id="cls"><option value="">All</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select></label>
+    <label>County<select id="cty"><option value="">All</option></select></label>
+    <label>Pos<select id="pos"><option value="">All</option></select></label>
+    <label>Year<select id="yr"><option value="">All</option><option>2026</option><option>2027</option><option>2028</option></select></label>
+    <label>Min Ht (in)<input id="minHt" type="number" min="60" max="84" placeholder="70"></label>
+    <label>Max Wt<input id="maxWt" type="number" min="140" max="400" placeholder="250"></label>
+    <label>Min GPA<input id="minGpa" type="number" min="0" max="5" step="0.1" placeholder="3.0"></label>
   </div>
 </header>
-<main><div id="map"></div><aside class="drawer" id="drawer"></aside></main>
+<main>
+  <div id="map"></div>
+  <aside class="drawer">
+    <div class="tabs">
+      <div class="tab on" id="tabSchool" onclick="setTab('school')">SCHOOL</div>
+      <div class="tab" id="tabPlayers" onclick="setTab('players')">PLAYERS</div>
+    </div>
+    <div id="drawer"></div>
+  </aside>
+</main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
@@ -489,15 +512,82 @@ S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton,
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
 ];
 
+const players=[
+  {name:"Cedric Bridges", school:"Johnson County High School", pos:"LB", htIn:71, wt:210, gpa:3.7, year:"2028", jersey:56, x:"CedricBridges58", hudl:"https://www.hudl.com/video/3/22737408/68cbdc453176d35663e3546d", notes:"Sophomore film also shows DL/OL. School: (478) 578-0402"}
+];
+
+const POS=["QB","RB","WR","TE","OT","OG","OC","DE","DT","LB","CB","S","ATH","K","P","LS"];
+const posEl=document.getElementById("pos");
+POS.forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;posEl.appendChild(o);});
 const counties=[...new Set(schools.map(s=>s.county))].sort();
 const ctyEl=document.getElementById("cty");
 counties.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;ctyEl.appendChild(o);});
+
+function schoolByName(n){return schools.find(s=>s.name.toLowerCase()===n.toLowerCase());}
+function playersAt(schoolName){return players.filter(p=>p.school===schoolName);}
+function fmtHt(inches){if(!inches) return "—"; return Math.floor(inches/12)+ "'"+(inches%12)+'"';}
+function playerMatch(p){
+  const q=document.getElementById("q").value.toLowerCase();
+  const pos=document.getElementById("pos").value;
+  const yr=document.getElementById("yr").value;
+  const minHt=parseFloat(document.getElementById("minHt").value);
+  const maxWt=parseFloat(document.getElementById("maxWt").value);
+  const minGpa=parseFloat(document.getElementById("minGpa").value);
+  const sch=schoolByName(p.school);
+  const hay=(p.name+" "+p.school+" "+(sch?sch.city+" "+sch.county:"")).toLowerCase();
+  if(q && !hay.includes(q)) return false;
+  if(pos && p.pos!==pos) return false;
+  if(yr && p.year!==yr) return false;
+  if(!isNaN(minHt) && (p.htIn||0)<minHt) return false;
+  if(!isNaN(maxWt) && (p.wt||999)>maxWt) return false;
+  if(!isNaN(minGpa) && (p.gpa||0)<minGpa) return false;
+  return true;
+}
+function schoolHasMatch(s){
+  const q=document.getElementById("q").value.toLowerCase();
+  const cl=document.getElementById("cls").value;
+  const co=document.getElementById("cty").value;
+  const playerFilters=document.getElementById("pos").value||document.getElementById("yr").value||document.getElementById("minHt").value||document.getElementById("maxWt").value||document.getElementById("minGpa").value;
+  const textOk=!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q)||playersAt(s.name).some(p=>p.name.toLowerCase().includes(q));
+  if(!textOk) return false;
+  if(cl && s.cls!==cl) return false;
+  if(co && s.county!==co) return false;
+  if(playerFilters && !playersAt(s.name).some(playerMatch)) return false;
+  return true;
+}
+
+let tab="school", lastSchool=null;
+function setTab(t){
+  tab=t;
+  document.getElementById("tabSchool").classList.toggle("on",t==="school");
+  document.getElementById("tabPlayers").classList.toggle("on",t==="players");
+  if(t==="players") renderPlayerList();
+  else if(lastSchool) showSchool(lastSchool);
+}
+function playerLine(p){
+  const x=p.x?`<a class="link" href="https://x.com/${p.x.replace("@","")}" target="_blank" rel="noopener">X</a>`:"";
+  const h=p.hudl?`<a class="link" href="${p.hudl}" target="_blank" rel="noopener">Hudl</a>`:"";
+  return `<div class="player" onclick="openPlayer('${p.name.replace(/'/g,"\\'")}')">
+    <strong>${p.jersey?"#"+p.jersey+" ":""}${p.name}</strong> · ${p.pos} · ${p.year||""}
+    <div class="meta">${fmtHt(p.htIn)} · ${p.wt||"—"} lbs · GPA ${p.gpa??"—"} · ${p.school}${p.notes?"<br>"+p.notes:""}</div>
+    <div class="links">${x}${h}</div>
+  </div>`;
+}
+function renderPlayerList(){
+  const list=players.filter(playerMatch);
+  document.getElementById("drawer").innerHTML=`<div class="count">${list.length} PLAYER${list.length===1?"":"S"}</div>${list.length?list.map(playerLine).join(""):'<p class="empty">No players match those filters.</p>'}`;
+}
 function mono(name){
   const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));
   return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();
 }
 function mapsUrl(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function showSchool(s){
+  lastSchool=s; tab="school";
+  document.getElementById("tabSchool").classList.add("on");
+  document.getElementById("tabPlayers").classList.remove("on");
+  const recs=playersAt(s.name);
+  const shown=recs.length?recs.map(playerLine).join(""):`<div class="slot">◆ To be listed</div><div class="slot">◆ To be listed</div><div class="slot">◆ To be listed</div>`;
   document.getElementById("drawer").innerHTML=`<article class="card"><div class="card-inner">
     <div class="top"><div class="mono">${mono(s.name)}</div><div class="badge">${s.cls}</div></div>
     <div class="kicker">GHSA 2026–28 · CLASS ${s.cls}</div>
@@ -506,16 +596,23 @@ function showSchool(s){
     <div class="row">${ICO.stadium}<div>${s.stadium}</div></div>
     <div class="row">${ICO.pin}<div class="addr-row"><div>${s.address}<div style="color:var(--muted);font-size:.75rem;margin-top:.15rem;">${s.city} · ${s.county} County</div></div><a class="dir" href="${mapsUrl(s)}" target="_blank" rel="noopener">Directions ›</a></div></div>
     <div class="rule"></div><div class="recruits">◆ &nbsp; R E C R U I T S &nbsp; ◆</div>
-    <div class="slot">◆ To be listed</div><div class="slot">◆ To be listed</div><div class="slot">◆ To be listed</div>
+    ${shown}
   </div></article>`;
 }
+function openPlayer(name){
+  const p=players.find(x=>x.name===name);
+  const s=schoolByName(p.school);
+  if(s){showSchool(s); map.setView([s.lat,s.lng],11);}
+}
+
 const map=L.map("map").setView([32.9,-83.5],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
 fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json").then(r=>r.json()).then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map));
 const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48});
 function pinFor(s){
-  const m=L.circleMarker([s.lat,s.lng],{radius:6,color:"#d4af37",fillColor:"#f0d56a",fillOpacity:0.95,weight:1});
-  m.bindTooltip(s.name+" · "+s.cls);
+  const n=playersAt(s.name).length;
+  const m=L.circleMarker([s.lat,s.lng],{radius:n?8:6,color:"#d4af37",fillColor:n?"#f0d56a":"#c4b06a",fillOpacity:0.95,weight:1});
+  m.bindTooltip(s.name+" · "+s.cls+(n?` · ${n} recruit${n>1?"s":""}`:""));
   m.on("click",()=>{showSchool(s);map.setView([s.lat,s.lng],Math.max(map.getZoom(),10));});
   return m;
 }
@@ -523,19 +620,21 @@ function render(list){
   clusters.clearLayers();
   list.forEach(s=>clusters.addLayer(pinFor(s)));
   if(!list.length) document.getElementById("drawer").innerHTML='<p class="empty">No schools match those filters.</p>';
+  if(tab==="players") renderPlayerList();
 }
 map.addLayer(clusters);
-render(schools);
-showSchool(schools.find(s=>s.name.startsWith("Mountain View"))||schools[0]);
 function applyFilters(){
-  const q=document.getElementById("q").value.toLowerCase();
-  const cl=document.getElementById("cls").value;
-  const co=document.getElementById("cty").value;
-  render(schools.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q))&&(!cl||s.cls===cl)&&(!co||s.county===co)));
+  render(schools.filter(schoolHasMatch));
+  if(tab==="players") renderPlayerList();
 }
-document.getElementById("q").addEventListener("input",applyFilters);
-document.getElementById("cls").addEventListener("change",applyFilters);
-document.getElementById("cty").addEventListener("change",applyFilters);
+["q","cls","cty","pos","yr","minHt","maxWt","minGpa"].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener(id==="q"||el.type==="number"?"input":"change",applyFilters);
+});
+render(schools);
+const jc=schools.find(s=>s.name==="Johnson County High School");
+showSchool(jc);
+map.setView([jc.lat,jc.lng],10);
 </script>
 </body>
 </html>
