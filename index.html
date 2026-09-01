@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <style>
-    :root { --bg:#070907; --panel:#0c110c; --line:#d4af37; --text:#f3ead1; --muted:#9a9178; --fill:#1a221a; }
+    :root { --bg:#070907; --panel:#0c110c; --line:#d4af37; --text:#f3ead1; --muted:#9a9178; }
     * { box-sizing:border-box; margin:0; padding:0; }
     html, body { height:100%; overflow:hidden; font-family:Georgia, serif; background:var(--bg); color:var(--text); }
     header { height:68px; display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center; padding:0 1.1rem; border-bottom:1px solid rgba(212,175,55,.25); }
@@ -25,10 +25,9 @@
     #map { height:100%; background:#0a0d0a; }
     .drawer { border-left:1px solid rgba(212,175,55,.22); overflow:auto; padding:1rem; background:radial-gradient(circle at 20% 0%, #162016, var(--panel) 55%); }
     .card { position:relative; border:1px solid var(--line); padding:1.15rem 1.05rem 1rem; background:linear-gradient(180deg, rgba(212,175,55,.06), transparent 28%), #0d130d; }
-    .card:before, .card:after { content:""; position:absolute; width:14px; height:14px; border:1px solid var(--line); }
+    .card:before, .card:after, .card-inner:before, .card-inner:after { content:""; position:absolute; width:14px; height:14px; border:1px solid var(--line); }
     .card:before { top:6px; left:6px; border-right:0; border-bottom:0; }
     .card:after { top:6px; right:6px; border-left:0; border-bottom:0; }
-    .card-inner:before, .card-inner:after { content:""; position:absolute; width:14px; height:14px; border:1px solid var(--line); }
     .card-inner:before { bottom:6px; left:6px; border-right:0; border-top:0; }
     .card-inner:after { bottom:6px; right:6px; border-left:0; border-top:0; }
     .top { display:flex; justify-content:space-between; align-items:flex-start; gap:.7rem; }
@@ -45,8 +44,8 @@
     .slots { margin-top:.7rem; }
     .slot { border-bottom:1px dashed rgba(212,175,55,.28); padding:.42rem 0; color:var(--muted); font-size:.8rem; display:flex; gap:.45rem; }
     .slot span { color:var(--line); }
+    .empty { color:var(--muted); font-size:.85rem; padding:1rem .2rem; }
     .leaflet-tooltip { background:#0d130d; color:#f3ead1; border:1px solid #d4af37; }
-
     .marker-cluster-small { background-color: rgba(240,213,106,.28); }
     .marker-cluster-small div { background-color: rgba(240,213,106,.85); color:#1a1608; }
     .marker-cluster-medium { background-color: rgba(212,175,55,.32); }
@@ -55,8 +54,12 @@
     .marker-cluster-large div { background-color: rgba(139,105,20,.95); color:#f3ead1; }
     .marker-cluster { border:1px solid rgba(212,175,55,.55); }
     .marker-cluster div { font-family:Georgia,serif; font-weight:700; }
-
-    @media (max-width:900px) { main { grid-template-columns:1fr; } .drawer { height:46%; } #map { height:54%; } header { grid-template-columns:1fr; height:auto; padding:.7rem; } }
+    @media (max-width:900px) {
+      main { grid-template-columns:1fr; }
+      .drawer { height:46%; }
+      #map { height:54%; }
+      header { grid-template-columns:1fr; height:auto; padding:.7rem; }
+    }
   </style>
 </head>
 <body>
@@ -72,7 +75,11 @@
       <input id="q" class="search" placeholder="Search school or city" />
     </div>
     <div class="filters">
-      <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option></select>
+      <select id="cls">
+        <option value="">All classes</option>
+        <option>7A</option><option>6A</option><option>5A</option>
+        <option>4A</option><option>3A</option><option>2A</option><option>A</option>
+      </select>
       <select id="cty"><option value="">All counties</option></select>
     </div>
   </header>
@@ -133,6 +140,8 @@
       {name:"North Paulding High School",city:"Dallas",county:"Paulding",address:"300 North Paulding Dr, Dallas, GA 30132",stadium:"North Paulding Stadium",cls:"7A",coach:"To be listed",lat:34.014,lng:-84.813},
       {name:"Pebblebrook High School",city:"Mableton",county:"Cobb",address:"991 Old Alabama Rd SW, Mableton, GA 30126",stadium:"Pebblebrook Stadium",cls:"7A",coach:"Rodney Hackney",lat:33.819,lng:-84.582},
       {name:"Walton High School",city:"Marietta",county:"Cobb",address:"1590 Bill Murdock Rd, Marietta, GA 30062",stadium:"Walton Stadium",cls:"7A",coach:"To be listed",lat:34.012,lng:-84.442},
+      {name:"Northgate High School",city:"Newnan",county:"Coweta",address:"3220 Fischer Rd, Newnan, GA 30265",stadium:"Northgate Stadium",cls:"7A",coach:"Casey Smith",lat:33.407,lng:-84.698},
+      {name:"Kennesaw Mountain High School",city:"Kennesaw",county:"Cobb",address:"1898 Kennesaw Due West Rd NW, Kennesaw, GA 30152",stadium:"Kennesaw Mountain Stadium",cls:"7A",coach:"To be listed",lat:33.999,lng:-84.617},
 
       {name:"Mountain View High School",city:"Lawrenceville",county:"Gwinnett",address:"2351 Sunny Hill Rd, Lawrenceville, GA 30043",stadium:"Mountain View Stadium",cls:"6A",coach:"Todd Welborn",lat:34.066,lng:-83.981},
       {name:"Heritage High School",city:"Conyers",county:"Rockdale",address:"2400 Granade Rd SW, Conyers, GA 30094",stadium:"Heritage Stadium",cls:"6A",coach:"Quincy Carter",lat:33.625,lng:-84.026},
@@ -185,8 +194,20 @@
       {name:"Lowndes High School",city:"Valdosta",county:"Lowndes",address:"1606 Norman Dr, Valdosta, GA 31601",stadium:"Lowndes Stadium",cls:"6A",coach:"Adam Carter",lat:30.848,lng:-83.302},
       {name:"Valdosta High School",city:"Valdosta",county:"Lowndes",address:"4590 Inner Perimeter Rd, Valdosta, GA 31601",stadium:"Bazemore-Hyder Stadium",cls:"6A",coach:"Shelton Felton",lat:30.833,lng:-83.280},
       {name:"Thomas County Central High School",city:"Thomasville",county:"Thomas",address:"4686 US Hwy 84, Thomasville, GA 31792",stadium:"Thomas County Central Stadium",cls:"6A",coach:"J. Rogers",lat:30.869,lng:-83.978},
-      {name:"Northgate High School",city:"Newnan",county:"Coweta",address:"3220 Fischer Rd, Newnan, GA 30265",stadium:"Northgate Stadium",cls:"6A",coach:"Casey Smith",lat:33.407,lng:-84.698},
       {name:"South Paulding High School",city:"Douglasville",county:"Paulding",address:"1655 S Paulding Dr, Douglasville, GA 30134",stadium:"South Paulding Stadium",cls:"6A",coach:"Jared Zito",lat:33.812,lng:-84.796},
+      {name:"Bradwell Institute",city:"Hinesville",county:"Liberty",address:"108 Red Devil Cir, Hinesville, GA 31313",stadium:"Bradwell Stadium",cls:"6A",coach:"John Adams",lat:31.847,lng:-81.596},
+      {name:"Brunswick High School",city:"Brunswick",county:"Glynn",address:"3885 Altama Ave, Brunswick, GA 31520",stadium:"Glynn County Stadium",cls:"6A",coach:"Byron Slack",lat:31.182,lng:-81.489},
+      {name:"Lakeside High School (Evans)",city:"Evans",county:"Columbia",address:"533 Blue Ridge Dr, Evans, GA 30809",stadium:"Lakeside Stadium",cls:"6A",coach:"To be listed",lat:33.534,lng:-82.140},
+      {name:"Chapel Hill High School",city:"Douglasville",county:"Douglas",address:"4899 Chapel Hill Rd, Douglasville, GA 30135",stadium:"Chapel Hill Stadium",cls:"6A",coach:"To be listed",lat:33.701,lng:-84.777},
+      {name:"Rome High School",city:"Rome",county:"Floyd",address:"1000 Veterans Memorial Hwy, Rome, GA 30161",stadium:"Barron Stadium",cls:"6A",coach:"Bill Stewart",lat:34.257,lng:-85.165},
+      {name:"Gainesville High School",city:"Gainesville",county:"Hall",address:"830 Century Pl, Gainesville, GA 30501",stadium:"Gainesville Stadium",cls:"6A",coach:"Santavious Bryant",lat:34.298,lng:-83.826},
+      {name:"Johns Creek High School",city:"Johns Creek",county:"Fulton",address:"5575 State Bridge Rd, Johns Creek, GA 30022",stadium:"Johns Creek Stadium",cls:"6A",coach:"Jason Tester",lat:34.029,lng:-84.200},
+      {name:"Milton High School",city:"Milton",county:"Fulton",address:"13025 Birmingham Hwy, Milton, GA 30004",stadium:"Milton Stadium",cls:"6A",coach:"Ben Reaves",lat:34.132,lng:-84.309},
+      {name:"Riverwood High School",city:"Sandy Springs",county:"Fulton",address:"5900 Raider Dr NW, Sandy Springs, GA 30328",stadium:"Riverwood Stadium",cls:"6A",coach:"Josh Coffey",lat:33.924,lng:-84.393},
+      {name:"Apalachee High School",city:"Winder",county:"Barrow",address:"940 Haymon Morris Rd, Winder, GA 30680",stadium:"Apalachee Stadium",cls:"6A",coach:"Chuck Kenyon",lat:33.973,lng:-83.720},
+      {name:"Midtown High School",city:"Atlanta",county:"Fulton",address:"929 Charles Allen Dr NE, Atlanta, GA 30309",stadium:"Grady Stadium",cls:"6A",coach:"To be listed",lat:33.781,lng:-84.373},
+      {name:"Northside High School (Columbus)",city:"Columbus",county:"Muscogee",address:"2002 E Victory Dr, Columbus, GA 31901",stadium:"A.J. McClung Memorial Stadium",cls:"6A",coach:"To be listed",lat:32.460,lng:-84.940},
+      {name:"Alcovy High School",city:"Covington",county:"Newton",address:"14567 Hwy 36, Covington, GA 30014",stadium:"Alcovy Stadium",cls:"6A",coach:"Diego Dixon",lat:33.527,lng:-83.832},
 
       {name:"Benedictine Military School",city:"Savannah",county:"Chatham",address:"6502 Seawright Dr, Savannah, GA 31406",stadium:"Memorial Stadium",cls:"5A",coach:"Danny Britt",lat:32.022,lng:-81.100},
       {name:"Blessed Trinity Catholic High School",city:"Roswell",county:"Fulton",address:"11320 Woodstock Rd, Roswell, GA 30075",stadium:"Blessed Trinity Stadium",cls:"5A",coach:"Ed Dudley",lat:34.058,lng:-84.380},
@@ -217,15 +238,9 @@
       {name:"East Forsyth High School",city:"Gainesville",county:"Forsyth",address:"2120 Settingdown Rd, Gainesville, GA 30506",stadium:"East Forsyth Stadium",cls:"5A",coach:"Dustin Canon",lat:34.290,lng:-83.980},
       {name:"Flowery Branch High School",city:"Flowery Branch",county:"Hall",address:"4450 Hog Mountain Rd, Flowery Branch, GA 30542",stadium:"Flowery Branch Stadium",cls:"5A",coach:"Michael Perry",lat:34.186,lng:-83.925},
       {name:"Johnson High School (Gainesville)",city:"Gainesville",county:"Hall",address:"3305 Poplar Springs Rd, Gainesville, GA 30507",stadium:"Johnson Stadium",cls:"5A",coach:"Donovan Odom",lat:34.263,lng:-83.774},
-      {name:"Alcovy High School",city:"Covington",county:"Newton",address:"14567 Hwy 36, Covington, GA 30014",stadium:"Alcovy Stadium",cls:"5A",coach:"Diego Dixon",lat:33.527,lng:-83.832},
-      {name:"Apalachee High School",city:"Winder",county:"Barrow",address:"940 Haymon Morris Rd, Winder, GA 30680",stadium:"Apalachee Stadium",cls:"5A",coach:"Chuck Kenyon",lat:33.973,lng:-83.720},
       {name:"Allatoona High School",city:"Acworth",county:"Cobb",address:"3300 Dallas Acworth Hwy, Acworth, GA 30101",stadium:"Allatoona Stadium",cls:"5A",coach:"Paul Carter",lat:34.066,lng:-84.704},
       {name:"Woodstock High School",city:"Woodstock",county:"Cherokee",address:"2010 Towne Lake Hills South Dr, Woodstock, GA 30189",stadium:"Woodstock Stadium",cls:"5A",coach:"Justin Pearce",lat:34.116,lng:-84.519},
-      {name:"Milton High School",city:"Milton",county:"Fulton",address:"13025 Birmingham Hwy, Milton, GA 30004",stadium:"Milton Stadium",cls:"5A",coach:"Ben Reaves",lat:34.132,lng:-84.309},
-      {name:"Riverwood High School",city:"Sandy Springs",county:"Fulton",address:"5900 Raider Dr NW, Sandy Springs, GA 30328",stadium:"Riverwood Stadium",cls:"5A",coach:"Josh Coffey",lat:33.924,lng:-84.393},
-      {name:"Brunswick High School",city:"Brunswick",county:"Glynn",address:"3885 Altama Ave, Brunswick, GA 31520",stadium:"Glynn County Stadium",cls:"5A",coach:"Byron Slack",lat:31.182,lng:-81.489},
       {name:"Groves High School",city:"Garden City",county:"Chatham",address:"100 Priscilla D Thomas Way, Garden City, GA 31408",stadium:"Groves Stadium",cls:"5A",coach:"Howard Jordan",lat:32.114,lng:-81.154},
-      {name:"Gainesville High School",city:"Gainesville",county:"Hall",address:"830 Century Pl, Gainesville, GA 30501",stadium:"Gainesville Stadium",cls:"5A",coach:"Santavious Bryant",lat:34.298,lng:-83.826},
       {name:"Jenkins High School",city:"Savannah",county:"Chatham",address:"1800 East DeRenne Ave, Savannah, GA 31406",stadium:"Memorial Stadium",cls:"5A",coach:"To be listed",lat:32.022,lng:-81.073},
       {name:"Richmond Academy",city:"Augusta",county:"Richmond",address:"910 Russell St, Augusta, GA 30904",stadium:"Richmond Academy Stadium",cls:"5A",coach:"K. Grissett",lat:33.470,lng:-82.000},
       {name:"Perry High School",city:"Perry",county:"Houston",address:"1307 North Ave, Perry, GA 31069",stadium:"Perry Stadium",cls:"5A",coach:"To be listed",lat:32.458,lng:-83.735},
@@ -242,16 +257,263 @@
       {name:"Cass High School",city:"White",county:"Bartow",address:"1000 Colonel Way, White, GA 30184",stadium:"Cass Stadium",cls:"5A",coach:"Steve Gates",lat:34.281,lng:-84.745},
       {name:"Jefferson High School",city:"Jefferson",county:"Jackson",address:"575 Washington St, Jefferson, GA 30549",stadium:"Jefferson Stadium",cls:"5A",coach:"To be listed",lat:34.117,lng:-83.572},
       {name:"North Oconee High School",city:"Bogart",county:"Oconee",address:"1081 Rocky Branch Rd, Bogart, GA 30622",stadium:"North Oconee Stadium",cls:"5A",coach:"Tyler Aurandt",lat:33.948,lng:-83.534},
-      {name:"Johns Creek High School",city:"Johns Creek",county:"Fulton",address:"5575 State Bridge Rd, Johns Creek, GA 30022",stadium:"Johns Creek Stadium",cls:"5A",coach:"Jason Tester",lat:34.029,lng:-84.200},
       {name:"Chattahoochee High School",city:"Johns Creek",county:"Fulton",address:"5230 Taylor Rd, Johns Creek, GA 30022",stadium:"Chattahoochee Stadium",cls:"5A",coach:"Austin Hamilton",lat:34.048,lng:-84.220},
       {name:"Northview High School",city:"Johns Creek",county:"Fulton",address:"10625 Parsons Rd, Johns Creek, GA 30097",stadium:"Northview Stadium",cls:"5A",coach:"Mario Drayton",lat:34.039,lng:-84.173},
       {name:"Arabia Mountain High School",city:"Lithonia",county:"DeKalb",address:"6610 Browns Mill Rd, Lithonia, GA 30038",stadium:"Arabia Mountain Stadium",cls:"5A",coach:"Dante Ferguson",lat:33.665,lng:-84.128},
       {name:"Morrow High School",city:"Morrow",county:"Clayton",address:"2299 Old Rex Morrow Rd, Morrow, GA 30260",stadium:"Morrow Stadium",cls:"5A",coach:"Jarrett Laws",lat:33.583,lng:-84.339},
       {name:"Villa Rica High School",city:"Villa Rica",county:"Carroll",address:"600 Houston Rd, Villa Rica, GA 30180",stadium:"Villa Rica Stadium",cls:"5A",coach:"Michael Hilbert",lat:33.732,lng:-84.919},
       {name:"Winder-Barrow High School",city:"Winder",county:"Barrow",address:"272 Fifth Ave, Winder, GA 30680",stadium:"Winder-Barrow Stadium",cls:"5A",coach:"Russell DeMasi",lat:33.993,lng:-83.720},
-      {name:"Bradwell Institute",city:"Hinesville",county:"Liberty",address:"108 Red Devil Cir, Hinesville, GA 31313",stadium:"Bradwell Stadium",cls:"5A",coach:"John Adams",lat:31.847,lng:-81.596},
-      {name:"Rome High School",city:"Rome",county:"Floyd",address:"1000 Veterans Memorial Hwy, Rome, GA 30161",stadium:"Barron Stadium",cls:"5A",coach:"Bill Stewart",lat:34.257,lng:-85.165}
-    ];
+      {name:"Wayne County High School",city:"Jesup",county:"Wayne",address:"1 Wildcat Dr, Jesup, GA 31545",stadium:"Wayne County Stadium",cls:"5A",coach:"To be listed",lat:31.607,lng:-81.885},
+      {name:"Locust Grove High School",city:"Locust Grove",county:"Henry",address:"3275 S Bethel Rd, Locust Grove, GA 30248",stadium:"Locust Grove Stadium",cls:"5A",coach:"To be listed",lat:33.346,lng:-84.181},
+      {name:"Mundy's Mill High School",city:"Jonesboro",county:"Clayton",address:"1251 Mundys Mill Rd, Jonesboro, GA 30238",stadium:"Mundy's Mill Stadium",cls:"5A",coach:"To be listed",lat:33.503,lng:-84.377},
+      {name:"Banneker High School",city:"College Park",county:"Fulton",address:"5935 Feldwood Rd, College Park, GA 30349",stadium:"Banneker Stadium",cls:"5A",coach:"To be listed",lat:33.614,lng:-84.528},
+      {name:"Druid Hills High School",city:"Atlanta",county:"DeKalb",address:"1798 Haygood Dr NE, Atlanta, GA 30307",stadium:"Adams Stadium",cls:"5A",coach:"To be listed",lat:33.776,lng:-84.337},
+      {name:"Mays High School",city:"Atlanta",county:"Fulton",address:"3450 Benjamin E Mays Dr SW, Atlanta, GA 30331",stadium:"Mays Stadium",cls:"5A",coach:"To be listed",lat:33.743,lng:-84.510},
+      {name:"St. Pius X Catholic High School",city:"Atlanta",county:"DeKalb",address:"2674 Johnson Rd NE, Atlanta, GA 30345",stadium:"St. Pius Stadium",cls:"5A",coach:"To be listed",lat:33.852,lng:-84.280},
+      {name:"Cedartown High School",city:"Cedartown",county:"Polk",address:"167 Frank Lott Dr, Cedartown, GA 30125",stadium:"Cedartown Stadium",cls:"5A",coach:"To be listed",lat:34.054,lng:-85.256},
+      {name:"Madison County High School",city:"Danielsville",county:"Madison",address:"600 Madison St, Danielsville, GA 30633",stadium:"Madison County Stadium",cls:"5A",coach:"To be listed",lat:34.125,lng:-83.221}
+    ].concat([
+      {name:"Bainbridge High School",city:"Bainbridge",county:"Decatur",address:"1301 E College St, Bainbridge, GA 39819",stadium:"Bainbridge Stadium",cls:"4A",coach:"To be listed",lat:30.904,lng:-84.569},
+      {name:"Cairo High School",city:"Cairo",county:"Grady",address:"455 5th St SE, Cairo, GA 39828",stadium:"Cairo Stadium",cls:"4A",coach:"To be listed",lat:30.877,lng:-84.201},
+      {name:"Columbus High School",city:"Columbus",county:"Muscogee",address:"1700 Cherokee Ave, Columbus, GA 31906",stadium:"A.J. McClung Memorial Stadium",cls:"4A",coach:"To be listed",lat:32.479,lng:-84.957},
+      {name:"Dougherty High School",city:"Albany",county:"Dougherty",address:"1800 Pearce Ave, Albany, GA 31705",stadium:"Hugh Mills Stadium",cls:"4A",coach:"To be listed",lat:31.570,lng:-84.103},
+      {name:"Hardaway High School",city:"Columbus",county:"Muscogee",address:"2901 College Dr, Columbus, GA 31906",stadium:"A.J. McClung Memorial Stadium",cls:"4A",coach:"To be listed",lat:32.489,lng:-84.961},
+      {name:"Monroe High School",city:"Albany",county:"Dougherty",address:"900 W Roosevelt Ave, Albany, GA 31701",stadium:"Hugh Mills Stadium",cls:"4A",coach:"To be listed",lat:31.575,lng:-84.176},
+      {name:"Shaw High School",city:"Columbus",county:"Muscogee",address:"7204 Lynch Rd, Columbus, GA 31907",stadium:"A.J. McClung Memorial Stadium",cls:"4A",coach:"To be listed",lat:32.509,lng:-84.887},
+      {name:"Spencer High School",city:"Columbus",county:"Muscogee",address:"1045 Cross Country Dr, Columbus, GA 31906",stadium:"A.J. McClung Memorial Stadium",cls:"4A",coach:"To be listed",lat:32.458,lng:-84.941},
+      {name:"Westover High School",city:"Albany",county:"Dougherty",address:"2600 Lothridge Dr, Albany, GA 31707",stadium:"Hugh Mills Stadium",cls:"4A",coach:"To be listed",lat:31.598,lng:-84.218},
+      {name:"Baldwin High School",city:"Milledgeville",county:"Baldwin",address:"155 Highway 49 W, Milledgeville, GA 31061",stadium:"Baldwin Stadium",cls:"4A",coach:"To be listed",lat:33.081,lng:-83.250},
+      {name:"Howard High School",city:"Macon",county:"Bibb",address:"6400 Forsyth Rd, Macon, GA 31210",stadium:"Howard Stadium",cls:"4A",coach:"To be listed",lat:32.891,lng:-83.757},
+      {name:"Mary Persons High School",city:"Forsyth",county:"Monroe",address:"300 Tillman Rd, Forsyth, GA 31029",stadium:"Mary Persons Stadium",cls:"4A",coach:"To be listed",lat:33.035,lng:-83.938},
+      {name:"Peach County High School",city:"Fort Valley",county:"Peach",address:"900 Tiger Cir, Fort Valley, GA 31030",stadium:"Peach County Stadium",cls:"4A",coach:"To be listed",lat:32.552,lng:-83.888},
+      {name:"Spalding High School",city:"Griffin",county:"Spalding",address:"433 Wilson Rd, Griffin, GA 30224",stadium:"Spalding Stadium",cls:"4A",coach:"To be listed",lat:33.227,lng:-84.264},
+      {name:"Troup County High School",city:"LaGrange",county:"Troup",address:"1920 Hamilton Rd, LaGrange, GA 30241",stadium:"Callaway Stadium",cls:"4A",coach:"To be listed",lat:33.039,lng:-84.984},
+      {name:"Upson-Lee High School",city:"Thomaston",county:"Upson",address:"2688 Hwy 19 N, Thomaston, GA 30286",stadium:"Upson-Lee Stadium",cls:"4A",coach:"To be listed",lat:32.908,lng:-84.327},
+      {name:"Westside High School (Macon)",city:"Macon",county:"Bibb",address:"101 N Foss Dr, Macon, GA 31210",stadium:"Westside Stadium",cls:"4A",coach:"To be listed",lat:32.868,lng:-83.700},
+      {name:"Harlem High School",city:"Harlem",county:"Columbia",address:"1070 Ford Ave, Harlem, GA 30814",stadium:"Harlem Stadium",cls:"4A",coach:"To be listed",lat:33.414,lng:-82.313},
+      {name:"Liberty County High School",city:"Hinesville",county:"Liberty",address:"3216 E Oglethorpe Hwy, Hinesville, GA 31313",stadium:"Liberty County Stadium",cls:"4A",coach:"To be listed",lat:31.846,lng:-81.596},
+      {name:"Long County High School",city:"Ludowici",county:"Long",address:"65 Paterson Ave, Ludowici, GA 31316",stadium:"Long County Stadium",cls:"4A",coach:"To be listed",lat:31.708,lng:-81.742},
+      {name:"New Hampstead High School",city:"Bloomingdale",county:"Chatham",address:"2451 Little Neck Rd, Bloomingdale, GA 31302",stadium:"New Hampstead Stadium",cls:"4A",coach:"To be listed",lat:32.133,lng:-81.299},
+      {name:"Southeast Bulloch High School",city:"Brooklet",county:"Bulloch",address:"922 Kolic Dr, Brooklet, GA 30415",stadium:"Southeast Bulloch Stadium",cls:"4A",coach:"To be listed",lat:32.381,lng:-81.664},
+      {name:"West Laurens High School",city:"Dexter",county:"Laurens",address:"3692 Hwy 257, Dexter, GA 31019",stadium:"West Laurens Stadium",cls:"4A",coach:"To be listed",lat:32.435,lng:-83.059},
+      {name:"Windsor Forest High School",city:"Savannah",county:"Chatham",address:"12419 Largo Dr, Savannah, GA 31419",stadium:"Windsor Forest Stadium",cls:"4A",coach:"To be listed",lat:31.978,lng:-81.159},
+      {name:"Fayette County High School",city:"Fayetteville",county:"Fayette",address:"1 Tiger Trl, Fayetteville, GA 30214",stadium:"Fayette County Stadium",cls:"4A",coach:"To be listed",lat:33.447,lng:-84.455},
+      {name:"Hampton High School",city:"Hampton",county:"Henry",address:"795 Hampton Locust Grove Rd, Hampton, GA 30228",stadium:"Hampton Stadium",cls:"4A",coach:"To be listed",lat:33.387,lng:-84.283},
+      {name:"Luella High School",city:"Locust Grove",county:"Henry",address:"603 Walker Dr, Locust Grove, GA 30248",stadium:"Luella Stadium",cls:"4A",coach:"To be listed",lat:33.370,lng:-84.200},
+      {name:"McDonough High School",city:"McDonough",county:"Henry",address:"155 Postmaster Dr, McDonough, GA 30253",stadium:"McDonough Stadium",cls:"4A",coach:"To be listed",lat:33.447,lng:-84.147},
+      {name:"Mount Zion High School (Jonesboro)",city:"Jonesboro",county:"Clayton",address:"2535 Mount Zion Pkwy, Jonesboro, GA 30236",stadium:"Mount Zion Stadium",cls:"4A",coach:"To be listed",lat:33.505,lng:-84.331},
+      {name:"North Clayton High School",city:"College Park",county:"Clayton",address:"1525 Norman Dr, College Park, GA 30349",stadium:"North Clayton Stadium",cls:"4A",coach:"To be listed",lat:33.612,lng:-84.477},
+      {name:"Riverdale High School",city:"Riverdale",county:"Clayton",address:"160 Roberts Dr, Riverdale, GA 30274",stadium:"Riverdale Stadium",cls:"4A",coach:"To be listed",lat:33.565,lng:-84.413},
+      {name:"Sandy Creek High School",city:"Tyrone",county:"Fayette",address:"360 Jenkins Rd, Tyrone, GA 30290",stadium:"Sandy Creek Stadium",cls:"4A",coach:"To be listed",lat:33.471,lng:-84.591},
+      {name:"Woodland High School (Stockbridge)",city:"Stockbridge",county:"Henry",address:"800 N Moseley Dr, Stockbridge, GA 30281",stadium:"Woodland Stadium",cls:"4A",coach:"To be listed",lat:33.544,lng:-84.181},
+      {name:"Clarkston High School",city:"Clarkston",county:"DeKalb",address:"618 N Indian Creek Dr, Clarkston, GA 30021",stadium:"Adams Stadium",cls:"4A",coach:"To be listed",lat:33.810,lng:-84.240},
+      {name:"Douglass High School",city:"Atlanta",county:"Fulton",address:"225 Hamilton E Holmes Dr NW, Atlanta, GA 30318",stadium:"Lakewood Stadium",cls:"4A",coach:"To be listed",lat:33.755,lng:-84.468},
+      {name:"Greater Atlanta Christian School",city:"Norcross",county:"Gwinnett",address:"1575 Indian Trail Rd, Norcross, GA 30093",stadium:"GAC Stadium",cls:"4A",coach:"To be listed",lat:33.932,lng:-84.176},
+      {name:"North Springs High School",city:"Atlanta",county:"Fulton",address:"7447 Roswell Rd, Atlanta, GA 30328",stadium:"North Springs Stadium",cls:"4A",coach:"To be listed",lat:33.961,lng:-84.362},
+      {name:"Pace Academy",city:"Atlanta",county:"Fulton",address:"966 W Paces Ferry Rd NW, Atlanta, GA 30327",stadium:"Pace Stadium",cls:"4A",coach:"To be listed",lat:33.852,lng:-84.426},
+      {name:"Salem High School",city:"Conyers",county:"Rockdale",address:"3551 Underwood Rd SE, Conyers, GA 30013",stadium:"Salem Stadium",cls:"4A",coach:"To be listed",lat:33.623,lng:-83.986},
+      {name:"Stephenson High School",city:"Stone Mountain",county:"DeKalb",address:"701 Stephenson Rd, Stone Mountain, GA 30087",stadium:"Stephenson Stadium",cls:"4A",coach:"To be listed",lat:33.774,lng:-84.123},
+      {name:"Stone Mountain High School",city:"Stone Mountain",county:"DeKalb",address:"4556 Central Dr, Stone Mountain, GA 30083",stadium:"Stone Mountain Stadium",cls:"4A",coach:"To be listed",lat:33.808,lng:-84.170},
+      {name:"Westminster Schools",city:"Atlanta",county:"Fulton",address:"1424 W Paces Ferry Rd NW, Atlanta, GA 30327",stadium:"Westminster Stadium",cls:"4A",coach:"To be listed",lat:33.845,lng:-84.423},
+      {name:"Chestatee High School",city:"Gainesville",county:"Hall",address:"3005 Sardis Rd, Gainesville, GA 30506",stadium:"Chestatee Stadium",cls:"4A",coach:"To be listed",lat:34.347,lng:-83.912},
+      {name:"Dawson County High School",city:"Dawsonville",county:"Dawson",address:"1665 Perimeter Rd, Dawsonville, GA 30534",stadium:"Dawson County Stadium",cls:"4A",coach:"To be listed",lat:34.421,lng:-84.119},
+      {name:"Gilmer High School",city:"Ellijay",county:"Gilmer",address:"408 Bobcat Trl, Ellijay, GA 30540",stadium:"Gilmer Stadium",cls:"4A",coach:"To be listed",lat:34.695,lng:-84.482},
+      {name:"North Hall High School",city:"Gainesville",county:"Hall",address:"4885 Mount Vernon Rd, Gainesville, GA 30506",stadium:"North Hall Stadium",cls:"4A",coach:"To be listed",lat:34.368,lng:-83.832},
+      {name:"Pickens High School",city:"Jasper",county:"Pickens",address:"500 Dragon Dr, Jasper, GA 30143",stadium:"Pickens Stadium",cls:"4A",coach:"To be listed",lat:34.468,lng:-84.429},
+      {name:"White County High School",city:"Cleveland",county:"White",address:"2600 Hwy 129 N, Cleveland, GA 30528",stadium:"White County Stadium",cls:"4A",coach:"To be listed",lat:34.597,lng:-83.763},
+      {name:"Adairsville High School",city:"Adairsville",county:"Bartow",address:"519 Old Hwy 140, Adairsville, GA 30103",stadium:"Adairsville Stadium",cls:"4A",coach:"To be listed",lat:34.368,lng:-84.934},
+      {name:"Calhoun High School",city:"Calhoun",county:"Gordon",address:"335 S River St, Calhoun, GA 30701",stadium:"Phil Glover Stadium",cls:"4A",coach:"To be listed",lat:34.503,lng:-84.951},
+      {name:"Heritage High School (Catoosa)",city:"Ringgold",county:"Catoosa",address:"3960 Poplar Springs Rd, Ringgold, GA 30736",stadium:"Heritage Stadium",cls:"4A",coach:"To be listed",lat:34.916,lng:-85.109},
+      {name:"Northwest Whitfield High School",city:"Tunnel Hill",county:"Whitfield",address:"1651 Tunnel Hill Varnell Rd, Tunnel Hill, GA 30755",stadium:"Northwest Whitfield Stadium",cls:"4A",coach:"To be listed",lat:34.846,lng:-85.043},
+      {name:"Ridgeland High School",city:"Rossville",county:"Walker",address:"320 King St, Rossville, GA 30741",stadium:"Ridgeland Stadium",cls:"4A",coach:"To be listed",lat:34.983,lng:-85.286},
+      {name:"Southeast Whitfield High School",city:"Dalton",county:"Whitfield",address:"1954 Riverbend Rd, Dalton, GA 30721",stadium:"Southeast Whitfield Stadium",cls:"4A",coach:"To be listed",lat:34.737,lng:-84.918},
+      {name:"Cherokee Bluff High School",city:"Flowery Branch",county:"Hall",address:"6603 Spout Springs Rd, Flowery Branch, GA 30542",stadium:"Cherokee Bluff Stadium",cls:"4A",coach:"To be listed",lat:34.186,lng:-83.862},
+      {name:"East Hall High School",city:"Gainesville",county:"Hall",address:"3534 E Hall Rd, Gainesville, GA 30507",stadium:"East Hall Stadium",cls:"4A",coach:"To be listed",lat:34.297,lng:-83.748},
+      {name:"East Jackson High School",city:"Commerce",county:"Jackson",address:"1435 Hoods Mill Rd, Commerce, GA 30529",stadium:"East Jackson Stadium",cls:"4A",coach:"To be listed",lat:34.204,lng:-83.458},
+      {name:"Monroe Area High School",city:"Monroe",county:"Walton",address:"339 High School Dr, Monroe, GA 30655",stadium:"Monroe Area Stadium",cls:"4A",coach:"To be listed",lat:33.795,lng:-83.713},
+      {name:"Oconee County High School",city:"Watkinsville",county:"Oconee",address:"2721 Hog Mountain Rd, Watkinsville, GA 30677",stadium:"Oconee County Stadium",cls:"4A",coach:"To be listed",lat:33.863,lng:-83.409},
+      {name:"West Hall High School",city:"Oakwood",county:"Hall",address:"5500 McEver Rd, Oakwood, GA 30566",stadium:"West Hall Stadium",cls:"4A",coach:"To be listed",lat:34.231,lng:-83.884},
+
+      {name:"Carver High School (Columbus)",city:"Columbus",county:"Muscogee",address:"3100 8th St, Columbus, GA 31906",stadium:"A.J. McClung Memorial Stadium",cls:"3A",coach:"To be listed",lat:32.467,lng:-84.956},
+      {name:"Crisp County High School",city:"Cordele",county:"Crisp",address:"2402 Cougar Path, Cordele, GA 31015",stadium:"Crisp County Stadium",cls:"3A",coach:"To be listed",lat:31.964,lng:-83.782},
+      {name:"Jordan High School",city:"Columbus",county:"Muscogee",address:"3200 Woodruff Farm Rd, Columbus, GA 31907",stadium:"A.J. McClung Memorial Stadium",cls:"3A",coach:"To be listed",lat:32.458,lng:-84.887},
+      {name:"Kendrick High School",city:"Columbus",county:"Muscogee",address:"6175 Old Buena Vista Rd, Columbus, GA 31907",stadium:"A.J. McClung Memorial Stadium",cls:"3A",coach:"To be listed",lat:32.458,lng:-84.870},
+      {name:"Sumter County High School",city:"Americus",county:"Sumter",address:"901 N Martin Luther King Blvd, Americus, GA 31719",stadium:"Sumter County Stadium",cls:"3A",coach:"To be listed",lat:32.072,lng:-84.233},
+      {name:"Worth County High School",city:"Sylvester",county:"Worth",address:"406 W King St, Sylvester, GA 31791",stadium:"Worth County Stadium",cls:"3A",coach:"To be listed",lat:31.538,lng:-83.836},
+      {name:"Callaway High School",city:"Hogansville",county:"Troup",address:"221 Whitlock Ave, Hogansville, GA 30230",stadium:"Callaway Stadium",cls:"3A",coach:"To be listed",lat:33.170,lng:-84.915},
+      {name:"Central High School (Macon)",city:"Macon",county:"Bibb",address:"2155 Napier Ave, Macon, GA 31204",stadium:"Central Stadium",cls:"3A",coach:"To be listed",lat:32.838,lng:-83.670},
+      {name:"Jackson High School",city:"Jackson",county:"Butts",address:"1120 W 3rd St, Jackson, GA 30233",stadium:"Jackson Stadium",cls:"3A",coach:"To be listed",lat:33.294,lng:-83.966},
+      {name:"Lamar County High School",city:"Barnesville",county:"Lamar",address:"1 Trojan Way, Barnesville, GA 30204",stadium:"Lamar County Stadium",cls:"3A",coach:"To be listed",lat:33.051,lng:-84.156},
+      {name:"Northeast High School",city:"Macon",county:"Bibb",address:"1646 Upper River Rd, Macon, GA 31211",stadium:"Northeast Stadium",cls:"3A",coach:"To be listed",lat:32.870,lng:-83.612},
+      {name:"Pike County High School",city:"Zebulon",county:"Pike",address:"296 Highway 19 N, Zebulon, GA 30295",stadium:"Pike County Stadium",cls:"3A",coach:"To be listed",lat:33.102,lng:-84.343},
+      {name:"Rutland High School",city:"Macon",county:"Bibb",address:"6250 Skipper Rd, Macon, GA 31216",stadium:"Rutland Stadium",cls:"3A",coach:"To be listed",lat:32.754,lng:-83.698},
+      {name:"Southwest High School",city:"Macon",county:"Bibb",address:"1775 Williamson Rd, Macon, GA 31206",stadium:"Southwest Stadium",cls:"3A",coach:"To be listed",lat:32.798,lng:-83.693},
+      {name:"Appling County High School",city:"Baxley",county:"Appling",address:"482 Blackshear Hwy, Baxley, GA 31513",stadium:"Appling County Stadium",cls:"3A",coach:"To be listed",lat:31.778,lng:-82.348},
+      {name:"Beach High School",city:"Savannah",county:"Chatham",address:"3001 Hopkins St, Savannah, GA 31405",stadium:"Memorial Stadium",cls:"3A",coach:"To be listed",lat:32.056,lng:-81.108},
+      {name:"Brantley County High School",city:"Nahunta",county:"Brantley",address:"10804 US-82, Nahunta, GA 31553",stadium:"Brantley County Stadium",cls:"3A",coach:"To be listed",lat:31.204,lng:-81.981},
+      {name:"Islands High School",city:"Savannah",county:"Chatham",address:"170 Whitemarsh Island Rd, Savannah, GA 31410",stadium:"Islands Stadium",cls:"3A",coach:"To be listed",lat:32.030,lng:-80.975},
+      {name:"Johnson High School (Savannah)",city:"Savannah",county:"Chatham",address:"3012 Sunset Blvd, Savannah, GA 31404",stadium:"Memorial Stadium",cls:"3A",coach:"To be listed",lat:32.050,lng:-81.068},
+      {name:"Pierce County High School",city:"Blackshear",county:"Pierce",address:"4850 US-84, Blackshear, GA 31516",stadium:"Pierce County Stadium",cls:"3A",coach:"To be listed",lat:31.306,lng:-82.241},
+      {name:"Tattnall County High School",city:"Reidsville",county:"Tattnall",address:"1 Rebel Blvd, Reidsville, GA 30453",stadium:"Tattnall County Stadium",cls:"3A",coach:"To be listed",lat:32.057,lng:-82.118},
+      {name:"Toombs County High School",city:"Lyons",county:"Toombs",address:"600 Bulldog Rd, Lyons, GA 30436",stadium:"Toombs County Stadium",cls:"3A",coach:"To be listed",lat:32.204,lng:-82.322},
+      {name:"Burke County High School",city:"Waynesboro",county:"Burke",address:"1057 Burke Veterans Pkwy, Waynesboro, GA 30830",stadium:"Burke County Stadium",cls:"3A",coach:"To be listed",lat:33.090,lng:-82.016},
+      {name:"Butler High School",city:"Augusta",county:"Richmond",address:"2011 Lumpkin Rd, Augusta, GA 30906",stadium:"Butler Stadium",cls:"3A",coach:"To be listed",lat:33.406,lng:-82.024},
+      {name:"Cross Creek High School",city:"Augusta",county:"Richmond",address:"3850 Old Waynesboro Rd, Augusta, GA 30906",stadium:"Cross Creek Stadium",cls:"3A",coach:"To be listed",lat:33.368,lng:-82.048},
+      {name:"Hephzibah High School",city:"Hephzibah",county:"Richmond",address:"4558 Brothersville Rd, Hephzibah, GA 30815",stadium:"Hephzibah Stadium",cls:"3A",coach:"To be listed",lat:33.301,lng:-82.097},
+      {name:"Thomson High School",city:"Thomson",county:"McDuffie",address:"1160 Whiteoak Rd, Thomson, GA 30824",stadium:"Thomson Stadium",cls:"3A",coach:"To be listed",lat:33.471,lng:-82.505},
+      {name:"Washington County High School",city:"Sandersville",county:"Washington",address:"1140 Old Deepstep Rd, Sandersville, GA 31082",stadium:"Washington County Stadium",cls:"3A",coach:"To be listed",lat:32.984,lng:-82.811},
+      {name:"Westside High School (Augusta)",city:"Augusta",county:"Richmond",address:"1002 Patriot's Way, Augusta, GA 30909",stadium:"Westside Stadium",cls:"3A",coach:"To be listed",lat:33.487,lng:-82.078},
+      {name:"Haralson County High School",city:"Tallapoosa",county:"Haralson",address:"1655 Georgia Hwy 120, Tallapoosa, GA 30176",stadium:"Haralson County Stadium",cls:"3A",coach:"To be listed",lat:33.745,lng:-85.288},
+      {name:"Holy Innocents' Episcopal School",city:"Atlanta",county:"Fulton",address:"805 Mount Vernon Hwy NW, Atlanta, GA 30327",stadium:"Holy Innocents Stadium",cls:"3A",coach:"To be listed",lat:33.890,lng:-84.423},
+      {name:"KIPP Atlanta Collegiate",city:"Atlanta",county:"Fulton",address:"98 Anderson Ave NW, Atlanta, GA 30314",stadium:"KIPP Stadium",cls:"3A",coach:"To be listed",lat:33.755,lng:-84.418},
+      {name:"Lovett School",city:"Atlanta",county:"Fulton",address:"4075 Paces Ferry Rd NW, Atlanta, GA 30327",stadium:"Lovett Stadium",cls:"3A",coach:"To be listed",lat:33.868,lng:-84.446},
+      {name:"North Cobb Christian School",city:"Kennesaw",county:"Cobb",address:"4500 Lakeview Dr, Kennesaw, GA 30144",stadium:"North Cobb Christian Stadium",cls:"3A",coach:"To be listed",lat:34.037,lng:-84.615},
+      {name:"Temple High School",city:"Temple",county:"Carroll",address:"5515 Hwy 113, Temple, GA 30179",stadium:"Temple Stadium",cls:"3A",coach:"To be listed",lat:33.737,lng:-85.027},
+      {name:"Therrell High School",city:"Atlanta",county:"Fulton",address:"3099 Panther Trl SW, Atlanta, GA 30311",stadium:"Lakewood Stadium",cls:"3A",coach:"To be listed",lat:33.707,lng:-84.468},
+      {name:"Wesleyan School",city:"Peachtree Corners",county:"Gwinnett",address:"5405 Spalding Dr, Peachtree Corners, GA 30092",stadium:"Wesleyan Stadium",cls:"3A",coach:"To be listed",lat:33.972,lng:-84.238},
+      {name:"Carver High School (Atlanta)",city:"Atlanta",county:"Fulton",address:"1275 Capitol Ave SW, Atlanta, GA 30315",stadium:"Lakewood Stadium",cls:"3A",coach:"To be listed",lat:33.730,lng:-84.392},
+      {name:"Cedar Grove High School",city:"Ellenwood",county:"DeKalb",address:"2360 River Rd, Ellenwood, GA 30294",stadium:"Cedar Grove Stadium",cls:"3A",coach:"To be listed",lat:33.664,lng:-84.270},
+      {name:"Columbia High School",city:"Decatur",county:"DeKalb",address:"2106 Columbia Dr, Decatur, GA 30032",stadium:"Columbia Stadium",cls:"3A",coach:"To be listed",lat:33.717,lng:-84.256},
+      {name:"Hapeville Charter Career Academy",city:"Atlanta",county:"Fulton",address:"6045 Buffington Rd, Atlanta, GA 30349",stadium:"Hapeville Stadium",cls:"3A",coach:"To be listed",lat:33.660,lng:-84.478},
+      {name:"McNair High School",city:"Atlanta",county:"DeKalb",address:"1804 Hardee St SE, Atlanta, GA 30316",stadium:"McNair Stadium",cls:"3A",coach:"To be listed",lat:33.726,lng:-84.338},
+      {name:"Miller Grove High School",city:"Lithonia",county:"DeKalb",address:"2645 DeKalb Medical Pkwy, Lithonia, GA 30058",stadium:"Miller Grove Stadium",cls:"3A",coach:"To be listed",lat:33.713,lng:-84.144},
+      {name:"Redan High School",city:"Stone Mountain",county:"DeKalb",address:"5247 Redan Rd, Stone Mountain, GA 30088",stadium:"Redan Stadium",cls:"3A",coach:"To be listed",lat:33.739,lng:-84.165},
+      {name:"South Atlanta High School",city:"Atlanta",county:"Fulton",address:"800 Hutchens Rd SE, Atlanta, GA 30354",stadium:"Lakewood Stadium",cls:"3A",coach:"To be listed",lat:33.677,lng:-84.380},
+      {name:"Coahulla Creek High School",city:"Dalton",county:"Whitfield",address:"3364 Cross Plains Trl, Dalton, GA 30721",stadium:"Coahulla Creek Stadium",cls:"3A",coach:"To be listed",lat:34.837,lng:-84.887},
+      {name:"LaFayette High School",city:"LaFayette",county:"Walker",address:"516 N Main St, LaFayette, GA 30728",stadium:"LaFayette Stadium",cls:"3A",coach:"To be listed",lat:34.705,lng:-85.282},
+      {name:"Murray County High School",city:"Chatsworth",county:"Murray",address:"1001 Green Rd, Chatsworth, GA 30705",stadium:"Murray County Stadium",cls:"3A",coach:"To be listed",lat:34.766,lng:-84.769},
+      {name:"North Murray High School",city:"Chatsworth",county:"Murray",address:"2568 Crossroads, Chatsworth, GA 30705",stadium:"North Murray Stadium",cls:"3A",coach:"To be listed",lat:34.820,lng:-84.780},
+      {name:"Ringgold High School",city:"Ringgold",county:"Catoosa",address:"29 Tiger Trl, Ringgold, GA 30736",stadium:"Ringgold Stadium",cls:"3A",coach:"To be listed",lat:34.916,lng:-85.109},
+      {name:"Rockmart High School",city:"Rockmart",county:"Polk",address:"990 Cartersville Hwy, Rockmart, GA 30153",stadium:"Rockmart Stadium",cls:"3A",coach:"To be listed",lat:34.002,lng:-85.049},
+      {name:"Sonoraville High School",city:"Calhoun",county:"Gordon",address:"66 Perry Dr, Calhoun, GA 30701",stadium:"Sonoraville Stadium",cls:"3A",coach:"To be listed",lat:34.452,lng:-84.887},
+      {name:"Union County High School",city:"Blairsville",county:"Union",address:"384 School St, Blairsville, GA 30512",stadium:"Union County Stadium",cls:"3A",coach:"To be listed",lat:34.876,lng:-83.958},
+      {name:"Elbert County High School",city:"Elberton",county:"Elbert",address:"600 Abernathy Cir, Elberton, GA 30635",stadium:"Elbert County Stadium",cls:"3A",coach:"To be listed",lat:34.111,lng:-82.867},
+      {name:"Franklin County High School",city:"Carnesville",county:"Franklin",address:"6570 Hwy 145, Carnesville, GA 30521",stadium:"Franklin County Stadium",cls:"3A",coach:"To be listed",lat:34.370,lng:-83.234},
+      {name:"Hart County High School",city:"Hartwell",county:"Hart",address:"181 Powell Rd, Hartwell, GA 30643",stadium:"Hart County Stadium",cls:"3A",coach:"To be listed",lat:34.353,lng:-82.932},
+      {name:"Hebron Christian Academy",city:"Dacula",county:"Gwinnett",address:"3005 Old Auburn Rd, Dacula, GA 30019",stadium:"Hebron Stadium",cls:"3A",coach:"To be listed",lat:34.002,lng:-83.898},
+      {name:"Lumpkin County High School",city:"Dahlonega",county:"Lumpkin",address:"2001 Indian Dr, Dahlonega, GA 30533",stadium:"Lumpkin County Stadium",cls:"3A",coach:"To be listed",lat:34.532,lng:-83.985},
+      {name:"Morgan County High School",city:"Madison",county:"Morgan",address:"1231-A College Dr, Madison, GA 30650",stadium:"Morgan County Stadium",cls:"3A",coach:"To be listed",lat:33.596,lng:-83.468},
+      {name:"Stephens County High School",city:"Toccoa",county:"Stephens",address:"804 Martin Luther King Jr Dr, Toccoa, GA 30577",stadium:"Stephens County Stadium",cls:"3A",coach:"To be listed",lat:34.577,lng:-83.332},
+
+      {name:"Bacon County High School",city:"Alma",county:"Bacon",address:"1 Bearcat Blvd, Alma, GA 31510",stadium:"Bacon County Stadium",cls:"2A",coach:"To be listed",lat:31.541,lng:-82.462},
+      {name:"Berrien High School",city:"Nashville",county:"Berrien",address:"500 E Coleman Ave, Nashville, GA 31639",stadium:"Berrien Stadium",cls:"2A",coach:"To be listed",lat:31.207,lng:-83.250},
+      {name:"Brooks County High School",city:"Quitman",county:"Brooks",address:"1081 Barwick Rd, Quitman, GA 31643",stadium:"Brooks County Stadium",cls:"2A",coach:"To be listed",lat:30.785,lng:-83.560},
+      {name:"Cook High School",city:"Adel",county:"Cook",address:"9900 US-41 N, Adel, GA 31620",stadium:"Cook Stadium",cls:"2A",coach:"To be listed",lat:31.137,lng:-83.423},
+      {name:"Fitzgerald High School",city:"Fitzgerald",county:"Ben Hill",address:"301 Pierce St, Fitzgerald, GA 31750",stadium:"Fitzgerald Stadium",cls:"2A",coach:"To be listed",lat:31.715,lng:-83.253},
+      {name:"Jeff Davis High School",city:"Hazlehurst",county:"Jeff Davis",address:"44 Charles Rogers Blvd, Hazlehurst, GA 31539",stadium:"Jeff Davis Stadium",cls:"2A",coach:"To be listed",lat:31.863,lng:-82.594},
+      {name:"Thomasville High School",city:"Thomasville",county:"Thomas",address:"315 S Hansell St, Thomasville, GA 31792",stadium:"Thomasville Stadium",cls:"2A",coach:"To be listed",lat:30.836,lng:-83.978},
+      {name:"ACE Charter School",city:"Macon",county:"Bibb",address:"2612 Ingleside Ave, Macon, GA 31204",stadium:"ACE Stadium",cls:"2A",coach:"To be listed",lat:32.855,lng:-83.655},
+      {name:"Bleckley County High School",city:"Cochran",county:"Bleckley",address:"1 Royal Dr, Cochran, GA 31014",stadium:"Bleckley County Stadium",cls:"2A",coach:"To be listed",lat:32.387,lng:-83.355},
+      {name:"Dodge County High School",city:"Eastman",county:"Dodge",address:"1057 Max Bess Cir, Eastman, GA 31023",stadium:"Dodge County Stadium",cls:"2A",coach:"To be listed",lat:32.198,lng:-83.178},
+      {name:"Dublin High School",city:"Dublin",county:"Laurens",address:"1001 N Calhoun St, Dublin, GA 31021",stadium:"Dublin Stadium",cls:"2A",coach:"To be listed",lat:32.541,lng:-82.904},
+      {name:"East Laurens High School",city:"East Dublin",county:"Laurens",address:"50 Brantley St, East Dublin, GA 31027",stadium:"East Laurens Stadium",cls:"2A",coach:"To be listed",lat:32.551,lng:-82.868},
+      {name:"Swainsboro High School",city:"Swainsboro",county:"Emanuel",address:"689 S Main St, Swainsboro, GA 30401",stadium:"Swainsboro Stadium",cls:"2A",coach:"To be listed",lat:32.597,lng:-82.334},
+      {name:"Vidalia High School",city:"Vidalia",county:"Toombs",address:"1 Golden Eagle Dr, Vidalia, GA 30474",stadium:"Vidalia Stadium",cls:"2A",coach:"To be listed",lat:32.217,lng:-82.413},
+      {name:"Bryan County High School",city:"Pembroke",county:"Bryan",address:"1234 US-280, Pembroke, GA 31321",stadium:"Bryan County Stadium",cls:"2A",coach:"To be listed",lat:32.140,lng:-81.623},
+      {name:"Calvary Day School",city:"Savannah",county:"Chatham",address:"4625 Waters Ave, Savannah, GA 31404",stadium:"Calvary Stadium",cls:"2A",coach:"To be listed",lat:32.034,lng:-81.092},
+      {name:"Metter High School",city:"Metter",county:"Candler",address:"3407 E Carver St, Metter, GA 30439",stadium:"Metter Stadium",cls:"2A",coach:"To be listed",lat:32.397,lng:-82.060},
+      {name:"Savannah High School",city:"Savannah",county:"Chatham",address:"400 Pennsylvania Ave, Savannah, GA 31404",stadium:"Memorial Stadium",cls:"2A",coach:"To be listed",lat:32.056,lng:-81.078},
+      {name:"Savannah Christian Preparatory School",city:"Savannah",county:"Chatham",address:"1599 Chatham Pkwy, Savannah, GA 31408",stadium:"Savannah Christian Stadium",cls:"2A",coach:"To be listed",lat:32.101,lng:-81.174},
+      {name:"Screven County High School",city:"Sylvania",county:"Screven",address:"1236 Douglas Bight Rd, Sylvania, GA 30467",stadium:"Screven County Stadium",cls:"2A",coach:"To be listed",lat:32.750,lng:-81.637},
+      {name:"Aquinas High School",city:"Augusta",county:"Richmond",address:"1900 Highland Ave, Augusta, GA 30904",stadium:"Aquinas Stadium",cls:"2A",coach:"To be listed",lat:33.476,lng:-82.016},
+      {name:"Glenn Hills High School",city:"Augusta",county:"Richmond",address:"2941 Glenn Hills Dr, Augusta, GA 30906",stadium:"Glenn Hills Stadium",cls:"2A",coach:"To be listed",lat:33.421,lng:-82.040},
+      {name:"Jasper County High School",city:"Monticello",county:"Jasper",address:"14477 Hwy 11 N, Monticello, GA 31064",stadium:"Jasper County Stadium",cls:"2A",coach:"To be listed",lat:33.305,lng:-83.688},
+      {name:"Jefferson County High School",city:"Louisville",county:"Jefferson",address:"1157 GA-17, Louisville, GA 30434",stadium:"Jefferson County Stadium",cls:"2A",coach:"To be listed",lat:32.998,lng:-82.395},
+      {name:"Johnson High School (Augusta)",city:"Augusta",county:"Richmond",address:"1327 Augusta Ave, Augusta, GA 30901",stadium:"Johnson Stadium",cls:"2A",coach:"To be listed",lat:33.470,lng:-81.980},
+      {name:"Josey High School",city:"Augusta",county:"Richmond",address:"1701 15th St, Augusta, GA 30901",stadium:"Josey Stadium",cls:"2A",coach:"To be listed",lat:33.470,lng:-81.990},
+      {name:"Laney High School",city:"Augusta",county:"Richmond",address:"1339 Laney Walker Blvd, Augusta, GA 30901",stadium:"Laney Stadium",cls:"2A",coach:"To be listed",lat:33.466,lng:-81.979},
+      {name:"Putnam County High School",city:"Eatonton",county:"Putnam",address:"300 War Eagle Dr, Eatonton, GA 31024",stadium:"Putnam County Stadium",cls:"2A",coach:"To be listed",lat:33.327,lng:-83.388},
+      {name:"Social Circle High School",city:"Social Circle",county:"Walton",address:"154 W Hightower Trl, Social Circle, GA 30025",stadium:"Social Circle Stadium",cls:"2A",coach:"To be listed",lat:33.656,lng:-83.718},
+      {name:"Eagle's Landing Christian Academy",city:"McDonough",county:"Henry",address:"2400 Hwy 42 N, McDonough, GA 30253",stadium:"ELCA Stadium",cls:"2A",coach:"To be listed",lat:33.481,lng:-84.187},
+      {name:"Landmark Christian School",city:"Fairburn",county:"Fulton",address:"50 SE Broad St, Fairburn, GA 30213",stadium:"Landmark Stadium",cls:"2A",coach:"To be listed",lat:33.567,lng:-84.581},
+      {name:"Trinity Christian School",city:"Sharpsburg",county:"Coweta",address:"8817 Hwy 54, Sharpsburg, GA 30277",stadium:"Trinity Stadium",cls:"2A",coach:"To be listed",lat:33.397,lng:-84.677},
+      {name:"Utopian Academy for the Arts",city:"Ellenwood",county:"Clayton",address:"2750 Fairview Rd, Ellenwood, GA 30294",stadium:"Utopian Stadium",cls:"2A",coach:"To be listed",lat:33.635,lng:-84.300},
+      {name:"Washington High School",city:"Atlanta",county:"Fulton",address:"45 Whitehouse Dr SW, Atlanta, GA 30314",stadium:"Lakewood Stadium",cls:"2A",coach:"To be listed",lat:33.754,lng:-84.422},
+      {name:"Whitefield Academy",city:"Mableton",county:"Cobb",address:"1 Whitefield Dr SE, Mableton, GA 30126",stadium:"Whitefield Stadium",cls:"2A",coach:"To be listed",lat:33.819,lng:-84.582},
+      {name:"Armuchee High School",city:"Rome",county:"Floyd",address:"4203 Martha Berry Hwy, Rome, GA 30165",stadium:"Armuchee Stadium",cls:"2A",coach:"To be listed",lat:34.326,lng:-85.168},
+      {name:"Bremen High School",city:"Bremen",county:"Haralson",address:"504 Georgia Ave S, Bremen, GA 30110",stadium:"Bremen Stadium",cls:"2A",coach:"To be listed",lat:33.721,lng:-85.146},
+      {name:"Coosa High School",city:"Rome",county:"Floyd",address:"4454 Alabama Hwy, Rome, GA 30165",stadium:"Coosa Stadium",cls:"2A",coach:"To be listed",lat:34.257,lng:-85.220},
+      {name:"Darlington School",city:"Rome",county:"Floyd",address:"1014 Cave Spring Rd SW, Rome, GA 30161",stadium:"Darlington Stadium",cls:"2A",coach:"To be listed",lat:34.232,lng:-85.176},
+      {name:"Heard County High School",city:"Franklin",county:"Heard",address:"545 Main St, Franklin, GA 30217",stadium:"Heard County Stadium",cls:"2A",coach:"To be listed",lat:33.280,lng:-85.098},
+      {name:"Model High School",city:"Rome",county:"Floyd",address:"172 Lovers Lane Rd NE, Rome, GA 30161",stadium:"Model Stadium",cls:"2A",coach:"To be listed",lat:34.292,lng:-85.120},
+      {name:"Mount Zion High School (Carroll)",city:"Mount Zion",county:"Carroll",address:"330 Liggett St, Mount Zion, GA 30150",stadium:"Mount Zion Stadium",cls:"2A",coach:"To be listed",lat:33.631,lng:-85.180},
+      {name:"Pepperell High School",city:"Lindale",county:"Floyd",address:"30 Dragon Dr, Lindale, GA 30147",stadium:"Pepperell Stadium",cls:"2A",coach:"To be listed",lat:34.187,lng:-85.174},
+      {name:"Chattooga High School",city:"Summerville",county:"Chattooga",address:"989 Hwy 114, Summerville, GA 30747",stadium:"Chattooga Stadium",cls:"2A",coach:"To be listed",lat:34.481,lng:-85.348},
+      {name:"Christian Heritage School",city:"Dalton",county:"Whitfield",address:"184 Pine Grove Rd, Dalton, GA 30720",stadium:"Christian Heritage Stadium",cls:"2A",coach:"To be listed",lat:34.770,lng:-84.970},
+      {name:"Dade County High School",city:"Trenton",county:"Dade",address:"300 Tradition Ln, Trenton, GA 30752",stadium:"Dade County Stadium",cls:"2A",coach:"To be listed",lat:34.872,lng:-85.509},
+      {name:"Fannin County High School",city:"Blue Ridge",county:"Fannin",address:"360 Rebel Cir, Blue Ridge, GA 30513",stadium:"Fannin County Stadium",cls:"2A",coach:"To be listed",lat:34.864,lng:-84.324},
+      {name:"Gordon Central High School",city:"Calhoun",county:"Gordon",address:"335 S River St, Calhoun, GA 30701",stadium:"Gordon Central Stadium",cls:"2A",coach:"To be listed",lat:34.503,lng:-84.951},
+      {name:"Gordon Lee High School",city:"Chickamauga",county:"Walker",address:"106 Warrior Path, Chickamauga, GA 30707",stadium:"Gordon Lee Stadium",cls:"2A",coach:"To be listed",lat:34.871,lng:-85.291},
+      {name:"Lakeview-Fort Oglethorpe High School",city:"Fort Oglethorpe",county:"Catoosa",address:"63 Catoosa Park Dr, Fort Oglethorpe, GA 30742",stadium:"Lakeview Stadium",cls:"2A",coach:"To be listed",lat:34.949,lng:-85.257},
+      {name:"Athens Academy",city:"Athens",county:"Clarke",address:"1281 Spartan Ln, Athens, GA 30606",stadium:"Athens Academy Stadium",cls:"2A",coach:"To be listed",lat:33.918,lng:-83.430},
+      {name:"Banks County High School",city:"Homer",county:"Banks",address:"1486 Hwy 51 S, Homer, GA 30547",stadium:"Banks County Stadium",cls:"2A",coach:"To be listed",lat:34.335,lng:-83.499},
+      {name:"Commerce High School",city:"Commerce",county:"Jackson",address:"272 Lakeview Dr, Commerce, GA 30529",stadium:"Commerce Stadium",cls:"2A",coach:"To be listed",lat:34.204,lng:-83.458},
+      {name:"Oglethorpe County High School",city:"Lexington",county:"Oglethorpe",address:"749 Athens Rd, Lexington, GA 30648",stadium:"Oglethorpe County Stadium",cls:"2A",coach:"To be listed",lat:33.880,lng:-83.111},
+      {name:"Prince Avenue Christian School",city:"Bogart",county:"Oconee",address:"2201 Ruth Jackson Rd, Bogart, GA 30622",stadium:"Prince Avenue Stadium",cls:"2A",coach:"To be listed",lat:33.948,lng:-83.534},
+      {name:"Providence Christian Academy",city:"Lilburn",county:"Gwinnett",address:"4575 Lawrenceville Hwy, Lilburn, GA 30047",stadium:"Providence Stadium",cls:"2A",coach:"To be listed",lat:33.889,lng:-84.114},
+      {name:"Rabun County High School",city:"Tiger",county:"Rabun",address:"230 Wildcat Hill Dr, Tiger, GA 30576",stadium:"Rabun County Stadium",cls:"2A",coach:"To be listed",lat:34.847,lng:-83.433},
+      {name:"Fellowship Christian School",city:"Roswell",county:"Fulton",address:"10965 W Willeo Rd, Roswell, GA 30075",stadium:"Fellowship Stadium",cls:"2A",coach:"To be listed",lat:34.039,lng:-84.352},
+      {name:"King's Ridge Christian School",city:"Alpharetta",county:"Fulton",address:"2765 Bethany Bend, Alpharetta, GA 30004",stadium:"King's Ridge Stadium",cls:"2A",coach:"To be listed",lat:34.132,lng:-84.270},
+      {name:"Mount Vernon School",city:"Atlanta",county:"Fulton",address:"4505 Mount Vernon Hwy NE, Atlanta, GA 30327",stadium:"Mount Vernon Stadium",cls:"2A",coach:"To be listed",lat:33.890,lng:-84.423},
+      {name:"Mount Bethel Christian Academy",city:"Marietta",county:"Cobb",address:"4385 Lower Roswell Rd, Marietta, GA 30068",stadium:"Mount Bethel Stadium",cls:"2A",coach:"To be listed",lat:33.968,lng:-84.412},
+      {name:"Mount Paran Christian School",city:"Kennesaw",county:"Cobb",address:"1275 Stanley Rd NW, Kennesaw, GA 30152",stadium:"Mount Paran Stadium",cls:"2A",coach:"To be listed",lat:33.999,lng:-84.666},
+      {name:"Mount Pisgah Christian School",city:"Johns Creek",county:"Fulton",address:"9820 Nesbit Ferry Rd, Johns Creek, GA 30022",stadium:"Mount Pisgah Stadium",cls:"2A",coach:"To be listed",lat:34.029,lng:-84.200},
+      {name:"St. Francis High School",city:"Milton",county:"Fulton",address:"13440 Cogburn Rd, Milton, GA 30004",stadium:"St. Francis Stadium",cls:"2A",coach:"To be listed",lat:34.132,lng:-84.270},
+      {name:"The Walker School",city:"Marietta",county:"Cobb",address:"700 Cobb Pkwy N, Marietta, GA 30062",stadium:"Walker Stadium",cls:"2A",coach:"To be listed",lat:33.984,lng:-84.473},
+
+      {name:"Baconton Charter School",city:"Baconton",county:"Mitchell",address:"149 W Walton St, Baconton, GA 31716",stadium:"Baconton Stadium",cls:"A",coach:"To be listed",lat:31.382,lng:-84.161},
+      {name:"Calhoun County High School",city:"Edison",county:"Calhoun",address:"28092 Main St, Edison, GA 39846",stadium:"Calhoun County Stadium",cls:"A",coach:"To be listed",lat:31.558,lng:-84.738},
+      {name:"Early County High School",city:"Blakely",county:"Early",address:"12020 Columbia St, Blakely, GA 39823",stadium:"Early County Stadium",cls:"A",coach:"To be listed",lat:31.377,lng:-84.934},
+      {name:"Miller County High School",city:"Colquitt",county:"Miller",address:"96 Perry St, Colquitt, GA 39837",stadium:"Miller County Stadium",cls:"A",coach:"To be listed",lat:31.171,lng:-84.743},
+      {name:"Pelham High School",city:"Pelham",county:"Mitchell",address:"1025 Panther Dr, Pelham, GA 31779",stadium:"Pelham Stadium",cls:"A",coach:"To be listed",lat:31.128,lng:-84.152},
+      {name:"Randolph-Clay High School",city:"Cuthbert",county:"Randolph",address:"1530 Hwy 27 S, Cuthbert, GA 39840",stadium:"Randolph-Clay Stadium",cls:"A",coach:"To be listed",lat:31.771,lng:-84.789},
+      {name:"Seminole County High School",city:"Donalsonville",county:"Seminole",address:"800 S Wiley Ave, Donalsonville, GA 39845",stadium:"Seminole County Stadium",cls:"A",coach:"To be listed",lat:31.041,lng:-84.879},
+      {name:"Southwest Georgia STEM Charter",city:"Shellman",county:"Randolph",address:"134 Perry St, Shellman, GA 39886",stadium:"SWGA STEM Stadium",cls:"A",coach:"To be listed",lat:31.758,lng:-84.613},
+      {name:"Terrell County High School",city:"Dawson",county:"Terrell",address:"201 Greenwave Blvd, Dawson, GA 39842",stadium:"Terrell County Stadium",cls:"A",coach:"To be listed",lat:31.774,lng:-84.447},
+      {name:"Atkinson County High School",city:"Pearson",county:"Atkinson",address:"145 Rebel Ln, Pearson, GA 31642",stadium:"Atkinson County Stadium",cls:"A",coach:"To be listed",lat:31.298,lng:-82.852},
+      {name:"Charlton County High School",city:"Folkston",county:"Charlton",address:"12043 3rd St N, Folkston, GA 31537",stadium:"Charlton County Stadium",cls:"A",coach:"To be listed",lat:30.830,lng:-82.010},
+      {name:"Clinch County High School",city:"Homerville",county:"Clinch",address:"1 Panther Way, Homerville, GA 31634",stadium:"Clinch County Stadium",cls:"A",coach:"To be listed",lat:31.037,lng:-82.747},
+      {name:"Irwin County High School",city:"Ocilla",county:"Irwin",address:"149 Chieftain Cir, Ocilla, GA 31774",stadium:"Irwin County Stadium",cls:"A",coach:"To be listed",lat:31.594,lng:-83.250},
+      {name:"Lanier County High School",city:"Lakeland",county:"Lanier",address:"52 W Patten Ave, Lakeland, GA 31635",stadium:"Lanier County Stadium",cls:"A",coach:"To be listed",lat:31.041,lng:-83.075},
+      {name:"Mitchell County High School",city:"Camilla",county:"Mitchell",address:"1000 Newton Rd, Camilla, GA 31730",stadium:"Mitchell County Stadium",cls:"A",coach:"To be listed",lat:31.231,lng:-84.209},
+      {name:"Claxton High School",city:"Claxton",county:"Evans",address:"102 N Clark St, Claxton, GA 30417",stadium:"Claxton Stadium",cls:"A",coach:"To be listed",lat:32.161,lng:-81.909},
+      {name:"Emanuel County Institute",city:"Twin City",county:"Emanuel",address:"102 W Smith St, Twin City, GA 30471",stadium:"ECI Stadium",cls:"A",coach:"To be listed",lat:32.581,lng:-82.158},
+      {name:"McIntosh County Academy",city:"Darien",county:"McIntosh",address:"500 Green St, Darien, GA 31305",stadium:"McIntosh County Stadium",cls:"A",coach:"To be listed",lat:31.370,lng:-81.434},
+      {name:"Montgomery County High School",city:"Mount Vernon",county:"Montgomery",address:"7133 US-280, Mount Vernon, GA 30445",stadium:"Montgomery County Stadium",cls:"A",coach:"To be listed",lat:32.178,lng:-82.594},
+      {name:"Portal High School",city:"Portal",county:"Bulloch",address:"30449 Hwy 80 W, Portal, GA 30450",stadium:"Portal Stadium",cls:"A",coach:"To be listed",lat:32.537,lng:-81.932},
+      {name:"Dooly County High School",city:"Vienna",county:"Dooly",address:"170 Lincoln St, Vienna, GA 31092",stadium:"Dooly County Stadium",cls:"A",coach:"To be listed",lat:32.091,lng:-83.795},
+      {name:"Hawkinsville High School",city:"Hawkinsville",county:"Pulaski",address:"158 South Houston St, Hawkinsville, GA 31036",stadium:"Hawkinsville Stadium",cls:"A",coach:"To be listed",lat:32.283,lng:-83.472},
+      {name:"Telfair County High School",city:"McRae",county:"Telfair",address:"3 Telfair St, McRae, GA 31055",stadium:"Telfair County Stadium",cls:"A",coach:"To be listed",lat:32.065,lng:-82.901},
+      {name:"Treutlen High School",city:"Soperton",county:"Treutlen",address:"201 Main St, Soperton, GA 30457",stadium:"Treutlen Stadium",cls:"A",coach:"To be listed",lat:32.377,lng:-82.592},
+      {name:"Turner County High School",city:"Ashburn",county:"Turner",address:"316 Lamar St, Ashburn, GA 31714",stadium:"Turner County Stadium",cls:"A",coach:"To be listed",lat:31.706,lng:-83.653},
+      {name:"Wheeler County High School",city:"Alamo",county:"Wheeler",address:"51 3rd Ave, Alamo, GA 30411",stadium:"Wheeler County Stadium",cls:"A",coach:"To be listed",lat:32.147,lng:-82.778},
+      {name:"Wilcox County High School",city:"Rochelle",county:"Wilcox",address:"1357 GA-112, Rochelle, GA 31079",stadium:"Wilcox County Stadium",cls:"A",coach:"To be listed",lat:31.951,lng:-83.456},
+      {name:"Georgia Military College Prep",city:"Milledgeville",county:"Baldwin",address:"201 E Greene St, Milledgeville, GA 31061",stadium:"GMC Stadium",cls:"A",coach:"To be listed",lat:33.081,lng:-83.232},
+      {name:"Glascock County High School",city:"Gibson",county:"Glascock",address:"770 Railroad Ave, Gibson, GA 30810",stadium:"Glascock County Stadium",cls:"A",coach:"To be listed",lat:33.233,lng:-82.595},
+      {name:"Hancock Central High School",city:"Sparta",county:"Hancock",address:"11287 Broad St, Sparta, GA 31087",stadium:"Hancock Central Stadium",cls:"A",coach:"To be listed",lat:33.256,lng:-82.972},
+      {name:"Jenkins County High School",city:"Millen",county:"Jenkins",address:"433 Barney Ave, Millen, GA 30442",stadium:"Jenkins County Stadium",cls:"A",coach:"To be listed",lat:32.804,lng:-81.949},
+      {name:"Johnson County High School",city:"Wrightsville",county:"Johnson",address:"150 Trojan Way, Wrightsville, GA 31096",stadium:"Johnson County Stadium",cls:"A",coach:"To be listed",lat:32.729,lng:-82.720},
+      {name:"Twiggs County High School",city:"Jeffersonville",county:"Twiggs",address:"1010-B Jeffersonville Rd, Jeffersonville, GA 31044",stadium:"Twiggs County Stadium",cls:"A",coach:"To be listed",lat:32.688,lng:-83.340},
+      {name:"Wilkinson County High School",city:"Irwinton",county:"Wilkinson",address:"11481 Hwy 57, Irwinton, GA 31042",stadium:"Wilkinson County Stadium",cls:"A",coach:"To be listed",lat:32.811,lng:-83.174},
+      {name:"Central High School (Talbotton)",city:"Talbotton",county:"Talbot",address:"14048 GA-41, Talbotton, GA 31827",stadium:"Central Stadium",cls:"A",coach:"To be listed",lat:32.678,lng:-84.540},
+      {name:"Chattahoochee County High School",city:"Cusseta",county:"Chattahoochee",address:"360 Hwy 26, Cusseta, GA 31805",stadium:"Chattahoochee County Stadium",cls:"A",coach:"To be listed",lat:32.306,lng:-84.773},
+      {name:"Crawford County High School",city:"Roberta",county:"Crawford",address:"401 GA-128, Roberta, GA 31078",stadium:"Crawford County Stadium",cls:"A",coach:"To be listed",lat:32.721,lng:-84.011},
+      {name:"Macon County High School",city:"Montezuma",county:"Macon",address:"1 Trojan Way, Montezuma, GA 31063",stadium:"Macon County Stadium",cls:"A",coach:"To be listed",lat:32.305,lng:-84.027},
+      {name:"Marion County High School",city:"Buena Vista",county:"Marion",address:"1 E Patriot Blvd, Buena Vista, GA 31803",stadium:"Marion County Stadium",cls:"A",coach:"To be listed",lat:32.319,lng:-84.517},
+      {name:"Schley County High School",city:"Ellaville",county:"Schley",address:"201 Perry Dr, Ellaville, GA 31806",stadium:"Schley County Stadium",cls:"A",coach:"To be listed",lat:32.238,lng:-84.309},
+      {name:"Taylor County High School",city:"Butler",county:"Taylor",address:"24 W Main St, Butler, GA 31006",stadium:"Taylor County Stadium",cls:"A",coach:"To be listed",lat:32.557,lng:-84.239},
+      {name:"B.E.S.T. Academy",city:"Atlanta",county:"Fulton",address:"1636 Ridge Ave SW, Atlanta, GA 30315",stadium:"BEST Stadium",cls:"A",coach:"To be listed",lat:33.730,lng:-84.400},
+      {name:"Bowdon High School",city:"Bowdon",county:"Carroll",address:"39 Loftin St, Bowdon, GA 30108",stadium:"Bowdon Stadium",cls:"A",coach:"To be listed",lat:33.539,lng:-85.253},
+      {name:"Greenville High School",city:"Greenville",county:"Meriwether",address:"17649 Roosevelt Hwy, Greenville, GA 30222",stadium:"Greenville Stadium",cls:"A",coach:"To be listed",lat:33.028,lng:-84.713},
+      {name:"Manchester High School",city:"Manchester",county:"Meriwether",address:"405 5th Ave, Manchester, GA 31816",stadium:"Manchester Stadium",cls:"A",coach:"To be listed",lat:32.860,lng:-84.620},
+      {name:"Trion High School",city:"Trion",county:"Chattooga",address:"919 Allgood St, Trion, GA 30753",stadium:"Trion Stadium",cls:"A",coach:"To be listed",lat:34.544,lng:-85.310},
+      {name:"Greene County High School",city:"Greensboro",county:"Greene",address:"1002 S Main St, Greensboro, GA 30642",stadium:"Greene County Stadium",cls:"A",coach:"To be listed",lat:33.576,lng:-83.182},
+      {name:"Lake Oconee Academy",city:"Greensboro",county:"Greene",address:"1021 Titan Cir, Greensboro, GA 30642",stadium:"Lake Oconee Stadium",cls:"A",coach:"To be listed",lat:33.520,lng:-83.210},
+      {name:"Lincoln County High School",city:"Lincolnton",county:"Lincoln",address:"200 Charles Ward Way, Lincolnton, GA 30817",stadium:"Lincoln County Stadium",cls:"A",coach:"To be listed",lat:33.794,lng:-82.478},
+      {name:"Towns County High School",city:"Hiawassee",county:"Towns",address:"1400 Hwy 76 E, Hiawassee, GA 30546",stadium:"Towns County Stadium",cls:"A",coach:"To be listed",lat:34.949,lng:-83.757},
+      {name:"Warren County High School",city:"Warrenton",county:"Warren",address:"1273 Atlanta Hwy, Warrenton, GA 30828",stadium:"Warren County Stadium",cls:"A",coach:"To be listed",lat:33.407,lng:-82.662},
+      {name:"Washington-Wilkes Comprehensive High School",city:"Washington",county:"Wilkes",address:"1180 Tignall Rd, Washington, GA 30673",stadium:"Washington-Wilkes Stadium",cls:"A",coach:"To be listed",lat:33.737,lng:-82.739}
+    ]);
 
     const counties = [...new Set(schools.map(s => s.county))].sort();
     const cty = document.getElementById("cty");
@@ -261,15 +523,13 @@
     });
 
     function mono(name) {
-      const parts = name.replace(/[()]/g,"").split(/\s+/).filter(w => !/high|school|academy|catholic|military|county/i.test(w));
+      const parts = name.replace(/[()]/g,"").split(/\s+/).filter(w => !/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));
       const letters = parts.slice(0,2).map(w => w[0]).join("");
       return (letters || name.slice(0,2)).toUpperCase();
     }
-
     function mapsUrl(s) {
       return "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(s.address || (s.name + " " + s.city + " GA"));
     }
-
     function showSchool(s) {
       document.getElementById("drawer").innerHTML = `
         <article class="card"><div class="card-inner">
@@ -303,13 +563,14 @@
     const clusters = L.markerClusterGroup({ showCoverageOnHover:false, maxClusterRadius:48 });
     function pinFor(s) {
       const m = L.circleMarker([s.lat, s.lng], { radius:6, color:"#d4af37", fillColor:"#f0d56a", fillOpacity:0.95, weight:1 });
-      m.bindTooltip(s.name);
-      m.on("click", () => showSchool(s));
+      m.bindTooltip(s.name + " · " + s.cls);
+      m.on("click", () => { showSchool(s); map.setView([s.lat, s.lng], Math.max(map.getZoom(), 10)); });
       return m;
     }
     function render(list) {
       clusters.clearLayers();
       list.forEach(s => clusters.addLayer(pinFor(s)));
+      if (!list.length) document.getElementById("drawer").innerHTML = `<p class="empty">No schools match those filters.</p>`;
     }
     map.addLayer(clusters);
     render(schools);
@@ -320,7 +581,7 @@
       const cl = document.getElementById("cls").value;
       const co = document.getElementById("cty").value;
       render(schools.filter(s =>
-        (!q || s.name.toLowerCase().includes(q) || s.city.toLowerCase().includes(q)) &&
+        (!q || s.name.toLowerCase().includes(q) || s.city.toLowerCase().includes(q) || s.county.toLowerCase().includes(q)) &&
         (!cl || s.cls === cl) &&
         (!co || s.county === co)
       ));
@@ -331,4 +592,3 @@
   </script>
 </body>
 </html>
-
