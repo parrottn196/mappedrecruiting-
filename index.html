@@ -10,8 +10,16 @@
   <style>
     :root { --bg:#070907; --line:#d4af37; --text:#f3ead1; --muted:#9a9178; }
     * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:Georgia,serif; background:var(--bg); color:var(--text); }
-    header { display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center; padding:.85rem 1.1rem; border-bottom:1px solid rgba(212,175,55,.25); }
+    html, body { height:100%; overflow:hidden; font-family:Georgia,serif; background:var(--bg); color:var(--text); }
+    header {
+      height:68px;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:1rem;
+      align-items:center;
+      padding:0 1.1rem;
+      border-bottom:1px solid rgba(212,175,55,.25);
+    }
     .logo { display:flex; align-items:center; gap:.65rem; }
     .ga { width:36px; height:36px; border:1.5px solid var(--line); border-radius:50%; display:grid; place-items:center; color:var(--line); font-size:.72rem; }
     .logo h1 { font-size:.78rem; letter-spacing:.16em; color:var(--line); }
@@ -22,13 +30,20 @@
     .filters { display:flex; gap:.7rem; font-size:.68rem; color:var(--muted); }
     .filters label { display:grid; gap:.2rem; }
     .filters select { background:transparent; color:var(--text); border:0; border-bottom:1px solid rgba(212,175,55,.35); padding:.2rem 1rem .2rem 0; font:inherit; }
-    .layout { display:grid; grid-template-columns:1.15fr .85fr; min-height:calc(100vh - 68px); }
-    #map { background:#070907; min-height:560px; }
-    .leaflet-container { background:#070907; }
+    .layout { display:grid; grid-template-columns:1.15fr .85fr; height:calc(100vh - 68px); }
+    #map { background:#070907; height:100%; width:100%; }
+    .leaflet-container { background:#070907; height:100% !important; }
     .leaflet-tile-pane { filter:brightness(1.35) contrast(1.05); }
     .hint-map { position:absolute; left:14px; bottom:12px; z-index:500; color:var(--muted); font-size:.72rem; }
-    .drawer { padding:1rem; }
-    .card { background:#0e130e; border:1px solid rgba(212,175,55,.28); border-radius:10px; padding:1rem; min-height:calc(100vh - 100px); }
+    .drawer { padding:1rem; height:100%; }
+    .card {
+      background:#0e130e;
+      border:1px solid rgba(212,175,55,.28);
+      border-radius:10px;
+      padding:1rem;
+      height:calc(100vh - 100px);
+      overflow:auto;
+    }
     .top { display:grid; grid-template-columns:92px 1fr; gap:.85rem; }
     .photo { height:92px; border:1px solid rgba(212,175,55,.3); border-radius:8px; display:grid; place-items:center; color:var(--muted); font-size:.62rem; letter-spacing:.08em; text-align:center; }
     .badge { display:inline-block; border:1px solid var(--line); color:var(--line); font-size:.62rem; padding:.15rem .4rem; margin-top:.35rem; }
@@ -41,7 +56,11 @@
     .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large { background:rgba(212,175,55,.18)!important; }
     .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background:#d4af37!important; color:#111!important; font-weight:700; }
     .leaflet-tooltip { background:#0e130e; color:var(--text); border:1px solid var(--line); }
-    @media (max-width:980px){ header,.layout{display:block;} }
+    @media (max-width:980px){
+      html, body { overflow:auto; }
+      header, .layout { display:block; height:auto; }
+      #map { min-height:70vh; }
+    }
   </style>
 </head>
 <body>
@@ -61,7 +80,7 @@
     </div>
   </header>
   <div class="layout">
-    <div style="position:relative">
+    <div style="position:relative;height:100%;">
       <div id="map"></div>
       <div class="hint-map">Drag to pan • Scroll to zoom • 7A–5A plotted</div>
     </div>
@@ -121,7 +140,6 @@
       {name:"Discovery High School",city:"Lawrenceville",county:"Gwinnett",address:"1335 Old Norcross Rd, Lawrenceville, GA 30046",stadium:"Discovery",cls:"7A",coach:"To be listed",lat:33.929,lng:-84.027},
       {name:"Mill Creek High School",city:"Hoschton",county:"Gwinnett",address:"4400 Braselton Hwy, Hoschton, GA 30548",stadium:"Mill Creek",cls:"7A",coach:"To be listed",lat:34.114,lng:-83.850},
       {name:"Seckinger High School",city:"Buford",county:"Gwinnett",address:"3655 Sardis Church Rd, Buford, GA 30519",stadium:"Seckinger",cls:"7A",coach:"To be listed",lat:34.079,lng:-83.912},
-
       {name:"Bradwell Institute",city:"Hinesville",county:"Liberty",address:"108 Bradwell St, Hinesville, GA 31313",stadium:"Bradwell",cls:"6A",coach:"To be listed",lat:31.847,lng:-81.596},
       {name:"Brunswick High School",city:"Brunswick",county:"Glynn",address:"3885 Altama Ave, Brunswick, GA 31520",stadium:"Glynn County Stadium",cls:"6A",coach:"To be listed",lat:31.150,lng:-81.491},
       {name:"Effingham County High School",city:"Springfield",county:"Effingham",address:"1589 GA-119, Springfield, GA 31329",stadium:"Effingham County",cls:"6A",coach:"To be listed",lat:32.372,lng:-81.311},
@@ -186,7 +204,6 @@
       {name:"Loganville High School",city:"Loganville",county:"Walton",address:"1525 Harrison Rd, Loganville, GA 30052",stadium:"Loganville",cls:"6A",coach:"To be listed",lat:33.839,lng:-83.901},
       {name:"Mountain View High School",city:"Lawrenceville",county:"Gwinnett",address:"2351 Sunny Hill Rd, Lawrenceville, GA 30043",stadium:"Mountain View",cls:"6A",coach:"To be listed",lat:34.066,lng:-83.981},
       {name:"Walnut Grove High School",city:"Loganville",county:"Walton",address:"4863 Hwy 81, Loganville, GA 30052",stadium:"Walnut Grove",cls:"6A",coach:"To be listed",lat:33.747,lng:-83.846},
-
       {name:"Benedictine Military School",city:"Savannah",county:"Chatham",address:"6502 Seawright Dr, Savannah, GA 31406",stadium:"Memorial Stadium",cls:"5A",coach:"To be listed",lat:32.029,lng:-81.080},
       {name:"Evans High School",city:"Evans",county:"Columbia",address:"4550 Cox Rd, Evans, GA 30809",stadium:"Evans",cls:"5A",coach:"To be listed",lat:33.522,lng:-82.128},
       {name:"Groves High School",city:"Garden City",county:"Chatham",address:"201 Dean Forest Rd, Garden City, GA 31408",stadium:"Groves Stadium",cls:"5A",coach:"To be listed",lat:32.114,lng:-81.154},
@@ -278,6 +295,8 @@
     const map = L.map("map", { zoomControl:false, attributionControl:false }).setView([32.65, -83.45], 7);
     L.control.zoom({ position:"bottomleft" }).addTo(map);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { opacity:0.7 }).addTo(map);
+    setTimeout(function () { map.invalidateSize(); }, 200);
+    window.addEventListener("resize", function () { map.invalidateSize(); });
 
     fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
       .then(r => r.json())
