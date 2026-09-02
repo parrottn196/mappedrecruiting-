@@ -22,6 +22,8 @@ header{min-height:68px;display:grid;grid-template-columns:auto 1fr auto;gap:.75r
 select,input[type=number]{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.42rem .5rem;font:inherit;min-width:0}
 .filters{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;justify-content:flex-end}
 .filters label{font-size:.58rem;letter-spacing:.12em;color:var(--muted);display:flex;flex-direction:column;gap:.15rem}
+.board-link{color:var(--line);text-decoration:none;letter-spacing:.16em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem;white-space:nowrap}
+.board-link:hover{border-color:var(--line)}
 main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
 #map{height:100%;background:#0a0d0a}
 .drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%)}
@@ -29,11 +31,6 @@ main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
 .tab{flex:1;text-align:center;border:1px solid rgba(212,175,55,.35);padding:.4rem;font-size:.62rem;letter-spacing:.16em;color:var(--muted);cursor:pointer;background:#101510}
 .tab.on{color:var(--line);border-color:var(--line)}
 .card{position:relative;border:1px solid var(--line);padding:1.15rem 1.05rem 1rem;background:linear-gradient(180deg,rgba(212,175,55,.06),transparent 28%),#0d130d}
-.card:before,.card:after,.card-inner:before,.card-inner:after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--line)}
-.card:before{top:6px;left:6px;border-right:0;border-bottom:0}
-.card:after{top:6px;right:6px;border-left:0;border-bottom:0}
-.card-inner:before{bottom:6px;left:6px;border-right:0;border-top:0}
-.card-inner:after{bottom:6px;right:6px;border-left:0;border-top:0}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:.7rem}
 .mono{width:58px;height:58px;border:1px solid var(--line);display:grid;place-items:center;color:var(--line);font-size:1.05rem}
 .badge{border:1px solid var(--line);color:var(--line);font-size:.62rem;letter-spacing:.18em;padding:.28rem .45rem}
@@ -47,11 +44,10 @@ main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
 .recruits{text-align:center;letter-spacing:.32em;font-size:.62rem;color:var(--line);margin-bottom:.35rem}
 .slot,.player{border-bottom:1px dashed rgba(212,175,55,.28);padding:.6rem 0;color:var(--text);font-size:.82rem}
 .player{cursor:pointer}
-.player:hover{color:var(--line)}
 .meta{color:var(--muted);font-size:.72rem;margin-top:.2rem;line-height:1.45}
+.links{display:flex;gap:.75rem;margin-top:.35rem}
 .empty{color:var(--muted);padding:1rem .2rem}
 .count{font-size:.62rem;letter-spacing:.14em;color:var(--muted);margin-bottom:.6rem}
-.links{display:flex;gap:.75rem;margin-top:.35rem}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .marker-cluster-small{background-color:rgba(240,213,106,.28)}
 .marker-cluster-small div{background-color:rgba(240,213,106,.85);color:#1a1608}
@@ -60,7 +56,6 @@ main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
 .marker-cluster-large{background-color:rgba(139,105,20,.38)}
 .marker-cluster-large div{background-color:rgba(139,105,20,.95);color:#f3ead1}
 .marker-cluster{border:1px solid rgba(212,175,55,.55)}
-.marker-cluster div{font-family:Georgia,serif;font-weight:700}
 @media(max-width:900px){main{grid-template-columns:1fr}.drawer{height:50%}#map{height:50%}header{grid-template-columns:1fr;height:auto}}
 </style>
 </head>
@@ -69,12 +64,13 @@ main{height:calc(100% - 68px);display:grid;grid-template-columns:1fr 390px}
   <div class="logo"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></div>
   <div class="search-wrap"><input id="q" class="search" placeholder="Search school, city, or player"/></div>
   <div class="filters">
+    <a class="board-link" href="our-recruits.html">OUR RECRUITS</a>
     <label>Class<select id="cls"><option value="">All</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select></label>
     <label>County<select id="cty"><option value="">All</option></select></label>
     <label>Pos<select id="pos"><option value="">All</option></select></label>
     <label>Year<select id="yr"><option value="">All</option><option>2026</option><option>2027</option><option>2028</option></select></label>
-    <label>Min Ht (in)<input id="minHt" type="number" min="60" max="84" placeholder="70"></label>
-    <label>Max Wt<input id="maxWt" type="number" min="140" max="400" placeholder="250"></label>
+    <label>Min Ht<select id="minHt"><option value="">Any</option></select></label>
+    <label>Min Wt<input id="minWt" type="number" min="140" max="400" placeholder="200"></label>
     <label>Min GPA<input id="minGpa" type="number" min="0" max="5" step="0.1" placeholder="3.0"></label>
   </div>
 </header>
@@ -108,6 +104,8 @@ S("Douglas County High School","Douglasville","Douglas","8705 Campbellton St, Do
 S("East Coweta High School","Sharpsburg","Coweta","400 Hwy 154, Sharpsburg, GA 30277","East Coweta Stadium","7A","John Small",33.397,-84.677),
 S("Northgate High School","Newnan","Coweta","3220 Fischer Rd, Newnan, GA 30265","Northgate Stadium","7A","Casey Smith",33.407,-84.698),
 S("Westlake High School","Atlanta","Fulton","2370 Union Rd SW, Atlanta, GA 30331","Westlake Stadium","7A","Kevin Whitley",33.695,-84.574),
+S("Mountain View High School","Lawrenceville","Gwinnett","2351 Sunny Hill Rd, Lawrenceville, GA 30043","Mountain View Stadium","6A","Todd Welborn",34.066,-83.981),
+S("Johnson County High School","Wrightsville","Johnson","150 Trojan Way, Wrightsville, GA 31096","Johnson County Stadium","A","To be listed",32.729,-82.720),
 S("Campbell High School","Smyrna","Cobb","925 Powder Springs St, Smyrna, GA 30080","Campbell Stadium","7A","Jeff Phillips",33.883,-84.515),
 S("Harrison High School","Kennesaw","Cobb","4500 Due West Rd NW, Kennesaw, GA 30152","Harrison Stadium","7A","Luqman Salam",33.999,-84.666),
 S("Hillgrove High School","Powder Springs","Cobb","4165 Dallas Hwy, Powder Springs, GA 30127","Hillgrove Stadium","7A","Justin DeShon",33.916,-84.680),
@@ -210,7 +208,6 @@ S("Clarke Central High School","Athens","Clarke","350 S Milledge Ave, Athens, GA
 S("Habersham Central High School","Mt. Airy","Habersham","2059 State Hwy 197 S, Mt. Airy, GA 30563","Habersham Central Stadium","6A","Benji Harrison",34.518,-83.503),
 S("Jackson County High School","Jefferson","Jackson","152 Jamestown Blvd, Jefferson, GA 30549","Jackson County Stadium","6A","Korey Mobbs",34.117,-83.572),
 S("Loganville High School","Loganville","Walton","1525 Hwy 81, Loganville, GA 30052","Loganville Stadium","6A","Nic Snowden",33.839,-83.901),
-S("Mountain View High School","Lawrenceville","Gwinnett","2351 Sunny Hill Rd, Lawrenceville, GA 30043","Mountain View Stadium","6A","Todd Welborn",34.066,-83.981),
 S("Walnut Grove High School","Loganville","Walton","4863 Hwy 81, Loganville, GA 30052","Walnut Grove Stadium","6A","Mackenzie Bennett",33.743,-83.854),
 S("Benedictine Military School","Savannah","Chatham","6502 Seawright Dr, Savannah, GA 31406","Memorial Stadium","5A","Danny Britt",32.022,-81.100),
 S("Evans High School","Evans","Columbia","4550 Cox Rd, Evans, GA 30809","Evans Stadium","5A","Lee Hutto",33.534,-82.140),
@@ -489,7 +486,6 @@ S("Georgia Military College Prep","Milledgeville","Baldwin","201 E Greene St, Mi
 S("Glascock County High School","Gibson","Glascock","770 Railroad Ave, Gibson, GA 30810","Glascock County Stadium","A","To be listed",33.233,-82.595),
 S("Hancock Central High School","Sparta","Hancock","11287 Broad St, Sparta, GA 31087","Hancock Central Stadium","A","To be listed",33.256,-82.972),
 S("Jenkins County High School","Millen","Jenkins","433 Barney Ave, Millen, GA 30442","Jenkins County Stadium","A","To be listed",32.804,-81.949),
-S("Johnson County High School","Wrightsville","Johnson","150 Trojan Way, Wrightsville, GA 31096","Johnson County Stadium","A","To be listed",32.729,-82.720),
 S("Twiggs County High School","Jeffersonville","Twiggs","1010-B Jeffersonville Rd, Jeffersonville, GA 31044","Twiggs County Stadium","A","To be listed",32.688,-83.340),
 S("Wilkinson County High School","Irwinton","Wilkinson","11481 Hwy 57, Irwinton, GA 31042","Wilkinson County Stadium","A","To be listed",32.811,-83.174),
 S("Central High School (Talbotton)","Talbotton","Talbot","14048 GA-41, Talbotton, GA 31827","Central Stadium","A","To be listed",32.678,-84.540),
@@ -512,129 +508,89 @@ S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton,
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
 ];
 
-const players=[
-  {name:"Cedric Bridges", school:"Johnson County High School", pos:"LB", htIn:71, wt:210, gpa:3.7, year:"2028", jersey:56, x:"CedricBridges58", hudl:"https://www.hudl.com/video/3/22737408/68cbdc453176d35663e3546d", notes:"Sophomore film also shows DL/OL. School: (478) 578-0402"}
-];
+const players=[{name:"Cedric Bridges",school:"Johnson County High School",pos:"LB",htIn:71,wt:210,gpa:3.7,year:"2028",jersey:56,x:"CedricBridges58",hudl:"https://www.hudl.com/video/3/22737408/68cbdc453176d35663e3546d",notes:"Sophomore film also shows DL/OL. School: (478) 578-0402"}];
 
-const POS=["QB","RB","WR","TE","OT","OG","OC","DE","DT","LB","CB","S","ATH","K","P","LS"];
-const posEl=document.getElementById("pos");
-POS.forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;posEl.appendChild(o);});
-const counties=[...new Set(schools.map(s=>s.county))].sort();
-const ctyEl=document.getElementById("cty");
-counties.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;ctyEl.appendChild(o);});
-
-function schoolByName(n){return schools.find(s=>s.name.toLowerCase()===n.toLowerCase());}
-function playersAt(schoolName){return players.filter(p=>p.school===schoolName);}
-function fmtHt(inches){if(!inches) return "—"; return Math.floor(inches/12)+ "'"+(inches%12)+'"';}
+["QB","RB","WR","TE","OT","OG","OC","DE","DT","LB","CB","S","ATH","K","P","LS"].forEach(p=>{
+  const o=document.createElement("option");o.value=p;o.textContent=p;document.getElementById("pos").appendChild(o);
+});
+[...new Set(schools.map(s=>s.county))].sort().forEach(c=>{
+  const o=document.createElement("option");o.value=c;o.textContent=c;document.getElementById("cty").appendChild(o);
+});
+for(let inches=65;inches<=81;inches++){
+  const o=document.createElement("option");o.value=inches;o.textContent=Math.floor(inches/12)+"'"+(inches%12)+'"';
+  document.getElementById("minHt").appendChild(o);
+}
+function schoolByName(n){return schools.find(s=>s.name.toLowerCase()===String(n||"").toLowerCase());}
+function playersAt(n){return players.filter(p=>p.school===n);}
+function fmtHt(n){return n?Math.floor(n/12)+"'"+(n%12)+'"':"—";}
 function playerMatch(p){
   const q=document.getElementById("q").value.toLowerCase();
-  const pos=document.getElementById("pos").value;
-  const yr=document.getElementById("yr").value;
+  const pos=document.getElementById("pos").value, yr=document.getElementById("yr").value;
   const minHt=parseFloat(document.getElementById("minHt").value);
-  const maxWt=parseFloat(document.getElementById("maxWt").value);
+  const minWt=parseFloat(document.getElementById("minWt").value);
   const minGpa=parseFloat(document.getElementById("minGpa").value);
   const sch=schoolByName(p.school);
   const hay=(p.name+" "+p.school+" "+(sch?sch.city+" "+sch.county:"")).toLowerCase();
-  if(q && !hay.includes(q)) return false;
-  if(pos && p.pos!==pos) return false;
-  if(yr && p.year!==yr) return false;
-  if(!isNaN(minHt) && (p.htIn||0)<minHt) return false;
-  if(!isNaN(maxWt) && (p.wt||999)>maxWt) return false;
-  if(!isNaN(minGpa) && (p.gpa||0)<minGpa) return false;
+  if(q&&!hay.includes(q))return false;
+  if(pos&&p.pos!==pos)return false;
+  if(yr&&p.year!==yr)return false;
+  if(!isNaN(minHt)&&(p.htIn||0)<minHt)return false;
+  if(!isNaN(minWt)&&(p.wt||0)<minWt)return false;
+  if(!isNaN(minGpa)&&(p.gpa||0)<minGpa)return false;
   return true;
 }
 function schoolHasMatch(s){
   const q=document.getElementById("q").value.toLowerCase();
-  const cl=document.getElementById("cls").value;
-  const co=document.getElementById("cty").value;
-  const playerFilters=document.getElementById("pos").value||document.getElementById("yr").value||document.getElementById("minHt").value||document.getElementById("maxWt").value||document.getElementById("minGpa").value;
+  const cl=document.getElementById("cls").value, co=document.getElementById("cty").value;
+  const pf=document.getElementById("pos").value||document.getElementById("yr").value||document.getElementById("minHt").value||document.getElementById("minWt").value||document.getElementById("minGpa").value;
   const textOk=!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q)||playersAt(s.name).some(p=>p.name.toLowerCase().includes(q));
-  if(!textOk) return false;
-  if(cl && s.cls!==cl) return false;
-  if(co && s.county!==co) return false;
-  if(playerFilters && !playersAt(s.name).some(playerMatch)) return false;
+  if(!textOk)return false;
+  if(cl&&s.cls!==cl)return false;
+  if(co&&s.county!==co)return false;
+  if(pf&&!playersAt(s.name).some(playerMatch))return false;
   return true;
 }
-
 let tab="school", lastSchool=null;
-function setTab(t){
-  tab=t;
-  document.getElementById("tabSchool").classList.toggle("on",t==="school");
-  document.getElementById("tabPlayers").classList.toggle("on",t==="players");
-  if(t==="players") renderPlayerList();
-  else if(lastSchool) showSchool(lastSchool);
-}
+function setTab(t){tab=t;document.getElementById("tabSchool").classList.toggle("on",t==="school");document.getElementById("tabPlayers").classList.toggle("on",t==="players");if(t==="players")renderPlayerList();else if(lastSchool)showSchool(lastSchool);}
 function playerLine(p){
-  const x=p.x?`<a class="link" href="https://x.com/${p.x.replace("@","")}" target="_blank" rel="noopener">X</a>`:"";
-  const h=p.hudl?`<a class="link" href="${p.hudl}" target="_blank" rel="noopener">Hudl</a>`:"";
   return `<div class="player" onclick="openPlayer('${p.name.replace(/'/g,"\\'")}')">
     <strong>${p.jersey?"#"+p.jersey+" ":""}${p.name}</strong> · ${p.pos} · ${p.year||""}
     <div class="meta">${fmtHt(p.htIn)} · ${p.wt||"—"} lbs · GPA ${p.gpa??"—"} · ${p.school}${p.notes?"<br>"+p.notes:""}</div>
-    <div class="links">${x}${h}</div>
+    <div class="links">${p.x?`<a class="link" href="https://x.com/${p.x.replace("@","")}" target="_blank">X</a>`:""}${p.hudl?`<a class="link" href="${p.hudl}" target="_blank">Hudl</a>`:""}</div>
   </div>`;
 }
-function renderPlayerList(){
-  const list=players.filter(playerMatch);
-  document.getElementById("drawer").innerHTML=`<div class="count">${list.length} PLAYER${list.length===1?"":"S"}</div>${list.length?list.map(playerLine).join(""):'<p class="empty">No players match those filters.</p>'}`;
-}
-function mono(name){
-  const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));
-  return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();
-}
+function renderPlayerList(){const list=players.filter(playerMatch);document.getElementById("drawer").innerHTML=`<div class="count">${list.length} PLAYER${list.length===1?"":"S"}</div>${list.length?list.map(playerLine).join(""):'<p class="empty">No players match those filters.</p>'}`;}
+function mono(name){const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();}
 function mapsUrl(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function showSchool(s){
-  lastSchool=s; tab="school";
-  document.getElementById("tabSchool").classList.add("on");
-  document.getElementById("tabPlayers").classList.remove("on");
+  lastSchool=s;tab="school";
+  document.getElementById("tabSchool").classList.add("on");document.getElementById("tabPlayers").classList.remove("on");
   const recs=playersAt(s.name);
-  const shown=recs.length?recs.map(playerLine).join(""):`<div class="slot">◆ To be listed</div><div class="slot">◆ To be listed</div><div class="slot">◆ To be listed</div>`;
-  document.getElementById("drawer").innerHTML=`<article class="card"><div class="card-inner">
+  document.getElementById("drawer").innerHTML=`<article class="card">
     <div class="top"><div class="mono">${mono(s.name)}</div><div class="badge">${s.cls}</div></div>
     <div class="kicker">GHSA 2026–28 · CLASS ${s.cls}</div>
     <h2 class="title">${s.name}</h2>
     <div class="row">${ICO.shield}<div><small style="letter-spacing:.16em;color:var(--line);font-size:.58rem;">HEAD COACH</small><div>${s.coach}</div></div></div>
     <div class="row">${ICO.stadium}<div>${s.stadium}</div></div>
-    <div class="row">${ICO.pin}<div class="addr-row"><div>${s.address}<div style="color:var(--muted);font-size:.75rem;margin-top:.15rem;">${s.city} · ${s.county} County</div></div><a class="dir" href="${mapsUrl(s)}" target="_blank" rel="noopener">Directions ›</a></div></div>
+    <div class="row">${ICO.pin}<div class="addr-row"><div>${s.address}<div style="color:var(--muted);font-size:.75rem;margin-top:.15rem;">${s.city} · ${s.county} County</div></div><a class="dir" href="${mapsUrl(s)}" target="_blank">Directions ›</a></div></div>
     <div class="rule"></div><div class="recruits">◆ &nbsp; R E C R U I T S &nbsp; ◆</div>
-    ${shown}
-  </div></article>`;
+    ${recs.length?recs.map(playerLine).join(""):`<div class="slot">◆ To be listed</div><div class="slot">◆ To be listed</div>`}
+  </article>`;
 }
-function openPlayer(name){
-  const p=players.find(x=>x.name===name);
-  const s=schoolByName(p.school);
-  if(s){showSchool(s); map.setView([s.lat,s.lng],11);}
-}
-
+function openPlayer(name){const p=players.find(x=>x.name===name);const s=schoolByName(p.school);if(s){showSchool(s);map.setView([s.lat,s.lng],11);}}
 const map=L.map("map").setView([32.9,-83.5],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
 fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json").then(r=>r.json()).then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map));
 const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48});
-function pinFor(s){
-  const n=playersAt(s.name).length;
-  const m=L.circleMarker([s.lat,s.lng],{radius:n?8:6,color:"#d4af37",fillColor:n?"#f0d56a":"#c4b06a",fillOpacity:0.95,weight:1});
-  m.bindTooltip(s.name+" · "+s.cls+(n?` · ${n} recruit${n>1?"s":""}`:""));
-  m.on("click",()=>{showSchool(s);map.setView([s.lat,s.lng],Math.max(map.getZoom(),10));});
-  return m;
-}
-function render(list){
-  clusters.clearLayers();
-  list.forEach(s=>clusters.addLayer(pinFor(s)));
-  if(!list.length) document.getElementById("drawer").innerHTML='<p class="empty">No schools match those filters.</p>';
-  if(tab==="players") renderPlayerList();
-}
+function pinFor(s){const n=playersAt(s.name).length;const m=L.circleMarker([s.lat,s.lng],{radius:n?8:6,color:"#d4af37",fillColor:n?"#f0d56a":"#c4b06a",fillOpacity:.95,weight:1});m.bindTooltip(s.name+" · "+s.cls+(n?` · ${n} recruit${n>1?"s":""}`:""));m.on("click",()=>{showSchool(s);map.setView([s.lat,s.lng],Math.max(map.getZoom(),10));});return m;}
+function render(list){clusters.clearLayers();list.forEach(s=>clusters.addLayer(pinFor(s)));if(tab==="players")renderPlayerList();}
 map.addLayer(clusters);
-function applyFilters(){
-  render(schools.filter(schoolHasMatch));
-  if(tab==="players") renderPlayerList();
-}
-["q","cls","cty","pos","yr","minHt","maxWt","minGpa"].forEach(id=>{
-  const el=document.getElementById(id);
-  el.addEventListener(id==="q"||el.type==="number"?"input":"change",applyFilters);
-});
+function applyFilters(){render(schools.filter(schoolHasMatch));if(tab==="players")renderPlayerList();}
+["q","cls","cty","pos","yr","minHt","minWt","minGpa"].forEach(id=>{const el=document.getElementById(id);el.addEventListener(id==="q"||el.type==="number"?"input":"change",applyFilters);});
 render(schools);
-const jc=schools.find(s=>s.name==="Johnson County High School");
-showSchool(jc);
-map.setView([jc.lat,jc.lng],10);
+const want=new URLSearchParams(location.search).get("school");
+const start=schoolByName(want)||schoolByName("Johnson County High School")||schools[0];
+showSchool(start);map.setView([start.lat,start.lng],10);
 </script>
 </body>
 </html>
