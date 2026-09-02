@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Our Recruits — MappedRecruiting</title>
+<style>
+:root{--bg:#070907;--panel:#0c110c;--line:#d4af37;--text:#f3ead1;--muted:#9a9178}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:Georgia,serif;background:var(--bg);color:var(--text)}
+header{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:.85rem 1.2rem;border-bottom:1px solid rgba(212,175,55,.25)}
+.logo{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:inherit}
+.ga{width:36px;height:36px;border:1.5px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--line);font-size:.72rem}
+.logo h1{font-size:.78rem;letter-spacing:.16em;color:var(--line)}
+.logo p{font-size:.62rem;letter-spacing:.08em;color:var(--muted)}
+nav a{color:var(--muted);text-decoration:none;letter-spacing:.16em;font-size:.68rem;border:1px solid rgba(212,175,55,.25);padding:.42rem .6rem;margin-left:.35rem}
+nav a.on,nav a:hover{color:var(--line);border-color:var(--line)}
+.search{width:100%;max-width:420px;background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.5rem .7rem;font:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:1.25rem}
+.filters{display:flex;flex-wrap:wrap;gap:.45rem;margin:1rem 0 1.25rem}
+.filters label{font-size:.58rem;letter-spacing:.12em;color:var(--muted);display:flex;flex-direction:column;gap:.15rem}
+select,input[type=number]{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.42rem .5rem;font:inherit}
+h2.page{color:var(--line);letter-spacing:.28em;font-size:.8rem;font-weight:normal}
+.count{color:var(--muted);font-size:.72rem;margin:.35rem 0 1rem}
+.card{border:1px solid var(--line);padding:1.05rem 1rem;margin-bottom:.8rem;background:linear-gradient(180deg,rgba(212,175,55,.06),transparent 28%),#0d130d}
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+.mono{min-width:52px;height:52px;border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
+.badge{border:1px solid var(--line);color:var(--line);font-size:.62rem;letter-spacing:.16em;padding:.25rem .4rem}
+.name{font-size:1.2rem;margin:.25rem 0 .1rem}
+.sub,.meta{color:var(--muted);font-size:.8rem;line-height:1.5}
+.links a{color:var(--line);text-decoration:none;font-size:.72rem;margin-right:.8rem}
+.empty{color:var(--muted);padding:2rem 0}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></a>
+  <input id="q" class="search" placeholder="Search name, school, city, or position"/>
+  <nav>
+    <a href="index.html">MAP</a>
+    <a class="on" href="our-recruits.html">OUR RECRUITS</a>
+  </nav>
+</header>
+<div class="wrap">
+  <h2 class="page">OUR RECRUITS</h2>
+  <div class="count" id="count"></div>
+  <div class="filters">
+    <label>Pos<select id="pos"><option value="">All</option></select></label>
+    <label>Year<select id="yr"><option value="">All</option><option>2026</option><option>2027</option><option>2028</option></select></label>
+    <label>Min Ht<select id="minHt"><option value="">Any</option></select></label>
+    <label>Min Wt<input id="minWt" type="number" min="140" max="400" placeholder="200"></label>
+    <label>Min GPA<input id="minGpa" type="number" min="0" max="5" step="0.1" placeholder="3.0"></label>
+  </div>
+  <div id="board"></div>
+</div>
+<script>
+const recruits=[{name:"Cedric Bridges",school:"Johnson County High School",city:"Wrightsville",county:"Johnson",cls:"A",pos:"LB",htIn:71,wt:210,gpa:3.7,year:"2028",jersey:56,x:"CedricBridges58",hudl:"https://www.hudl.com/video/3/22737408/68cbdc453176d35663e3546d",notes:"Sophomore film also shows DL/OL"}];
+["QB","RB","WR","TE","OT","OG","OC","DE","DT","LB","CB","S","ATH","K","P","LS"].forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;document.getElementById("pos").appendChild(o);});
+for(let i=65;i<=81;i++){const o=document.createElement("option");o.value=i;o.textContent=Math.floor(i/12)+"'"+(i%12)+'"';document.getElementById("minHt").appendChild(o);}
+function fmtHt(n){return n?Math.floor(n/12)+"'"+(n%12)+'"':"—";}
+function match(p){
+  const q=document.getElementById("q").value.toLowerCase(),pos=document.getElementById("pos").value,yr=document.getElementById("yr").value;
+  const minHt=parseFloat(document.getElementById("minHt").value),minWt=parseFloat(document.getElementById("minWt").value),minGpa=parseFloat(document.getElementById("minGpa").value);
+  const hay=(p.name+" "+p.school+" "+p.city+" "+p.pos).toLowerCase();
+  if(q&&!hay.includes(q))return false;
+  if(pos&&p.pos!==pos)return false;
+  if(yr&&p.year!==yr)return false;
+  if(!isNaN(minHt)&&(p.htIn||0)<minHt)return false;
+  if(!isNaN(minWt)&&(p.wt||0)<minWt)return false;
+  if(!isNaN(minGpa)&&(p.gpa||0)<minGpa)return false;
+  return true;
+}
+function render(){
+  const list=recruits.filter(match);
+  document.getElementById("count").textContent=list.length+" recruit"+(list.length===1?"":"s");
+  document.getElementById("board").innerHTML=list.length?list.map(p=>`<article class="card">
+    <div class="top"><div class="mono">${p.jersey?"#"+p.jersey:p.pos}</div><div class="badge">${p.year} · ${p.pos}</div></div>
+    <div class="name">${p.name}</div>
+    <div class="sub">${p.school} · ${p.city}, GA · Class ${p.cls||""}</div>
+    <div class="meta">${fmtHt(p.htIn)} · ${p.wt||"—"} lbs · GPA ${p.gpa??"—"}${p.notes?" · "+p.notes:""}</div>
+    <div class="links">${p.x?`<a href="https://x.com/${p.x.replace("@","")}" target="_blank">X</a>`:""}${p.hudl?`<a href="${p.hudl}" target="_blank">Hudl</a>`:""}<a href="index.html?school=${encodeURIComponent(p.school)}">View on map</a></div>
+  </article>`).join(""):`<p class="empty">No recruits match those filters.</p>`;
+}
+["q","pos","yr","minHt","minWt","minGpa"].forEach(id=>{const el=document.getElementById(id);el.addEventListener(id==="q"||el.type==="number"?"input":"change",render);});
+render();
+</script>
+</body>
+</html>
