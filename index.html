@@ -664,4 +664,48 @@ function showSchool(s){
 function apply(){
   if(nearOn&&here){
     activeRegion=null;
-    const list=pool().sort((a,b)=>a....
+    const list=pool().sort((a,b)=>a.mi-b.mi);
+    clearPins();
+    list.forEach(s=>clusters.addLayer(pinFor(s)));
+    if(radiusCircle) map.removeLayer(radiusCircle);
+    radiusCircle=L.circle([here.lat,here.lng],{radius:parseFloat(document.getElementById("radius").value)*1609.34,color:"#d4af37",weight:1.2,fillColor:"#d4af37",fillOpacity:.08}).addTo(map);
+    const withN=list.filter(hasSheet).length;
+    document.getElementById("drawer").innerHTML=`
+      <button class="back" type="button" onclick="showRegions()">‹ All regions</button>
+      <div class="kicker" style="margin-top:.7rem">NEAR YOU · ${document.getElementById("radius").value} MILES</div>
+      <div class="count">${list.length} schools · ${withN} with sheets</div>
+      ${list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'>
+        <div><div class="n">${s.name}</div><div class="sub">${s.region} · ${s.city} · Class ${s.cls}</div></div>
+        <div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div>
+      </div>`).join("")||'<p class="empty">No schools in that radius.</p>'}`;
+    return;
+  }
+  if(activeRegion) openRegion(activeRegion);
+  else showRegions();
+}
+document.getElementById("regionsBtn").onclick=()=>showRegions();
+document.getElementById("nearBtn").onclick=()=>{
+  if(nearOn){nearOn=false;document.getElementById("nearBtn").classList.remove("on");showRegions();return;}
+  if(!navigator.geolocation){alert("Location is not available in this browser.");return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    nearOn=true;document.getElementById("nearBtn").classList.add("on");
+    here={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(youMarker) map.removeLayer(youMarker);
+    youMarker=L.circleMarker([here.lat,here.lng],{radius:8,color:"#fff4c2",fillColor:"#d4af37",fillOpacity:1,weight:2}).bindTooltip("You").addTo(map);
+    map.setView([here.lat,here.lng],9);
+    apply();
+  },()=>alert("Could not read your location. Allow location access and try again."),{enableHighAccuracy:true,timeout:10000});
+};
+document.getElementById("sheetBtn").onclick=()=>{
+  sheetOnly=!sheetOnly;
+  document.getElementById("sheetBtn").classList.toggle("on",sheetOnly);
+  apply();
+};
+["q","cls","cty","radius"].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener(id==="q"?"input":"change",apply);
+});
+showRegions();
+</script>
+</body>
+</html>
