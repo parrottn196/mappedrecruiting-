@@ -19,19 +19,25 @@ header{min-height:64px;display:grid;grid-template-columns:auto 1fr auto;gap:.7re
 .search{width:100%;max-width:380px;background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.48rem .7rem;font:inherit}
 .right{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;justify-content:flex-end}
 select{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.42rem .5rem;font:inherit}
-.btn{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--muted);padding:.42rem .55rem;font:inherit;letter-spacing:.12em;font-size:.62rem;cursor:pointer}
+.btn{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--muted);padding:.42rem .55rem;font:inherit;letter-spacing:.1em;font-size:.62rem;cursor:pointer}
 .btn.on{color:#1a1608;background:var(--line);border-color:var(--line)}
-a.board{color:var(--line);text-decoration:none;letter-spacing:.14em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem}
+a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem}
 main{height:calc(100% - 64px);display:grid;grid-template-columns:1fr 400px}
 #map{height:100%;background:#0a0d0a}
 .drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%)}
-.kicker{font-size:.62rem;letter-spacing:.2em;color:var(--line);margin-bottom:.35rem}
-.count{color:var(--muted);font-size:.72rem;margin-bottom:.8rem}
+.kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.35rem}
+.count{color:var(--muted);font-size:.72rem;margin-bottom:.45rem}
+.legend{display:flex;gap:1rem;font-size:.68rem;color:var(--muted);margin:0 0 .8rem}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:.35rem;vertical-align:middle}
+.dot.yes{background:#f0d56a}
+.dot.no{background:#5c5748}
 .school{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.7rem 0;border-bottom:1px dashed rgba(212,175,55,.28);cursor:pointer}
 .school:hover .n{color:var(--line)}
 .n{font-size:.92rem}
 .sub{color:var(--muted);font-size:.72rem;margin-top:.15rem}
-.mi{color:var(--line);font-size:.78rem;white-space:nowrap}
+.mi{color:var(--line);font-size:.72rem;text-align:right;white-space:nowrap}
+.tag{display:inline-block;border:1px solid var(--line);color:var(--line);font-size:.55rem;letter-spacing:.12em;padding:.12rem .32rem;margin-left:.35rem}
+.tag.off{border-color:#5c5748;color:#5c5748}
 .card{border:1px solid var(--line);padding:1.05rem 1rem;background:linear-gradient(180deg,rgba(212,175,55,.06),transparent 28%),#0d130d}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem}
 .mono{width:54px;height:54px;border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
@@ -39,8 +45,8 @@ main{height:calc(100% - 64px);display:grid;grid-template-columns:1fr 400px}
 .title{font-size:1.2rem;margin:.35rem 0 .55rem}
 .row{margin:.38rem 0;font-size:.86rem;color:#efe6c8}
 .muted{color:var(--muted);font-size:.74rem}
-.actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem}
-.actions a,.back{color:var(--line);text-decoration:none;border:1px solid rgba(212,175,55,.35);padding:.4rem .55rem;font-size:.72rem;letter-spacing:.08em;background:none;font:inherit;cursor:pointer}
+.actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem;align-items:center}
+.actions a,.back{color:var(--line);text-decoration:none;border:1px solid rgba(212,175,55,.35);padding:.4rem .55rem;font-size:.72rem;letter-spacing:.06em;background:none;font:inherit;cursor:pointer}
 .empty{color:var(--muted);padding:1rem 0}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .marker-cluster-small{background-color:rgba(240,213,106,.28)}
@@ -69,6 +75,7 @@ main{height:calc(100% - 64px);display:grid;grid-template-columns:1fr 400px}
       <option value="50" selected>50 mi</option>
       <option value="100">100 mi</option>
     </select>
+    <button class="btn" id="sheetBtn" type="button">HAS PROSPECT INFO</button>
     <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
     <select id="cty"><option value="">All counties</option></select>
   </div>
@@ -496,6 +503,11 @@ S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton,
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
 ];
 
+const sheets={
+  // "Johnson County High School":"sheets/johnson-county.pdf"
+};
+function hasSheet(s){return Boolean(sheets[s.name]);}
+
 [...new Set(schools.map(s=>s.county))].sort().forEach(c=>{
   const o=document.createElement("option");o.value=c;o.textContent=c;document.getElementById("cty").appendChild(o);
 });
@@ -513,33 +525,36 @@ function mono(name){
 function gmaps(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function amaps(s){return "https://maps.apple.com/?daddr="+encodeURIComponent(s.address);}
 
-let here=null, nearOn=false, selected=null;
+let here=null, nearOn=false, sheetOnly=false, selected=null;
 const map=L.map("map").setView([32.9,-83.5],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
 fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json").then(r=>r.json()).then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map));
 const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48}).addTo(map);
 let youMarker=null, radiusCircle=null;
 
-function filtered(){
+function pool(){
   const q=document.getElementById("q").value.toLowerCase();
   const cl=document.getElementById("cls").value;
   const co=document.getElementById("cty").value;
   const rad=parseFloat(document.getElementById("radius").value);
-  let list=schools.filter(s=>{
+  return schools.filter(s=>{
     const text=!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q);
-    return text&&(!cl||s.cls===cl)&&(!co||s.county===co);
-  }).map(s=>{
-    const copy={...s};
-    copy.mi=here?miles(here.lat,here.lng,s.lat,s.lng):null;
-    return copy;
-  });
-  if(nearOn&&here) list=list.filter(s=>s.mi<=rad).sort((a,b)=>a.mi-b.mi);
+    if(!(text&&(!cl||s.cls===cl)&&(!co||s.county===co))) return false;
+    if(nearOn&&here&&miles(here.lat,here.lng,s.lat,s.lng)>rad) return false;
+    return true;
+  }).map(s=>({...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null}));
+}
+function filtered(){
+  let list=pool();
+  if(sheetOnly) list=list.filter(hasSheet);
+  if(nearOn&&here) list.sort((a,b)=>a.mi-b.mi);
   else list.sort((a,b)=>a.name.localeCompare(b.name));
   return list;
 }
 function pinFor(s){
-  const m=L.circleMarker([s.lat,s.lng],{radius:6,color:"#d4af37",fillColor:"#f0d56a",fillOpacity:.95,weight:1});
-  m.bindTooltip(s.name+" · "+s.cls+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));
+  const on=hasSheet(s);
+  const m=L.circleMarker([s.lat,s.lng],{radius:on?8:6,color:on?"#d4af37":"#6b6554",fillColor:on?"#f0d56a":"#4a463c",fillOpacity:on?.95:.7,weight:1});
+  m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));
   m.on("click",()=>showSchool(s));
   return m;
 }
@@ -555,9 +570,17 @@ function showList(){
   selected=null;
   const list=filtered();
   drawPins(list);
+  const p=pool();
+  const withN=p.filter(hasSheet).length;
   const label=nearOn&&here?("NEAR YOU · "+document.getElementById("radius").value+" MILES"):"SCHOOLS";
-  document.getElementById("drawer").innerHTML=`<div class="kicker">${label}</div><div class="count">${list.length} school${list.length===1?"":"s"}</div>`+
-    (list.length?list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'><div><div class="n">${s.name}</div><div class="sub">${s.city} · ${s.county} · Class ${s.cls}</div></div><div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":s.cls}</div></div>`).join(""):`<p class="empty">${nearOn?"No schools in that radius with these filters.":"No schools match those filters."}</p>`);
+  document.getElementById("drawer").innerHTML=`
+    <div class="kicker">${label}${sheetOnly?" · HAS PROSPECT INFO":""}</div>
+    <div class="count">${withN} school${withN===1?"":"s"} with sheets · ${p.length-withN} without</div>
+    <div class="legend"><span><i class="dot yes"></i>Sheet on file</span><span><i class="dot no"></i>No sheet yet</span></div>
+    ${list.length?list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'>
+      <div><div class="n">${s.name}</div><div class="sub">${s.city} · ${s.county} · Class ${s.cls}</div></div>
+      <div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":""}<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div>
+    </div>`).join(""):`<p class="empty">${sheetOnly?"No schools in view have a prospect sheet yet.":"No schools match those filters."}</p>`}`;
 }
 function openNamed(name){const s=filtered().find(x=>x.name===name)||schools.find(x=>x.name===name);if(s)showSchool(s);}
 function showSchool(s){
@@ -574,10 +597,11 @@ function showSchool(s){
       <div class="actions">
         <a href="${gmaps(s)}" target="_blank" rel="noopener">Google Maps</a>
         <a href="${amaps(s)}" target="_blank" rel="noopener">Apple Maps</a>
+        ${hasSheet(s)?`<a href="${sheets[s.name]}" target="_blank" rel="noopener">Prospect sheet</a>`:`<span class="muted">No prospect sheet yet</span>`}
       </div>
     </article>`;
 }
-function apply(){if(selected){const s=filtered().find(x=>x.name===selected.name);if(s){drawPins(filtered());showSchool(s);return;}}showList();}
+function apply(){if(selected){const s=filtered().find(x=>x.name===selected.name);drawPins(filtered());if(s){showSchool(s);return;}}showList();}
 function setHere(lat,lng){
   here={lat,lng};
   if(youMarker) map.removeLayer(youMarker);
@@ -592,6 +616,11 @@ document.getElementById("nearBtn").onclick=()=>{
     nearOn=true;document.getElementById("nearBtn").classList.add("on");
     setHere(pos.coords.latitude,pos.coords.longitude);
   },()=>alert("Could not read your location. Allow location access and try again."),{enableHighAccuracy:true,timeout:10000});
+};
+document.getElementById("sheetBtn").onclick=()=>{
+  sheetOnly=!sheetOnly;
+  document.getElementById("sheetBtn").classList.toggle("on",sheetOnly);
+  apply();
 };
 ["q","cls","cty","radius"].forEach(id=>{
   const el=document.getElementById(id);
