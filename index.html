@@ -106,12 +106,13 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
-const S=(name,city,county,address,stadium,cls,coach,lat,lng)=>({name,city,county,address,stadium,cls,coach,lat,lng});
+const slug=(name,city)=>(name+" "+city).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const S=(name,city,county,address,stadium,cls,coach,lat,lng)=>({id:slug(name,city),name,city,county,address,stadium,cls,coach,lat,lng});
+
 const schools=[
 S("Camden County High School","Kingsland","Camden","6300 Laurel Island Pkwy, Kingsland, GA 31548","Camden County Stadium","7A","Tucker Pruitt",30.832,-81.650),
 S("Lowndes High School","Valdosta","Lowndes","1606 Norman Dr, Valdosta, GA 31601","Lowndes Stadium","7A","Adam Carter",30.848,-83.302),
 S("Colquitt County High School","Moultrie","Colquitt","1800 Park Ave SE, Moultrie, GA 31768","Mack Tharpe Stadium","7A","Sean Calhoun",31.165,-83.771),
-S("Lowndes High School","Valdosta","Lowndes","1606 Norman Dr, Valdosta, GA 31601","Lowndes Stadium","7A","Adam Carter",30.848,-83.302),
 S("Richmond Hill High School","Richmond Hill","Bryan","One Wildcat Dr, Richmond Hill, GA 31324","Richmond Hill Stadium","7A","To be listed",31.938,-81.304),
 S("Valdosta High School","Valdosta","Lowndes","4590 Inner Perimeter Rd, Valdosta, GA 31601","Bazemore-Hyder Stadium","7A","Shelton Felton",30.833,-83.280),
 S("Carrollton High School","Carrollton","Carroll","201 Trojan Dr, Carrollton, GA 30117","Grisham Stadium","7A","Joey King",33.580,-85.077),
@@ -224,7 +225,7 @@ S("Loganville High School","Loganville","Walton","1525 Hwy 81, Loganville, GA 30
 S("Mountain View High School","Lawrenceville","Gwinnett","2351 Sunny Hill Rd, Lawrenceville, GA 30043","Mountain View Stadium","6A","Todd Welborn",34.066,-83.981),
 S("Walnut Grove High School","Loganville","Walton","4863 Hwy 81, Loganville, GA 30052","Walnut Grove Stadium","6A","Mackenzie Bennett",33.743,-83.854),
 S("Benedictine Military School","Savannah","Chatham","6502 Seawright Dr, Savannah, GA 31406","Memorial Stadium","5A","Danny Britt",32.022,-81.100),
-S("Evans High School","Evans","Columbia","4550 Cox Rd, Evans, GA 30809","Evans Stadium","5A","Lee Hutto",33.534,-82.140),
+S("Evans High School","Evans","Columbia","4550 Cox Rd, Evans, GA 30809","Evans Stadium","5A","Lee Hutto",33.534,-82.145),
 S("Groves High School","Garden City","Chatham","100 Priscilla D Thomas Way, Garden City, GA 31408","Groves Stadium","5A","Howard Jordan",32.114,-81.154),
 S("Jenkins High School","Savannah","Chatham","1800 East DeRenne Ave, Savannah, GA 31406","Memorial Stadium","5A","To be listed",32.022,-81.073),
 S("Richmond Academy","Augusta","Richmond","910 Russell St, Augusta, GA 30904","Richmond Academy Stadium","5A","K. Grissett",33.470,-82.000),
@@ -236,15 +237,15 @@ S("Jones County High School","Gray","Jones","339 Railroad St, Gray, GA 31032","J
 S("Locust Grove High School","Locust Grove","Henry","3275 S Bethel Rd, Locust Grove, GA 30248","Locust Grove Stadium","5A","To be listed",33.346,-84.181),
 S("Ola High School","McDonough","Henry","3570 Hwy 42 N, McDonough, GA 30252","Ola Stadium","5A","Dustin Adkins",33.447,-84.101),
 S("Perry High School","Perry","Houston","1307 North Ave, Perry, GA 31069","Perry Stadium","5A","To be listed",32.458,-83.735),
-S("Union Grove High School","McDonough","Henry","120 E Lake Rd, McDonough, GA 30252","Union Grove Stadium","5A","Darren DeMeio",33.447,-84.101),
+S("Union Grove High School","McDonough","Henry","120 E Lake Rd, McDonough, GA 30252","Union Grove Stadium","5A","Darren DeMeio",33.450,-84.090),
 S("Warner Robins High School","Warner Robins","Houston","401 S Davis Dr, Warner Robins, GA 31088","McConnell-Talbert Stadium","5A","Shane Sams",32.609,-83.624),
-S("Central High School (Carroll)","Carrollton","Carroll","113 Denney Cir, Carrollton, GA 30117","Central Stadium","5A","To be listed",33.580,-85.077),
+S("Central High School (Carroll)","Carrollton","Carroll","113 Denney Cir, Carrollton, GA 30117","Central Stadium","5A","To be listed",33.572,-85.070),
 S("Griffin High School","Griffin","Spalding","1617 W Poplar St, Griffin, GA 30224","Griffin Memorial Stadium","5A","Bernard Goodrum",33.247,-84.288),
 S("Harris County High School","Hamilton","Harris","8281 GA-116, Hamilton, GA 31811","Harris County Stadium","5A","To be listed",32.758,-84.875),
 S("LaGrange High School","LaGrange","Troup","516 N Greenwood St, LaGrange, GA 30240","Callaway Stadium","5A","To be listed",33.039,-85.031),
 S("Lithia Springs High School","Lithia Springs","Douglas","2520 E County Line Rd, Lithia Springs, GA 30122","Lithia Springs Stadium","5A","Ben Arnold",33.771,-84.661),
 S("Starr's Mill High School","Fayetteville","Fayette","193 Panther Path, Fayetteville, GA 30215","Starr's Mill Stadium","5A","David Cooper",33.352,-84.508),
-S("Whitewater High School","Fayetteville","Fayette","100 Wildcat Way, Fayetteville, GA 30215","Whitewater Stadium","5A","To be listed",33.352,-84.508),
+S("Whitewater High School","Fayetteville","Fayette","100 Wildcat Way, Fayetteville, GA 30215","Whitewater Stadium","5A","To be listed",33.340,-84.520),
 S("Arabia Mountain High School","Lithonia","DeKalb","6610 Browns Mill Rd, Lithonia, GA 30038","Arabia Mountain Stadium","5A","Dante Ferguson",33.665,-84.128),
 S("Drew High School","Riverdale","Clayton","62 McDonough Rd, Riverdale, GA 30296","Drew Stadium","5A","To be listed",33.573,-84.413),
 S("Dutchtown High School","Hampton","Henry","149 Mitchell Rd, Hampton, GA 30228","Dutchtown Stadium","5A","Kevon Glenn",33.480,-84.288),
@@ -263,13 +264,13 @@ S("Mays High School","Atlanta","Fulton","3450 Benjamin E Mays Dr SW, Atlanta, GA
 S("Southwest DeKalb High School","Decatur","DeKalb","2863 Kelley Chapel Rd, Decatur, GA 30034","Hallford Stadium","5A","Marion Bell III",33.707,-84.244),
 S("Tucker High School","Tucker","DeKalb","5036 LaVista Rd, Tucker, GA 30084","Tucker Stadium","5A","Lonnie Jones",33.854,-84.217),
 S("Blessed Trinity Catholic High School","Roswell","Fulton","11320 Woodstock Rd, Roswell, GA 30075","Blessed Trinity Stadium","5A","Ed Dudley",34.058,-84.380),
-S("Cambridge High School","Milton","Fulton","2845 Bethany Bend, Milton, GA 30004","Cambridge Stadium","5A","Tyler Jones",34.132,-84.270),
+S("Cambridge High School","Milton","Fulton","2845 Bethany Bend, Milton, GA 30004","Cambridge Stadium","5A","Tyler Jones",34.125,-84.255),
 S("Centennial High School","Roswell","Fulton","9310 Scott Rd, Roswell, GA 30076","Centennial Stadium","5A","Adam Miller",34.021,-84.319),
 S("Chattahoochee High School","Johns Creek","Fulton","5230 Taylor Rd, Johns Creek, GA 30022","Chattahoochee Stadium","5A","Austin Hamilton",34.048,-84.220),
 S("Marist School","Atlanta","DeKalb","3790 Ashford Dunwoody Rd NE, Atlanta, GA 30319","Marist Stadium","5A","Jerry Novac",33.872,-84.336),
 S("Northview High School","Johns Creek","Fulton","10625 Parsons Rd, Johns Creek, GA 30097","Northview Stadium","5A","Mario Drayton",34.039,-84.173),
 S("Sprayberry High School","Marietta","Cobb","2525 Sandy Plains Rd, Marietta, GA 30066","Sprayberry Stadium","5A","Pete Fominaya",33.999,-84.509),
-S("St. Pius X Catholic High School","Atlanta","DeKalb","2674 Johnson Rd NE, Atlanta, GA 30345","St. Pius Stadium","5A","To be listed",33.852,-84.280),
+S("St. Pius X Catholic High School","Atlanta","DeKalb","2674 Johnson Rd NE, Atlanta, GA 30345","St. Pius Stadium","5A","To be listed",33.848,-84.272),
 S("Allatoona High School","Acworth","Cobb","3300 Dallas Acworth Hwy, Acworth, GA 30101","Allatoona Stadium","5A","Paul Carter",34.066,-84.704),
 S("Cartersville High School","Cartersville","Bartow","320 E Church St, Cartersville, GA 30120","Cartersville Stadium","5A","Conor Foster",34.165,-84.796),
 S("Cass High School","White","Bartow","1000 Colonel Way, White, GA 30184","Cass Stadium","5A","Steve Gates",34.281,-84.745),
@@ -279,7 +280,7 @@ S("Villa Rica High School","Villa Rica","Carroll","600 Houston Rd, Villa Rica, G
 S("Woodland High School (Cartersville)","Cartersville","Bartow","800 Old Alabama Rd, Cartersville, GA 30120","Woodland Stadium","5A","Andy Scott",34.165,-84.737),
 S("East Forsyth High School","Gainesville","Forsyth","2120 Settingdown Rd, Gainesville, GA 30506","East Forsyth Stadium","5A","Dustin Canon",34.290,-83.980),
 S("Flowery Branch High School","Flowery Branch","Hall","4450 Hog Mountain Rd, Flowery Branch, GA 30542","Flowery Branch Stadium","5A","Michael Perry",34.186,-83.925),
-S("Jefferson High School","Jefferson","Jackson","575 Washington St, Jefferson, GA 30549","Jefferson Stadium","5A","To be listed",34.117,-83.572),
+S("Jefferson High School","Jefferson","Jackson","575 Washington St, Jefferson, GA 30549","Jefferson Stadium","5A","To be listed",34.112,-83.580),
 S("Johnson High School (Gainesville)","Gainesville","Hall","3305 Poplar Springs Rd, Gainesville, GA 30507","Johnson Stadium","5A","Donovan Odom",34.263,-83.774),
 S("Madison County High School","Danielsville","Madison","600 Madison St, Danielsville, GA 30633","Madison County Stadium","5A","To be listed",34.125,-83.221),
 S("North Oconee High School","Bogart","Oconee","1081 Rocky Branch Rd, Bogart, GA 30622","North Oconee Stadium","5A","Tyler Aurandt",33.948,-83.534),
@@ -302,7 +303,7 @@ S("Troup County High School","LaGrange","Troup","1920 Hamilton Rd, LaGrange, GA 
 S("Upson-Lee High School","Thomaston","Upson","2688 Hwy 19 N, Thomaston, GA 30286","Upson-Lee Stadium","4A","To be listed",32.908,-84.327),
 S("Westside High School (Macon)","Macon","Bibb","101 N Foss Dr, Macon, GA 31210","Westside Stadium","4A","To be listed",32.868,-83.700),
 S("Harlem High School","Harlem","Columbia","1070 Ford Ave, Harlem, GA 30814","Harlem Stadium","4A","To be listed",33.414,-82.313),
-S("Liberty County High School","Hinesville","Liberty","3216 E Oglethorpe Hwy, Hinesville, GA 31313","Liberty County Stadium","4A","To be listed",31.846,-81.596),
+S("Liberty County High School","Hinesville","Liberty","3216 E Oglethorpe Hwy, Hinesville, GA 31313","Liberty County Stadium","4A","To be listed",31.840,-81.588),
 S("Long County High School","Ludowici","Long","65 Paterson Ave, Ludowici, GA 31316","Long County Stadium","4A","To be listed",31.708,-81.742),
 S("New Hampstead High School","Bloomingdale","Chatham","2451 Little Neck Rd, Bloomingdale, GA 31302","New Hampstead Stadium","4A","To be listed",32.133,-81.299),
 S("Southeast Bulloch High School","Brooklet","Bulloch","922 Kolic Dr, Brooklet, GA 30415","Southeast Bulloch Stadium","4A","To be listed",32.381,-81.664),
@@ -314,12 +315,12 @@ S("Luella High School","Locust Grove","Henry","603 Walker Dr, Locust Grove, GA 3
 S("McDonough High School","McDonough","Henry","155 Postmaster Dr, McDonough, GA 30253","McDonough Stadium","4A","To be listed",33.447,-84.147),
 S("Mount Zion High School (Jonesboro)","Jonesboro","Clayton","2535 Mount Zion Pkwy, Jonesboro, GA 30236","Mount Zion Stadium","4A","To be listed",33.505,-84.331),
 S("North Clayton High School","College Park","Clayton","1525 Norman Dr, College Park, GA 30349","North Clayton Stadium","4A","To be listed",33.612,-84.477),
-S("Riverdale High School","Riverdale","Clayton","160 Roberts Dr, Riverdale, GA 30274","Riverdale Stadium","4A","To be listed",33.565,-84.413),
+S("Riverdale High School","Riverdale","Clayton","160 Roberts Dr, Riverdale, GA 30274","Riverdale Stadium","4A","To be listed",33.565,-84.405),
 S("Sandy Creek High School","Tyrone","Fayette","360 Jenkins Rd, Tyrone, GA 30290","Sandy Creek Stadium","4A","To be listed",33.471,-84.591),
 S("Woodland High School (Stockbridge)","Stockbridge","Henry","800 N Moseley Dr, Stockbridge, GA 30281","Woodland Stadium","4A","To be listed",33.544,-84.181),
 S("Clarkston High School","Clarkston","DeKalb","618 N Indian Creek Dr, Clarkston, GA 30021","Adams Stadium","4A","To be listed",33.810,-84.240),
 S("Douglass High School","Atlanta","Fulton","225 Hamilton E Holmes Dr NW, Atlanta, GA 30318","Lakewood Stadium","4A","To be listed",33.755,-84.468),
-S("Greater Atlanta Christian School","Norcross","Gwinnett","1575 Indian Trail Rd, Norcross, GA 30093","GAC Stadium","4A","To be listed",33.932,-84.176),
+S("Greater Atlanta Christian School","Norcross","Gwinnett","1575 Indian Trail Rd, Norcross, GA 30093","GAC Stadium","4A","To be listed",33.932,-84.168),
 S("North Springs High School","Atlanta","Fulton","7447 Roswell Rd, Atlanta, GA 30328","North Springs Stadium","4A","To be listed",33.961,-84.362),
 S("Pace Academy","Atlanta","Fulton","966 W Paces Ferry Rd NW, Atlanta, GA 30327","Pace Stadium","4A","To be listed",33.852,-84.426),
 S("Salem High School","Conyers","Rockdale","3551 Underwood Rd SE, Conyers, GA 30013","Salem Stadium","4A","To be listed",33.623,-83.986),
@@ -334,7 +335,7 @@ S("Pickens High School","Jasper","Pickens","500 Dragon Dr, Jasper, GA 30143","Pi
 S("White County High School","Cleveland","White","2600 Hwy 129 N, Cleveland, GA 30528","White County Stadium","4A","To be listed",34.597,-83.763),
 S("Adairsville High School","Adairsville","Bartow","519 Old Hwy 140, Adairsville, GA 30103","Adairsville Stadium","4A","To be listed",34.368,-84.934),
 S("Calhoun High School","Calhoun","Gordon","335 S River St, Calhoun, GA 30701","Phil Glover Stadium","4A","To be listed",34.503,-84.951),
-S("Heritage High School (Catoosa)","Ringgold","Catoosa","3960 Poplar Springs Rd, Ringgold, GA 30736","Heritage Stadium","4A","To be listed",34.916,-85.109),
+S("Heritage High School (Catoosa)","Ringgold","Catoosa","3960 Poplar Springs Rd, Ringgold, GA 30736","Heritage Stadium","4A","To be listed",34.910,-85.100),
 S("Northwest Whitfield High School","Tunnel Hill","Whitfield","1651 Tunnel Hill Varnell Rd, Tunnel Hill, GA 30755","Northwest Whitfield Stadium","4A","To be listed",34.846,-85.043),
 S("Ridgeland High School","Rossville","Walker","320 King St, Rossville, GA 30741","Ridgeland Stadium","4A","To be listed",34.983,-85.286),
 S("Southeast Whitfield High School","Dalton","Whitfield","1954 Riverbend Rd, Dalton, GA 30721","Southeast Whitfield Stadium","4A","To be listed",34.737,-84.918),
@@ -377,7 +378,7 @@ S("Haralson County High School","Tallapoosa","Haralson","1655 Georgia Hwy 120, T
 S("Holy Innocents' Episcopal School","Atlanta","Fulton","805 Mount Vernon Hwy NW, Atlanta, GA 30327","Holy Innocents Stadium","3A","To be listed",33.890,-84.423),
 S("KIPP Atlanta Collegiate","Atlanta","Fulton","98 Anderson Ave NW, Atlanta, GA 30314","KIPP Stadium","3A","To be listed",33.755,-84.418),
 S("Lovett School","Atlanta","Fulton","4075 Paces Ferry Rd NW, Atlanta, GA 30327","Lovett Stadium","3A","To be listed",33.868,-84.446),
-S("North Cobb Christian School","Kennesaw","Cobb","4500 Lakeview Dr, Kennesaw, GA 30144","North Cobb Christian Stadium","3A","To be listed",34.037,-84.615),
+S("North Cobb Christian School","Kennesaw","Cobb","4500 Lakeview Dr, Kennesaw, GA 30144","North Cobb Christian Stadium","3A","To be listed",34.037,-84.608),
 S("Temple High School","Temple","Carroll","5515 Hwy 113, Temple, GA 30179","Temple Stadium","3A","To be listed",33.737,-85.027),
 S("Therrell High School","Atlanta","Fulton","3099 Panther Trl SW, Atlanta, GA 30311","Lakewood Stadium","3A","To be listed",33.707,-84.468),
 S("Wesleyan School","Peachtree Corners","Gwinnett","5405 Spalding Dr, Peachtree Corners, GA 30092","Wesleyan Stadium","3A","To be listed",33.972,-84.238),
@@ -400,7 +401,7 @@ S("Union County High School","Blairsville","Union","384 School St, Blairsville, 
 S("Elbert County High School","Elberton","Elbert","600 Abernathy Cir, Elberton, GA 30635","Elbert County Stadium","3A","To be listed",34.111,-82.867),
 S("Franklin County High School","Carnesville","Franklin","6570 Hwy 145, Carnesville, GA 30521","Franklin County Stadium","3A","To be listed",34.370,-83.234),
 S("Hart County High School","Hartwell","Hart","181 Powell Rd, Hartwell, GA 30643","Hart County Stadium","3A","To be listed",34.353,-82.932),
-S("Hebron Christian Academy","Dacula","Gwinnett","3005 Old Auburn Rd, Dacula, GA 30019","Hebron Stadium","3A","To be listed",34.002,-83.898),
+S("Hebron Christian Academy","Dacula","Gwinnett","3005 Old Auburn Rd, Dacula, GA 30019","Hebron Stadium","3A","To be listed",34.002,-83.890),
 S("Lumpkin County High School","Dahlonega","Lumpkin","2001 Indian Dr, Dahlonega, GA 30533","Lumpkin County Stadium","3A","To be listed",34.532,-83.985),
 S("Morgan County High School","Madison","Morgan","1231-A College Dr, Madison, GA 30650","Morgan County Stadium","3A","To be listed",33.596,-83.468),
 S("Stephens County High School","Toccoa","Stephens","804 Martin Luther King Jr Dr, Toccoa, GA 30577","Stephens County Stadium","3A","To be listed",34.577,-83.332),
@@ -433,12 +434,12 @@ S("Josey High School","Augusta","Richmond","1701 15th St, Augusta, GA 30901","Jo
 S("Laney High School","Augusta","Richmond","1339 Laney Walker Blvd, Augusta, GA 30901","Laney Stadium","2A","To be listed",33.466,-81.979),
 S("Putnam County High School","Eatonton","Putnam","300 War Eagle Dr, Eatonton, GA 31024","Putnam County Stadium","2A","To be listed",33.327,-83.388),
 S("Social Circle High School","Social Circle","Walton","154 W Hightower Trl, Social Circle, GA 30025","Social Circle Stadium","2A","To be listed",33.656,-83.718),
-S("Eagle's Landing Christian Academy","McDonough","Henry","2400 Hwy 42 N, McDonough, GA 30253","ELCA Stadium","2A","To be listed",33.481,-84.187),
-S("Landmark Christian School","Fairburn","Fulton","50 SE Broad St, Fairburn, GA 30213","Landmark Stadium","2A","To be listed",33.567,-84.581),
-S("Trinity Christian School","Sharpsburg","Coweta","8817 Hwy 54, Sharpsburg, GA 30277","Trinity Stadium","2A","To be listed",33.397,-84.677),
+S("Eagle's Landing Christian Academy","McDonough","Henry","2400 Hwy 42 N, McDonough, GA 30253","ELCA Stadium","2A","To be listed",33.488,-84.180),
+S("Landmark Christian School","Fairburn","Fulton","50 SE Broad St, Fairburn, GA 30213","Landmark Stadium","2A","To be listed",33.560,-84.580),
+S("Trinity Christian School","Sharpsburg","Coweta","8817 Hwy 54, Sharpsburg, GA 30277","Trinity Stadium","2A","To be listed",33.390,-84.670),
 S("Utopian Academy for the Arts","Ellenwood","Clayton","2750 Fairview Rd, Ellenwood, GA 30294","Utopian Stadium","2A","To be listed",33.635,-84.300),
 S("Washington High School","Atlanta","Fulton","45 Whitehouse Dr SW, Atlanta, GA 30314","Lakewood Stadium","2A","To be listed",33.754,-84.422),
-S("Whitefield Academy","Mableton","Cobb","1 Whitefield Dr SE, Mableton, GA 30126","Whitefield Stadium","2A","To be listed",33.819,-84.582),
+S("Whitefield Academy","Mableton","Cobb","1 Whitefield Dr SE, Mableton, GA 30126","Whitefield Stadium","2A","To be listed",33.812,-84.575),
 S("Armuchee High School","Rome","Floyd","4203 Martha Berry Hwy, Rome, GA 30165","Armuchee Stadium","2A","To be listed",34.326,-85.168),
 S("Bremen High School","Bremen","Haralson","504 Georgia Ave S, Bremen, GA 30110","Bremen Stadium","2A","To be listed",33.721,-85.146),
 S("Coosa High School","Rome","Floyd","4454 Alabama Hwy, Rome, GA 30165","Coosa Stadium","2A","To be listed",34.257,-85.220),
@@ -448,27 +449,27 @@ S("Model High School","Rome","Floyd","172 Lovers Lane Rd NE, Rome, GA 30161","Mo
 S("Mount Zion High School (Carroll)","Mount Zion","Carroll","330 Liggett St, Mount Zion, GA 30150","Mount Zion Stadium","2A","To be listed",33.631,-85.180),
 S("Pepperell High School","Lindale","Floyd","30 Dragon Dr, Lindale, GA 30147","Pepperell Stadium","2A","To be listed",34.187,-85.174),
 S("Chattooga High School","Summerville","Chattooga","989 Hwy 114, Summerville, GA 30747","Chattooga Stadium","2A","To be listed",34.481,-85.348),
-S("Christian Heritage School","Dalton","Whitfield","184 Pine Grove Rd, Dalton, GA 30720","Christian Heritage Stadium","2A","To be listed",34.770,-84.970),
+S("Christian Heritage School","Dalton","Whitfield","184 Pine Grove Rd, Dalton, GA 30720","Christian Heritage Stadium","2A","To be listed",34.762,-84.962),
 S("Dade County High School","Trenton","Dade","300 Tradition Ln, Trenton, GA 30752","Dade County Stadium","2A","To be listed",34.872,-85.509),
 S("Fannin County High School","Blue Ridge","Fannin","360 Rebel Cir, Blue Ridge, GA 30513","Fannin County Stadium","2A","To be listed",34.864,-84.324),
-S("Gordon Central High School","Calhoun","Gordon","335 S River St, Calhoun, GA 30701","Gordon Central Stadium","2A","To be listed",34.503,-84.951),
+S("Gordon Central High School","Calhoun","Gordon","335 S River St, Calhoun, GA 30701","Gordon Central Stadium","2A","To be listed",34.496,-84.945),
 S("Gordon Lee High School","Chickamauga","Walker","106 Warrior Path, Chickamauga, GA 30707","Gordon Lee Stadium","2A","To be listed",34.871,-85.291),
 S("Lakeview-Fort Oglethorpe High School","Fort Oglethorpe","Catoosa","63 Catoosa Park Dr, Fort Oglethorpe, GA 30742","Lakeview Stadium","2A","To be listed",34.949,-85.257),
 S("Athens Academy","Athens","Clarke","1281 Spartan Ln, Athens, GA 30606","Athens Academy Stadium","2A","To be listed",33.918,-83.430),
 S("Banks County High School","Homer","Banks","1486 Hwy 51 S, Homer, GA 30547","Banks County Stadium","2A","To be listed",34.335,-83.499),
-S("Commerce High School","Commerce","Jackson","272 Lakeview Dr, Commerce, GA 30529","Commerce Stadium","2A","To be listed",34.204,-83.458),
+S("Commerce High School","Commerce","Jackson","272 Lakeview Dr, Commerce, GA 30529","Commerce Stadium","2A","To be listed",34.198,-83.450),
 S("Oglethorpe County High School","Lexington","Oglethorpe","749 Athens Rd, Lexington, GA 30648","Oglethorpe County Stadium","2A","To be listed",33.880,-83.111),
-S("Prince Avenue Christian School","Bogart","Oconee","2201 Ruth Jackson Rd, Bogart, GA 30622","Prince Avenue Stadium","2A","To be listed",33.948,-83.534),
-S("Providence Christian Academy","Lilburn","Gwinnett","4575 Lawrenceville Hwy, Lilburn, GA 30047","Providence Stadium","2A","To be listed",33.889,-84.114),
+S("Prince Avenue Christian School","Bogart","Oconee","2201 Ruth Jackson Rd, Bogart, GA 30622","Prince Avenue Stadium","2A","To be listed",33.940,-83.540),
+S("Providence Christian Academy","Lilburn","Gwinnett","4575 Lawrenceville Hwy, Lilburn, GA 30047","Providence Stadium","2A","To be listed",33.882,-84.108),
 S("Rabun County High School","Tiger","Rabun","230 Wildcat Hill Dr, Tiger, GA 30576","Rabun County Stadium","2A","To be listed",34.847,-83.433),
-S("Fellowship Christian School","Roswell","Fulton","10965 W Willeo Rd, Roswell, GA 30075","Fellowship Stadium","2A","To be listed",34.039,-84.352),
-S("King's Ridge Christian School","Alpharetta","Fulton","2765 Bethany Bend, Alpharetta, GA 30004","King's Ridge Stadium","2A","To be listed",34.132,-84.270),
-S("Mount Vernon School","Atlanta","Fulton","4505 Mount Vernon Hwy NE, Atlanta, GA 30327","Mount Vernon Stadium","2A","To be listed",33.890,-84.423),
+S("Fellowship Christian School","Roswell","Fulton","10965 W Willeo Rd, Roswell, GA 30075","Fellowship Stadium","2A","To be listed",34.032,-84.360),
+S("King's Ridge Christian School","Alpharetta","Fulton","2765 Bethany Bend, Alpharetta, GA 30004","King's Ridge Stadium","2A","To be listed",34.128,-84.268),
+S("Mount Vernon School","Atlanta","Fulton","4505 Mount Vernon Hwy NE, Atlanta, GA 30327","Mount Vernon Stadium","2A","To be listed",33.885,-84.418),
 S("Mount Bethel Christian Academy","Marietta","Cobb","4385 Lower Roswell Rd, Marietta, GA 30068","Mount Bethel Stadium","2A","To be listed",33.968,-84.412),
-S("Mount Paran Christian School","Kennesaw","Cobb","1275 Stanley Rd NW, Kennesaw, GA 30152","Mount Paran Stadium","2A","To be listed",33.999,-84.666),
-S("Mount Pisgah Christian School","Johns Creek","Fulton","9820 Nesbit Ferry Rd, Johns Creek, GA 30022","Mount Pisgah Stadium","2A","To be listed",34.029,-84.200),
-S("St. Francis High School","Milton","Fulton","13440 Cogburn Rd, Milton, GA 30004","St. Francis Stadium","2A","To be listed",34.132,-84.270),
-S("The Walker School","Marietta","Cobb","700 Cobb Pkwy N, Marietta, GA 30062","Walker Stadium","2A","To be listed",33.984,-84.473),
+S("Mount Paran Christian School","Kennesaw","Cobb","1275 Stanley Rd NW, Kennesaw, GA 30152","Mount Paran Stadium","2A","To be listed",33.992,-84.660),
+S("Mount Pisgah Christian School","Johns Creek","Fulton","9820 Nesbit Ferry Rd, Johns Creek, GA 30022","Mount Pisgah Stadium","2A","To be listed",34.022,-84.195),
+S("St. Francis High School","Milton","Fulton","13440 Cogburn Rd, Milton, GA 30004","St. Francis Stadium","2A","To be listed",34.140,-84.262),
+S("The Walker School","Marietta","Cobb","700 Cobb Pkwy N, Marietta, GA 30062","Walker Stadium","2A","To be listed",33.990,-84.468),
 S("Baconton Charter School","Baconton","Mitchell","149 W Walton St, Baconton, GA 31716","Baconton Stadium","A","To be listed",31.382,-84.161),
 S("Calhoun County High School","Edison","Calhoun","28092 Main St, Edison, GA 39846","Calhoun County Stadium","A","To be listed",31.558,-84.738),
 S("Early County High School","Blakely","Early","12020 Columbia St, Blakely, GA 39823","Early County Stadium","A","To be listed",31.377,-84.934),
@@ -523,8 +524,28 @@ S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton,
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
 ];
 
-const sheets={};
-function hasSheet(s){return Boolean(sheets[s.name]);}
+/* Key by school id (name-city slug). Add files when you have them:
+   sheets["camden-county-high-school-kingsland"] = "sheets/camden.html";
+*/
+const sheets = {};
+function hasSheet(s){ return Boolean(sheets[s.id]); }
+
+(function separateStackedPins(){
+  const seen = new Map();
+  schools.forEach(s=>{
+    const key = s.lat.toFixed(4)+","+s.lng.toFixed(4);
+    const n = seen.get(key) || 0;
+    if(n){
+      const ang = n * 0.9;
+      s.lat += 0.006 * Math.cos(ang);
+      s.lng += 0.006 * Math.sin(ang);
+    }
+    seen.set(key, n+1);
+  });
+})();
+
+const byId = Object.fromEntries(schools.map(s=>[s.id,s]));
+
 const REGION_COUNTIES={
   "Northwest Georgia":["Bartow","Catoosa","Chattooga","Dade","Fannin","Floyd","Gilmer","Gordon","Haralson","Murray","Paulding","Pickens","Polk","Walker","Whitfield"],
   "Northeast Georgia":["Banks","Dawson","Forsyth","Franklin","Habersham","Hall","Hart","Lumpkin","Rabun","Stephens","Towns","Union","White"],
@@ -545,38 +566,82 @@ const REGION_CENTER={
   "East Georgia":[33.40,-82.25],"West Georgia":[32.35,-84.55],"South Georgia":[32.25,-82.55],
   "Southwest Georgia":[31.35,-84.25],"Southeast Georgia":[31.22,-82.95],"Coastal Georgia":[31.75,-81.45]
 };
-function regionOf(county){for(const [r,list] of Object.entries(REGION_COUNTIES)) if(list.includes(county)) return r;return "Other";}
-[...new Set(schools.map(s=>s.county))].sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;document.getElementById("cty").appendChild(o);});
-function miles(aLat,aLng,bLat,bLng){const R=3958.8,toR=d=>d*Math.PI/180;const dLat=toR(bLat-aLat),dLng=toR(bLng-aLng);const m=Math.sin(dLat/2)**2+Math.cos(toR(aLat))*Math.cos(toR(bLat))*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(m)));}
-function mono(name){const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();}
+function regionOf(county){
+  for(const [r,list] of Object.entries(REGION_COUNTIES)) if(list.includes(county)) return r;
+  return "Other";
+}
+
+[...new Set(schools.map(s=>s.county))].sort().forEach(c=>{
+  const o=document.createElement("option");
+  o.value=c; o.textContent=c;
+  document.getElementById("cty").appendChild(o);
+});
+
+function miles(aLat,aLng,bLat,bLng){
+  const R=3958.8, toR=d=>d*Math.PI/180;
+  const dLat=toR(bLat-aLat), dLng=toR(bLng-aLng);
+  const m=Math.sin(dLat/2)**2+Math.cos(toR(aLat))*Math.cos(toR(bLat))*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(m)));
+}
+function mono(name){
+  const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));
+  return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();
+}
 function gmaps(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function amaps(s){return "https://maps.apple.com/?daddr="+encodeURIComponent(s.address);}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
-let here=null,nearOn=false,sheetOnly=false,selected=null,activeRegion=null;
+let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
 const map=L.map("map").setView([32.9,-83.5],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
-fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json").then(r=>r.json()).then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map));
+fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
+  .then(r=>{ if(!r.ok) throw new Error("geojson"); return r.json(); })
+  .then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map))
+  .catch(()=>{});
+
 const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48}).addTo(map);
 const regionLayer=L.layerGroup().addTo(map);
-let youMarker=null,radiusCircle=null;
+let youMarker=null, radiusCircle=null;
 
+function enrich(s){
+  return {...s, mi:here?miles(here.lat,here.lng,s.lat,s.lng):null, region:regionOf(s.county)};
+}
 function baseFilter(s){
-  const q=document.getElementById("q").value.toLowerCase();
+  const q=document.getElementById("q").value.toLowerCase().trim();
   const cl=document.getElementById("cls").value;
   const co=document.getElementById("cty").value;
   const rad=parseFloat(document.getElementById("radius").value);
-  const text=!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q)||regionOf(s.county).toLowerCase().includes(q);
-  if(!(text&&(!cl||s.cls===cl)&&(!co||s.county===co))) return false;
-  if(nearOn&&here&&miles(here.lat,here.lng,s.lat,s.lng)>rad) return false;
-  if(sheetOnly&&!hasSheet(s)) return false;
+  const region=regionOf(s.county);
+  const text=!q || s.name.toLowerCase().includes(q) || s.city.toLowerCase().includes(q) || s.county.toLowerCase().includes(q) || region.toLowerCase().includes(q);
+  if(!(text && (!cl||s.cls===cl) && (!co||s.county===co))) return false;
+  if(nearOn && here && miles(here.lat,here.lng,s.lat,s.lng)>rad) return false;
+  if(sheetOnly && !hasSheet(s)) return false;
   return true;
 }
-function pool(){return schools.filter(baseFilter).map(s=>({...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null,region:regionOf(s.county)}));}
-function regionStats(){const list=pool();return Object.keys(REGION_CENTER).map(name=>{const kids=list.filter(s=>s.region===name);const [lat,lng]=REGION_CENTER[name];return {name,lat,lng,count:kids.length,sheets:kids.filter(hasSheet).length};}).filter(r=>r.count>0);}
-function pinFor(s){const on=hasSheet(s);const m=L.circleMarker([s.lat,s.lng],{radius:on?8:6,color:on?"#d4af37":"#6b6554",fillColor:on?"#f0d56a":"#4a463c",fillOpacity:on?.95:.7,weight:1});m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));m.on("click",()=>showSchool(s));return m;}
-function clearPins(){clusters.clearLayers();regionLayer.clearLayers();if(radiusCircle){map.removeLayer(radiusCircle);radiusCircle=null;}}
+function pool(){ return schools.filter(baseFilter).map(enrich); }
+function regionStats(){
+  const list=pool();
+  return Object.keys(REGION_CENTER).map(name=>{
+    const kids=list.filter(s=>s.region===name);
+    const [lat,lng]=REGION_CENTER[name];
+    return {name,lat,lng,count:kids.length,sheets:kids.filter(hasSheet).length};
+  }).filter(r=>r.count>0);
+}
+function pinFor(s){
+  const on=hasSheet(s);
+  const m=L.circleMarker([s.lat,s.lng],{radius:on?8:6,color:on?"#d4af37":"#6b6554",fillColor:on?"#f0d56a":"#4a463c",fillOpacity:on?.95:.7,weight:1});
+  m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));
+  m.on("click",()=>showSchool(s.id));
+  return m;
+}
+function clearPins(){
+  clusters.clearLayers();
+  regionLayer.clearLayers();
+  if(radiusCircle){ map.removeLayer(radiusCircle); radiusCircle=null; }
+}
+
 function showRegions(){
-  activeRegion=null;selected=null;nearOn=false;
+  activeRegion=null; selected=null; nearOn=false;
   document.getElementById("nearBtn").classList.remove("on");
   document.getElementById("regionsBtn").classList.add("on");
   clearPins();
@@ -584,53 +649,135 @@ function showRegions(){
   regs.forEach(r=>{
     const icon=L.divIcon({className:"",html:`<div class="region-pin">${r.count}</div>`,iconSize:[46,46],iconAnchor:[23,23]});
     const m=L.marker([r.lat,r.lng],{icon}).bindTooltip(r.name+" · "+r.count+" schools");
-    m.on("click",()=>openRegion(r.name));regionLayer.addLayer(m);
+    m.on("click",()=>openRegion(r.name));
+    regionLayer.addLayer(m);
   });
   map.setView([32.9,-83.5],7);
-  document.getElementById("drawer").innerHTML=`<div class="kicker">GEORGIA REGIONS</div><div class="count">${regs.reduce((n,r)=>n+r.count,0)} schools · ${regs.length} regions</div>${regs.map(r=>`<div class="region" onclick='openRegion(${JSON.stringify(r.name)})'><div><div class="n">${r.name}</div><div class="sub">${r.sheets} with prospect sheets</div></div><div class="mi">${r.count}</div></div>`).join("")}`;
+  document.getElementById("drawer").innerHTML=
+    `<div class="kicker">GEORGIA REGIONS</div>
+     <div class="count">${regs.reduce((n,r)=>n+r.count,0)} schools · ${regs.length} regions</div>`+
+    regs.map(r=>`<div class="region" data-region="${esc(r.name)}"><div><div class="n">${esc(r.name)}</div><div class="sub">${r.sheets} with prospect sheets</div></div><div class="mi">${r.count}</div></div>`).join("");
 }
+
 function openRegion(name){
-  activeRegion=name;selected=null;document.getElementById("regionsBtn").classList.remove("on");
+  activeRegion=name; selected=null;
+  document.getElementById("regionsBtn").classList.remove("on");
   const list=pool().filter(s=>s.region===name);
-  if(nearOn&&here) list.sort((a,b)=>a.mi-b.mi); else list.sort((a,b)=>a.name.localeCompare(b.name));
-  clearPins();list.forEach(s=>clusters.addLayer(pinFor(s)));
+  if(nearOn && here) list.sort((a,b)=>a.mi-b.mi);
+  else list.sort((a,b)=>a.name.localeCompare(b.name));
+  clearPins();
+  list.forEach(s=>clusters.addLayer(pinFor(s)));
   if(list.length) map.fitBounds(L.latLngBounds(list.map(s=>[s.lat,s.lng])).pad(0.18));
   const withN=list.filter(hasSheet).length;
-  document.getElementById("drawer").innerHTML=`<button class="back" type="button" onclick="showRegions()">‹ All regions</button><div class="kicker" style="margin-top:.7rem">${name.toUpperCase()}</div><div class="count">${list.length} school${list.length===1?"":"s"} · ${withN} with sheets</div><div class="legend"><span><i class="dot yes"></i>Sheet on file</span><span><i class="dot no"></i>No sheet yet</span></div>${list.length?list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'><div><div class="n">${s.name}</div><div class="sub">${s.city} · ${s.county} · Class ${s.cls}</div></div><div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":""}<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join(""):`<p class="empty">No schools in this region match those filters.</p>`}`;
+  document.getElementById("drawer").innerHTML=
+    `<button class="back" type="button" data-action="regions">‹ All regions</button>
+     <div class="kicker" style="margin-top:.7rem">${esc(name.toUpperCase())}</div>
+     <div class="count">${list.length} school${list.length===1?"":"s"} · ${withN} with sheets</div>
+     <div class="legend"><span><i class="dot yes"></i>Sheet on file</span><span><i class="dot no"></i>No sheet yet</span></div>`+
+    (list.length
+      ? list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.city)} · ${esc(s.county)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":""}<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")
+      : `<p class="empty">No schools in this region match those filters.</p>`);
 }
-function openNamed(name){const s=schools.find(x=>x.name===name);if(s) showSchool({...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null,region:regionOf(s.county)});}
-function showSchool(s){
-  selected=s;if(!activeRegion) openRegion(s.region||regionOf(s.county));
+
+function showSchool(id){
+  const raw=byId[id];
+  if(!raw) return;
+  const s=enrich(raw);
+  selected=s;
+  if(!activeRegion) openRegion(s.region);
   map.setView([s.lat,s.lng],Math.max(map.getZoom(),10));
-  document.getElementById("drawer").innerHTML=`<button class="back" type="button" onclick="openRegion('${(s.region||regionOf(s.county)).replace(/'/g,"\\'")}')">‹ ${s.region||regionOf(s.county)}</button><article class="card" style="margin-top:.7rem"><div class="top"><div class="mono">${mono(s.name)}</div><div class="badge">${s.cls}</div></div><h2 class="title">${s.name}</h2><div class="muted" style="margin-bottom:.4rem">${s.region||regionOf(s.county)}</div><div class="row"><span class="muted">HEAD COACH</span><div>${s.coach}</div></div><div class="row">${s.stadium}</div><div class="row">${s.address}<div class="muted">${s.city} · ${s.county} County${s.mi!=null?" · "+s.mi.toFixed(1)+" miles":""}</div></div><div class="actions"><a href="${gmaps(s)}" target="_blank" rel="noopener">Google Maps</a><a href="${amaps(s)}" target="_blank" rel="noopener">Apple Maps</a>${hasSheet(s)?`<a href="${sheets[s.name]}" target="_blank" rel="noopener">Prospect sheet</a>`:`<span class="muted">No prospect sheet yet</span>`}</div></article>`;
+  const sheetLink=hasSheet(s)
+    ? `<a href="${esc(sheets[s.id])}" target="_blank" rel="noopener">Prospect sheet</a>`
+    : `<span class="muted">No prospect sheet yet</span>`;
+  document.getElementById("drawer").innerHTML=
+    `<button class="back" type="button" data-action="region" data-region="${esc(s.region)}">‹ ${esc(s.region)}</button>
+     <article class="card" style="margin-top:.7rem">
+       <div class="top"><div class="mono">${esc(mono(s.name))}</div><div class="badge">${esc(s.cls)}</div></div>
+       <h2 class="title">${esc(s.name)}</h2>
+       <div class="muted" style="margin-bottom:.4rem">${esc(s.region)}</div>
+       <div class="row"><span class="muted">HEAD COACH</span><div>${esc(s.coach)}</div></div>
+       <div class="row">${esc(s.stadium)}</div>
+       <div class="row">${esc(s.address)}<div class="muted">${esc(s.city)} · ${esc(s.county)} County${s.mi!=null?" · "+s.mi.toFixed(1)+" miles":""}</div></div>
+       <div class="actions">
+         <a href="${gmaps(s)}" target="_blank" rel="noopener">Google Maps</a>
+         <a href="${amaps(s)}" target="_blank" rel="noopener">Apple Maps</a>
+         ${sheetLink}
+       </div>
+     </article>`;
 }
+
 function apply(){
-  if(nearOn&&here){
-    activeRegion=null;const list=pool().sort((a,b)=>a.mi-b.mi);clearPins();list.forEach(s=>clusters.addLayer(pinFor(s)));
-    radiusCircle=L.circle([here.lat,here.lng],{radius:parseFloat(document.getElementById("radius").value)*1609.34,color:"#d4af37",weight:1.2,fillColor:"#d4af37",fillOpacity:.08}).addTo(map);
+  if(nearOn && here){
+    activeRegion=null;
+    const list=pool().sort((a,b)=>a.mi-b.mi);
+    clearPins();
+    list.forEach(s=>clusters.addLayer(pinFor(s)));
+    radiusCircle=L.circle([here.lat,here.lng],{
+      radius:parseFloat(document.getElementById("radius").value)*1609.34,
+      color:"#d4af37",weight:1.2,fillColor:"#d4af37",fillOpacity:.08
+    }).addTo(map);
     const withN=list.filter(hasSheet).length;
-    document.getElementById("drawer").innerHTML=`<button class="back" type="button" onclick="showRegions()">‹ All regions</button><div class="kicker" style="margin-top:.7rem">NEAR YOU · ${document.getElementById("radius").value} MILES</div><div class="count">${list.length} schools · ${withN} with sheets</div>${list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'><div><div class="n">${s.name}</div><div class="sub">${s.region} · ${s.city} · Class ${s.cls}</div></div><div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")||'<p class="empty">No schools in that radius.</p>'}`;
+    document.getElementById("drawer").innerHTML=
+      `<button class="back" type="button" data-action="regions">‹ All regions</button>
+       <div class="kicker" style="margin-top:.7rem">NEAR YOU · ${esc(document.getElementById("radius").value)} MILES</div>
+       <div class="count">${list.length} schools · ${withN} with sheets</div>`+
+      (list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.region)} · ${esc(s.city)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")
+        || '<p class="empty">No schools in that radius.</p>');
     return;
   }
-  if(activeRegion) openRegion(activeRegion); else showRegions();
+  if(activeRegion) openRegion(activeRegion);
+  else showRegions();
 }
+
+document.getElementById("drawer").addEventListener("click",e=>{
+  const back=e.target.closest("[data-action]");
+  if(back){
+    if(back.dataset.action==="regions") showRegions();
+    else if(back.dataset.action==="region") openRegion(back.dataset.region);
+    return;
+  }
+  const regionEl=e.target.closest("[data-region].region");
+  if(regionEl){ openRegion(regionEl.dataset.region); return; }
+  const schoolEl=e.target.closest("[data-school]");
+  if(schoolEl) showSchool(schoolEl.dataset.school);
+});
+
 document.getElementById("regionsBtn").onclick=()=>showRegions();
 document.getElementById("nearBtn").onclick=()=>{
-  if(nearOn){nearOn=false;document.getElementById("nearBtn").classList.remove("on");showRegions();return;}
-  if(!navigator.geolocation){alert("Location is not available in this browser.");return;}
+  if(nearOn){ nearOn=false; document.getElementById("nearBtn").classList.remove("on"); showRegions(); return; }
+  if(!navigator.geolocation){ alert("Location is not available in this browser."); return; }
   navigator.geolocation.getCurrentPosition(pos=>{
-    nearOn=true;document.getElementById("nearBtn").classList.add("on");
+    nearOn=true;
+    document.getElementById("nearBtn").classList.add("on");
+    document.getElementById("regionsBtn").classList.remove("on");
     here={lat:pos.coords.latitude,lng:pos.coords.longitude};
     if(youMarker) map.removeLayer(youMarker);
     youMarker=L.circleMarker([here.lat,here.lng],{radius:8,color:"#fff4c2",fillColor:"#d4af37",fillOpacity:1,weight:2}).bindTooltip("You").addTo(map);
-    map.setView([here.lat,here.lng],9);apply();
+    map.setView([here.lat,here.lng],9);
+    apply();
   },()=>alert("Could not read your location. Allow location access and try again."),{enableHighAccuracy:true,timeout:10000});
 };
-document.getElementById("sheetBtn").onclick=()=>{sheetOnly=!sheetOnly;document.getElementById("sheetBtn").classList.toggle("on",sheetOnly);apply();};
-const filterBtn=document.getElementById("filterBtn"),filterBox=document.getElementById("filterBox");
-filterBtn.onclick=e=>{e.stopPropagation();filterBox.classList.toggle("on");filterBtn.classList.toggle("on",filterBox.classList.contains("on"));};
-document.addEventListener("click",e=>{if(!filterBox.contains(e.target)&&e.target!==filterBtn){filterBox.classList.remove("on");filterBtn.classList.remove("on");}});
-["q","cls","cty","radius"].forEach(id=>{const el=document.getElementById(id);el.addEventListener(id==="q"?"input":"change",apply);});
+document.getElementById("sheetBtn").onclick=()=>{
+  sheetOnly=!sheetOnly;
+  document.getElementById("sheetBtn").classList.toggle("on",sheetOnly);
+  apply();
+};
+const filterBtn=document.getElementById("filterBtn"), filterBox=document.getElementById("filterBox");
+filterBtn.onclick=e=>{
+  e.stopPropagation();
+  filterBox.classList.toggle("on");
+  filterBtn.classList.toggle("on",filterBox.classList.contains("on"));
+};
+document.addEventListener("click",e=>{
+  if(!filterBox.contains(e.target) && e.target!==filterBtn){
+    filterBox.classList.remove("on");
+    filterBtn.classList.remove("on");
+  }
+});
+["q","cls","cty","radius"].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener(id==="q"?"input":"change",apply);
+});
 showRegions();
 </script>
 </body>
