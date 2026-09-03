@@ -61,6 +61,10 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 .empty{color:var(--muted);padding:1rem 0}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .region-pin{background:#d4af37;color:#1a1608;border:2px solid #f3ead1;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font:700 13px Georgia,serif;box-shadow:0 0 0 6px rgba(212,175,55,.25)}
+.sel-wrap{position:relative;width:28px;height:28px}
+.sel-dot{width:16px;height:16px;border-radius:50%;background:#f0d56a;border:3px solid #fff4c2;position:absolute;left:6px;top:6px;box-shadow:0 0 0 4px rgba(240,213,106,.35)}
+.sel-ring{position:absolute;inset:0;border-radius:50%;border:2px solid #f0d56a;animation:selPulse 1.4s ease-out infinite}
+@keyframes selPulse{0%{transform:scale(.55);opacity:.9}100%{transform:scale(1.35);opacity:0}}
 .marker-cluster-small{background-color:rgba(240,213,106,.28)}
 .marker-cluster-small div{background-color:rgba(240,213,106,.85);color:#1a1608}
 .marker-cluster-medium{background-color:rgba(212,175,55,.32)}
@@ -121,9 +125,7 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
 <script>
-const slug=(name,city)=>(name+" "+city).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-const S=(name,city,county,address,stadium,cls,coach,lat,lng)=>({id:slug(name,city),name,city,county,address,stadium,cls,coach,lat,lng});
-const schools=[
+
 S("Camden County High School","Kingsland","Camden","6300 Laurel Island Pkwy, Kingsland, GA 31548","Camden County Stadium","7A","Tucker Pruitt",30.832,-81.650),
 S("Lowndes High School","Valdosta","Lowndes","1606 Norman Dr, Valdosta, GA 31601","Lowndes Stadium","7A","Adam Carter",30.848,-83.302),
 S("Colquitt County High School","Moultrie","Colquitt","1800 Park Ave SE, Moultrie, GA 31768","Mack Tharpe Stadium","7A","Sean Calhoun",31.165,-83.771),
@@ -536,8 +538,6 @@ S("Lincoln County High School","Lincolnton","Lincoln","200 Charles Ward Way, Lin
 S("Towns County High School","Hiawassee","Towns","1400 Hwy 76 E, Hiawassee, GA 30546","Towns County Stadium","A","To be listed",34.949,-83.757),
 S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton, GA 30828","Warren County Stadium","A","To be listed",33.407,-82.662),
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
-];
-
 const sheets = {};
 function hasSheet(s){ return Boolean(sheets[s.id]); }
 
@@ -751,6 +751,21 @@ function regionStats(){
 }
 function pinFor(s){
   const on=hasSheet(s);
+  const isSel=selected && selected.id===s.id;
+  if(isSel){
+    const m=L.marker([s.lat,s.lng],{
+      icon:L.divIcon({
+        className:"",
+        html:`<div class="sel-wrap"><div class="sel-ring"></div><div class="sel-dot"></div></div>`,
+        iconSize:[28,28],
+        iconAnchor:[14,14]
+      }),
+      zIndexOffset:1000
+    });
+    m.bindTooltip(s.name+" · selected");
+    m.on("click",()=>showSchool(s.id));
+    return m;
+  }
   const m=L.circleMarker([s.lat,s.lng],{
     radius: on ? 10 : 8,
     color: on ? "#fff4c2" : "#e6d7a2",
@@ -817,8 +832,13 @@ function showSchool(id){
   if(!raw) return;
   const s=enrich(raw);
   selected=s;
-  if(!activeRegion) openRegion(s.region);
-  map.setView([s.lat,s.lng],Math.max(map.getZoom(),10));
+  activeRegion=s.region;
+  document.getElementById("regionsBtn").classList.remove("on");
+  showRegionOutlines(false);
+  const list=nearOn ? pool().sort((a,b)=>a.mi-b.mi) : pool().filter(x=>x.region===s.region).sort((a,b)=>a.name.localeCompare(b.name));
+  clearPins();
+  list.forEach(x=>clusters.addLayer(pinFor(x)));
+  map.setView([s.lat,s.lng],Math.max(map.getZoom(),11));
   const sheetLink=hasSheet(s)
     ? `<a href="${esc(sheets[s.id])}" target="_blank" rel="noopener">Prospect sheet</a>`
     : `<span class="muted">No prospect sheet yet</span>`;
@@ -843,6 +863,7 @@ function showSchool(id){
 function apply(){
   if(nearOn&&here){
     activeRegion=null;
+    selected=null;
     showRegionOutlines(false);
     const list=pool().sort((a,b)=>a.mi-b.mi);
     clearPins();
