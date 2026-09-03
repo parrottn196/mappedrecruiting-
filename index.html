@@ -59,6 +59,7 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 .empty{color:var(--muted);padding:1rem 0}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .region-pin{background:#d4af37;color:#1a1608;border:2px solid #f3ead1;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font:700 13px Georgia,serif;box-shadow:0 0 0 6px rgba(212,175,55,.25)}
+.hwy{background:#1a1608;color:#f0d56a;border:1px solid #d4af37;font:700 10px Georgia,serif;letter-spacing:.06em;padding:1px 5px;text-align:center;white-space:nowrap;pointer-events:none}
 .marker-cluster-small{background-color:rgba(240,213,106,.28)}
 .marker-cluster-small div{background-color:rgba(240,213,106,.85);color:#1a1608}
 .marker-cluster-medium{background-color:rgba(212,175,55,.32)}
@@ -105,10 +106,10 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
 <script>
 const slug=(name,city)=>(name+" "+city).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const S=(name,city,county,address,stadium,cls,coach,lat,lng)=>({id:slug(name,city),name,city,county,address,stadium,cls,coach,lat,lng});
-
 const schools=[
 S("Camden County High School","Kingsland","Camden","6300 Laurel Island Pkwy, Kingsland, GA 31548","Camden County Stadium","7A","Tucker Pruitt",30.832,-81.650),
 S("Lowndes High School","Valdosta","Lowndes","1606 Norman Dr, Valdosta, GA 31601","Lowndes Stadium","7A","Adam Carter",30.848,-83.302),
@@ -524,9 +525,6 @@ S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton,
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
 ];
 
-/* Key by school id (name-city slug). Add files when you have them:
-   sheets["camden-county-high-school-kingsland"] = "sheets/camden.html";
-*/
 const sheets = {};
 function hasSheet(s){ return Boolean(sheets[s.id]); }
 
@@ -594,10 +592,106 @@ function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
 const map=L.map("map").setView([32.9,-83.5],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
-fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
-  .then(r=>{ if(!r.ok) throw new Error("geojson"); return r.json(); })
-  .then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map))
-  .catch(()=>{});
+
+const regionBoundsLayer=L.layerGroup();
+const highwayLayer=L.layerGroup().addTo(map);
+
+function countyName(props){
+  const raw=props.NAME||props.NAME10||props.name||props.NAMELSAD||"";
+  return raw.replace(/\s+County$/i,"").trim();
+}
+function showRegionOutlines(on){
+  if(on){
+    if(!map.hasLayer(regionBoundsLayer)) regionBoundsLayer.addTo(map);
+  } else if(map.hasLayer(regionBoundsLayer)){
+    map.removeLayer(regionBoundsLayer);
+  }
+}
+
+fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
+  .then(r=>r.json())
+  .then(all=>{
+    const ga={
+      type:"FeatureCollection",
+      features:all.features.filter(f=>{
+        const id=String(f.id||f.properties.GEO_ID||"");
+        const st=String(f.properties.STATE||f.properties.STATEFP||f.properties.STATEFP10||"");
+        return id.startsWith("13")||st==="13";
+      })
+    };
+    L.geoJSON(ga,{
+      interactive:false,
+      style:{color:"#d4af37",weight:1.4,fillColor:"#2a332a",fillOpacity:0.16}
+    }).addTo(map);
+
+    const byRegion={};
+    ga.features.forEach(f=>{
+      const region=regionOf(countyName(f.properties));
+      if(!region||region==="Other") return;
+      (byRegion[region]||=[]).push(f);
+    });
+    Object.entries(byRegion).forEach(([name,feats])=>{
+      let merged=feats[0];
+      for(let i=1;i<feats.length;i++){
+        try{ merged=turf.union(merged,feats[i]); }catch(e){}
+      }
+      const layer=L.geoJSON(merged,{
+        style:{color:"#d4af37",weight:2.2,fillColor:"#d4af37",fillOpacity:0.07}
+      });
+      layer.bindTooltip(name);
+      layer.on("click",()=>openRegion(name));
+      regionBoundsLayer.addLayer(layer);
+    });
+    showRegionOutlines(true);
+  })
+  .catch(()=>{
+    fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
+      .then(r=>r.json())
+      .then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map))
+      .catch(()=>{});
+  });
+
+const MAJOR=new Set(["I-16","I-20","I-24","I-59","I-75","I-85","I-95","I-185","I-285","I-516","I-520","I-575","I-675","I-985"]);
+const PRIMARY=new Set(["I-16","I-20","I-75","I-85","I-95"]);
+function routeList(ref){
+  return String(ref||"").split(/[;,]/).map(s=>s.trim().toUpperCase().replace(/\s+/g,"")).map(s=>s.replace(/^I(?=\d)/,"I-")).filter(Boolean);
+}
+function bestRef(refs){ return refs.find(r=>PRIMARY.has(r))||refs.find(r=>MAJOR.has(r))||refs[0]||""; }
+
+fetch("https://overpass-api.de/api/interpreter",{
+  method:"POST",
+  body:"data="+encodeURIComponent(`[out:json][timeout:90];area["ISO3166-2"="US-GA"]->.ga;(way["highway"="motorway"]["ref"~"I[- ]?"](area.ga);way["highway"="trunk"]["ref"~"^I[- ]?"](area.ga););out geom;`)
+})
+.then(r=>r.json())
+.then(osm=>{
+  const labeled=new Set();
+  (osm.elements||[]).forEach(el=>{
+    if(!el.geometry||el.geometry.length<2) return;
+    const refs=routeList(el.tags&&el.tags.ref);
+    const key=bestRef(refs);
+    if(!MAJOR.has(key)) return;
+    const latlngs=el.geometry.map(p=>[p.lat,p.lon]);
+    highwayLayer.addLayer(L.polyline(latlngs,{
+      color:"#e6c96a",
+      weight:PRIMARY.has(key)?3.2:2,
+      opacity:0.9,
+      lineCap:"round",
+      interactive:false
+    }));
+    const mid=latlngs[Math.floor(latlngs.length/2)];
+    const bucket=key+":"+Math.round(mid[0]*2)+","+Math.round(mid[1]*2);
+    const already=[...labeled].filter(x=>x.startsWith(key+":")).length;
+    const maxLabels=PRIMARY.has(key)?3:1;
+    if(mid&&already<maxLabels&&!labeled.has(bucket)){
+      labeled.add(bucket);
+      highwayLayer.addLayer(L.marker(mid,{
+        interactive:false,keyboard:false,
+        icon:L.divIcon({className:"",html:`<div class="hwy">${key}</div>`,iconSize:[34,18],iconAnchor:[17,9]})
+      }));
+    }
+  });
+})
+.catch(()=>{});
 
 const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48}).addTo(map);
 const regionLayer=L.layerGroup().addTo(map);
@@ -612,10 +706,10 @@ function baseFilter(s){
   const co=document.getElementById("cty").value;
   const rad=parseFloat(document.getElementById("radius").value);
   const region=regionOf(s.county);
-  const text=!q || s.name.toLowerCase().includes(q) || s.city.toLowerCase().includes(q) || s.county.toLowerCase().includes(q) || region.toLowerCase().includes(q);
-  if(!(text && (!cl||s.cls===cl) && (!co||s.county===co))) return false;
-  if(nearOn && here && miles(here.lat,here.lng,s.lat,s.lng)>rad) return false;
-  if(sheetOnly && !hasSheet(s)) return false;
+  const text=!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q)||region.toLowerCase().includes(q);
+  if(!(text&&(!cl||s.cls===cl)&&(!co||s.county===co))) return false;
+  if(nearOn&&here&&miles(here.lat,here.lng,s.lat,s.lng)>rad) return false;
+  if(sheetOnly&&!hasSheet(s)) return false;
   return true;
 }
 function pool(){ return schools.filter(baseFilter).map(enrich); }
@@ -645,6 +739,7 @@ function showRegions(){
   document.getElementById("nearBtn").classList.remove("on");
   document.getElementById("regionsBtn").classList.add("on");
   clearPins();
+  showRegionOutlines(true);
   const regs=regionStats();
   regs.forEach(r=>{
     const icon=L.divIcon({className:"",html:`<div class="region-pin">${r.count}</div>`,iconSize:[46,46],iconAnchor:[23,23]});
@@ -662,8 +757,9 @@ function showRegions(){
 function openRegion(name){
   activeRegion=name; selected=null;
   document.getElementById("regionsBtn").classList.remove("on");
+  showRegionOutlines(false);
   const list=pool().filter(s=>s.region===name);
-  if(nearOn && here) list.sort((a,b)=>a.mi-b.mi);
+  if(nearOn&&here) list.sort((a,b)=>a.mi-b.mi);
   else list.sort((a,b)=>a.name.localeCompare(b.name));
   clearPins();
   list.forEach(s=>clusters.addLayer(pinFor(s)));
@@ -707,8 +803,9 @@ function showSchool(id){
 }
 
 function apply(){
-  if(nearOn && here){
+  if(nearOn&&here){
     activeRegion=null;
+    showRegionOutlines(false);
     const list=pool().sort((a,b)=>a.mi-b.mi);
     clearPins();
     list.forEach(s=>clusters.addLayer(pinFor(s)));
@@ -769,7 +866,7 @@ filterBtn.onclick=e=>{
   filterBtn.classList.toggle("on",filterBox.classList.contains("on"));
 };
 document.addEventListener("click",e=>{
-  if(!filterBox.contains(e.target) && e.target!==filterBtn){
+  if(!filterBox.contains(e.target)&&e.target!==filterBtn){
     filterBox.classList.remove("on");
     filterBtn.classList.remove("on");
   }
