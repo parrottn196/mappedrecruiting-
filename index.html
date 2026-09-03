@@ -34,7 +34,7 @@ a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.6
 .filter-box select{width:100%}
 main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 #map{height:100%;background:#0a0d0a}
-.drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%)}
+.drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%);position:relative}
 .kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.35rem}
 .count{color:var(--muted);font-size:.72rem;margin-bottom:.7rem}
 .school,.region{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.7rem 0;border-bottom:1px dashed rgba(212,175,55,.28);cursor:pointer}
@@ -56,6 +56,14 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 .muted{color:var(--muted);font-size:.74rem}
 .actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem;align-items:center}
 .actions a,.back{color:var(--line);text-decoration:none;border:1px solid rgba(212,175,55,.35);padding:.4rem .55rem;font-size:.72rem;background:none;font:inherit;cursor:pointer}
+.back{
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:inline-block;
+  background:var(--panel);
+  margin-bottom:.35rem;
+}
 .empty{color:var(--muted);padding:1rem 0}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .region-pin{background:#d4af37;color:#1a1608;border:2px solid #f3ead1;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font:700 13px Georgia,serif;box-shadow:0 0 0 6px rgba(212,175,55,.25)}
@@ -70,6 +78,7 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
   main{grid-template-rows:1fr 46%;grid-template-columns:1fr;height:calc(100% - 148px)}
   .drawer{border-left:0;border-top:1px solid rgba(212,175,55,.22)}
   .bar1,.bar2{flex-wrap:wrap}
+  .back{padding:.55rem .7rem}
 }
 </style>
 </head>
@@ -587,6 +596,9 @@ function mono(name){
 function gmaps(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function amaps(s){return "https://maps.apple.com/?daddr="+encodeURIComponent(s.address);}
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function resetDrawer(){
+  document.getElementById("drawer").scrollTop = 0;
+}
 
 let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
 const map=L.map("map").setView([32.9,-83.5],7);
@@ -704,6 +716,7 @@ function showRegions(){
     `<div class="kicker">GEORGIA REGIONS</div>
      <div class="count">${regs.reduce((n,r)=>n+r.count,0)} schools · ${regs.length} regions</div>`+
     regs.map(r=>`<div class="region" data-region="${esc(r.name)}"><div><div class="n">${esc(r.name)}</div><div class="sub">${r.sheets} with prospect sheets</div></div><div class="mi">${r.count}</div></div>`).join("");
+  resetDrawer();
 }
 
 function openRegion(name){
@@ -725,6 +738,7 @@ function openRegion(name){
     (list.length
       ? list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.city)} · ${esc(s.county)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":""}<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")
       : `<p class="empty">No schools in this region match those filters.</p>`);
+  resetDrawer();
 }
 
 function showSchool(id){
@@ -752,6 +766,7 @@ function showSchool(id){
          ${sheetLink}
        </div>
      </article>`;
+  resetDrawer();
 }
 
 function apply(){
@@ -772,6 +787,7 @@ function apply(){
        <div class="count">${list.length} schools · ${withN} with sheets</div>`+
       (list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.region)} · ${esc(s.city)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")
         || '<p class="empty">No schools in that radius.</p>');
+    resetDrawer();
     return;
   }
   if(activeRegion) openRegion(activeRegion);
@@ -830,4 +846,5 @@ document.addEventListener("click",e=>{
 showRegions();
 </script>
 </body>
+</html>
 </html>
