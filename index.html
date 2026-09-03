@@ -608,35 +608,36 @@ function showRegionOutlines(on){
   }
 }
 
+fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
+  .then(r=>r.json())
+  .then(geo=>L.geoJSON(geo,{
+    interactive:false,
+    style:{color:"#d4af37",weight:1.8,fillColor:"#2a332a",fillOpacity:0.22}
+  }).addTo(map))
+  .catch(()=>{});
+
 fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
   .then(r=>r.json())
   .then(all=>{
-    const ga={
-      type:"FeatureCollection",
-      features:all.features.filter(f=>{
-        const id=String(f.id||f.properties.GEO_ID||"");
-        const st=String(f.properties.STATE||f.properties.STATEFP||f.properties.STATEFP10||"");
-        return id.startsWith("13")||st==="13";
-      })
-    };
-    L.geoJSON(ga,{
-      interactive:false,
-      style:{color:"#d4af37",weight:1.4,fillColor:"#2a332a",fillOpacity:0.16}
-    }).addTo(map);
-
+    const gaFeats=all.features.filter(f=>{
+      const id=String(f.id||f.properties.GEO_ID||"");
+      const st=String(f.properties.STATE||f.properties.STATEFP||f.properties.STATEFP10||"");
+      return id.startsWith("13")||st==="13";
+    });
     const byRegion={};
-    ga.features.forEach(f=>{
+    gaFeats.forEach(f=>{
       const region=regionOf(countyName(f.properties));
       if(!region||region==="Other") return;
       (byRegion[region]||=[]).push(f);
     });
     Object.entries(byRegion).forEach(([name,feats])=>{
-      let merged=feats[0];
-      for(let i=1;i<feats.length;i++){
-        try{ merged=turf.union(merged,feats[i]); }catch(e){}
-      }
+      let merged=null;
+      feats.forEach(f=>{
+        try{ merged = merged ? turf.union(merged, f) : f; }catch(e){}
+      });
+      if(!merged) return;
       const layer=L.geoJSON(merged,{
-        style:{color:"#d4af37",weight:2.2,fillColor:"#d4af37",fillOpacity:0.07}
+        style:{color:"#d4af37",weight:2.4,fillColor:"#d4af37",fillOpacity:0.06}
       });
       layer.bindTooltip(name);
       layer.on("click",()=>openRegion(name));
@@ -644,12 +645,7 @@ fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties
     });
     showRegionOutlines(true);
   })
-  .catch(()=>{
-    fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
-      .then(r=>r.json())
-      .then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map))
-      .catch(()=>{});
-  });
+  .catch(()=>{});
 
 const MAJOR=new Set(["I-16","I-20","I-24","I-59","I-75","I-85","I-95","I-185","I-285","I-516","I-520","I-575","I-675","I-985"]);
 const PRIMARY=new Set(["I-16","I-20","I-75","I-85","I-95"]);
