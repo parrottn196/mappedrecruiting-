@@ -59,7 +59,6 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 .empty{color:var(--muted);padding:1rem 0}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .region-pin{background:#d4af37;color:#1a1608;border:2px solid #f3ead1;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font:700 13px Georgia,serif;box-shadow:0 0 0 6px rgba(212,175,55,.25)}
-.hwy{background:#1a1608;color:#f0d56a;border:1px solid #d4af37;font:700 10px Georgia,serif;letter-spacing:.06em;padding:1px 5px;text-align:center;white-space:nowrap;pointer-events:none}
 .marker-cluster-small{background-color:rgba(240,213,106,.28)}
 .marker-cluster-small div{background-color:rgba(240,213,106,.85);color:#1a1608}
 .marker-cluster-medium{background-color:rgba(212,175,55,.32)}
@@ -594,7 +593,6 @@ const map=L.map("map").setView([32.9,-83.5],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
 
 const regionBoundsLayer=L.layerGroup();
-const highwayLayer=L.layerGroup().addTo(map);
 
 function countyName(props){
   const raw=props.NAME||props.NAME10||props.name||props.NAMELSAD||"";
@@ -646,48 +644,6 @@ fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties
     showRegionOutlines(true);
   })
   .catch(()=>{});
-
-const MAJOR=new Set(["I-16","I-20","I-24","I-59","I-75","I-85","I-95","I-185","I-285","I-516","I-520","I-575","I-675","I-985"]);
-const PRIMARY=new Set(["I-16","I-20","I-75","I-85","I-95"]);
-function routeList(ref){
-  return String(ref||"").split(/[;,]/).map(s=>s.trim().toUpperCase().replace(/\s+/g,"")).map(s=>s.replace(/^I(?=\d)/,"I-")).filter(Boolean);
-}
-function bestRef(refs){ return refs.find(r=>PRIMARY.has(r))||refs.find(r=>MAJOR.has(r))||refs[0]||""; }
-
-fetch("https://overpass-api.de/api/interpreter",{
-  method:"POST",
-  body:"data="+encodeURIComponent(`[out:json][timeout:90];area["ISO3166-2"="US-GA"]->.ga;(way["highway"="motorway"]["ref"~"I[- ]?"](area.ga);way["highway"="trunk"]["ref"~"^I[- ]?"](area.ga););out geom;`)
-})
-.then(r=>r.json())
-.then(osm=>{
-  const labeled=new Set();
-  (osm.elements||[]).forEach(el=>{
-    if(!el.geometry||el.geometry.length<2) return;
-    const refs=routeList(el.tags&&el.tags.ref);
-    const key=bestRef(refs);
-    if(!MAJOR.has(key)) return;
-    const latlngs=el.geometry.map(p=>[p.lat,p.lon]);
-    highwayLayer.addLayer(L.polyline(latlngs,{
-      color:"#e6c96a",
-      weight:PRIMARY.has(key)?3.2:2,
-      opacity:0.9,
-      lineCap:"round",
-      interactive:false
-    }));
-    const mid=latlngs[Math.floor(latlngs.length/2)];
-    const bucket=key+":"+Math.round(mid[0]*2)+","+Math.round(mid[1]*2);
-    const already=[...labeled].filter(x=>x.startsWith(key+":")).length;
-    const maxLabels=PRIMARY.has(key)?3:1;
-    if(mid&&already<maxLabels&&!labeled.has(bucket)){
-      labeled.add(bucket);
-      highwayLayer.addLayer(L.marker(mid,{
-        interactive:false,keyboard:false,
-        icon:L.divIcon({className:"",html:`<div class="hwy">${key}</div>`,iconSize:[34,18],iconAnchor:[17,9]})
-      }));
-    }
-  });
-})
-.catch(()=>{});
 
 const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48}).addTo(map);
 const regionLayer=L.layerGroup().addTo(map);
