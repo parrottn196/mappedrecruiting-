@@ -11,18 +11,28 @@
 :root{--bg:#070907;--panel:#0c110c;--line:#d4af37;--text:#f3ead1;--muted:#9a9178}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:Georgia,serif;background:var(--bg);color:var(--text)}
-header{min-height:64px;display:grid;grid-template-columns:auto 1fr auto;gap:.7rem;align-items:center;padding:.55rem 1rem;border-bottom:1px solid rgba(212,175,55,.25)}
-.logo{display:flex;align-items:center;gap:.6rem}
+header.site{display:block}
+.bar1,.bar2{display:flex;align-items:center;gap:.7rem;padding:.55rem 1rem}
+.bar1{justify-content:space-between;border-bottom:1px solid rgba(212,175,55,.22)}
+.bar2{justify-content:flex-start;background:#0a0e0a;border-bottom:1px solid rgba(212,175,55,.18);position:relative}
+.logo{display:flex;align-items:center;gap:.6rem;flex:0 0 auto}
 .ga{width:34px;height:34px;border:1.5px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--line);font-size:.7rem}
 .logo h1{font-size:.74rem;letter-spacing:.16em;color:var(--line)}
 .logo p{font-size:.6rem;letter-spacing:.08em;color:var(--muted)}
-.search{width:100%;max-width:380px;background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.48rem .7rem;font:inherit}
-.right{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;justify-content:flex-end}
+.search{flex:1;max-width:520px;background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.48rem .7rem;font:inherit}
 select{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.42rem .5rem;font:inherit}
 .btn{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--muted);padding:.42rem .55rem;font:inherit;letter-spacing:.1em;font-size:.62rem;cursor:pointer}
 .btn.on{color:#1a1608;background:var(--line);border-color:var(--line)}
-a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem}
-main{height:calc(100% - 64px);display:grid;grid-template-columns:1fr 400px}
+a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem;white-space:nowrap}
+.near-group{display:flex;align-items:stretch}
+.near-group .btn{border-right:0}
+.near-group select{border-left:0}
+.grow{flex:1}
+.filter-box{position:absolute;right:1rem;top:calc(100% + 6px);z-index:5000;min-width:220px;background:#0d130d;border:1px solid var(--line);padding:.75rem;display:none}
+.filter-box.on{display:block}
+.filter-box label{display:flex;flex-direction:column;gap:.25rem;font-size:.58rem;letter-spacing:.12em;color:var(--muted);margin-bottom:.55rem}
+.filter-box select{width:100%}
+main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 #map{height:100%;background:#0a0d0a}
 .drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%)}
 .kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.35rem}
@@ -56,21 +66,37 @@ main{height:calc(100% - 64px);display:grid;grid-template-columns:1fr 400px}
 .marker-cluster-large{background-color:rgba(139,105,20,.38)}
 .marker-cluster-large div{background-color:rgba(139,105,20,.95);color:#f3ead1}
 .marker-cluster{border:1px solid rgba(212,175,55,.55)}
-@media(max-width:900px){main{grid-template-rows:1fr 46%;grid-template-columns:1fr}.drawer{border-left:0;border-top:1px solid rgba(212,175,55,.22)}header{grid-template-columns:1fr;height:auto}}
+@media(max-width:900px){
+  main{grid-template-rows:1fr 46%;grid-template-columns:1fr;height:calc(100% - 148px)}
+  .drawer{border-left:0;border-top:1px solid rgba(212,175,55,.22)}
+  .bar1,.bar2{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></div>
-  <input id="q" class="search" placeholder="Search school, city, county, or region"/>
-  <div class="right">
+<header class="site">
+  <div class="bar1">
+    <div class="logo"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></div>
+    <input id="q" class="search" placeholder="Search school, city, or county"/>
     <a class="board" href="our-recruits.html">OUR RECRUITING BOARD</a>
-    <button class="btn" id="regionsBtn" type="button">REGIONS</button>
-    <button class="btn" id="nearBtn" type="button">NEAR ME</button>
-    <select id="radius"><option value="25">25 mi</option><option value="50" selected>50 mi</option><option value="100">100 mi</option></select>
+  </div>
+  <div class="bar2">
+    <button class="btn on" id="regionsBtn" type="button">REGIONS</button>
+    <div class="near-group">
+      <button class="btn" id="nearBtn" type="button">NEAR ME</button>
+      <select id="radius"><option value="25">25 mi</option><option value="50" selected>50 mi</option><option value="100">100 mi</option></select>
+    </div>
     <button class="btn" id="sheetBtn" type="button">HAS PROSPECT INFO</button>
-    <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
-    <select id="cty"><option value="">All counties</option></select>
+    <span class="grow"></span>
+    <button class="btn" id="filterBtn" type="button">FILTER</button>
+    <div class="filter-box" id="filterBox">
+      <label>Class
+        <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
+      </label>
+      <label>County
+        <select id="cty"><option value="">All counties</option></select>
+      </label>
+    </div>
   </div>
 </header>
 <main>
@@ -497,11 +523,8 @@ S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton,
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
 ];
 
-const sheets={
-  // "Johnson County High School":"sheets/johnson-county.pdf"
-};
+const sheets={};
 function hasSheet(s){return Boolean(sheets[s.name]);}
-
 const REGION_COUNTIES={
   "Northwest Georgia":["Bartow","Catoosa","Chattooga","Dade","Fannin","Floyd","Gilmer","Gordon","Haralson","Murray","Paulding","Pickens","Polk","Walker","Whitfield"],
   "Northeast Georgia":["Banks","Dawson","Forsyth","Franklin","Habersham","Hall","Hart","Lumpkin","Rabun","Stephens","Towns","Union","White"],
@@ -517,48 +540,25 @@ const REGION_COUNTIES={
   "Coastal Georgia":["Bryan","Bulloch","Camden","Chatham","Effingham","Glynn","Liberty","Long","McIntosh","Screven"]
 };
 const REGION_CENTER={
-  "Northwest Georgia":[34.52,-85.05],
-  "Northeast Georgia":[34.55,-83.62],
-  "Metro Atlanta":[33.78,-84.39],
-  "West Central Georgia":[33.18,-84.82],
-  "East Central Georgia":[33.92,-83.42],
-  "Middle Georgia":[32.84,-83.63],
-  "East Georgia":[33.40,-82.25],
-  "West Georgia":[32.35,-84.55],
-  "South Georgia":[32.25,-82.55],
-  "Southwest Georgia":[31.35,-84.25],
-  "Southeast Georgia":[31.22,-82.95],
-  "Coastal Georgia":[31.75,-81.45]
+  "Northwest Georgia":[34.52,-85.05],"Northeast Georgia":[34.55,-83.62],"Metro Atlanta":[33.78,-84.39],
+  "West Central Georgia":[33.18,-84.82],"East Central Georgia":[33.92,-83.42],"Middle Georgia":[32.84,-83.63],
+  "East Georgia":[33.40,-82.25],"West Georgia":[32.35,-84.55],"South Georgia":[32.25,-82.55],
+  "Southwest Georgia":[31.35,-84.25],"Southeast Georgia":[31.22,-82.95],"Coastal Georgia":[31.75,-81.45]
 };
-function regionOf(county){
-  for(const [r,list] of Object.entries(REGION_COUNTIES)) if(list.includes(county)) return r;
-  return "Other";
-}
-
-[...new Set(schools.map(s=>s.county))].sort().forEach(c=>{
-  const o=document.createElement("option");o.value=c;o.textContent=c;document.getElementById("cty").appendChild(o);
-});
-
-function miles(aLat,aLng,bLat,bLng){
-  const R=3958.8, toR=d=>d*Math.PI/180;
-  const dLat=toR(bLat-aLat), dLng=toR(bLng-aLng);
-  const m=Math.sin(dLat/2)**2+Math.cos(toR(aLat))*Math.cos(toR(bLat))*Math.sin(dLng/2)**2;
-  return 2*R*Math.asin(Math.min(1,Math.sqrt(m)));
-}
-function mono(name){
-  const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));
-  return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();
-}
+function regionOf(county){for(const [r,list] of Object.entries(REGION_COUNTIES)) if(list.includes(county)) return r;return "Other";}
+[...new Set(schools.map(s=>s.county))].sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;document.getElementById("cty").appendChild(o);});
+function miles(aLat,aLng,bLat,bLng){const R=3958.8,toR=d=>d*Math.PI/180;const dLat=toR(bLat-aLat),dLng=toR(bLng-aLng);const m=Math.sin(dLat/2)**2+Math.cos(toR(aLat))*Math.cos(toR(bLat))*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(m)));}
+function mono(name){const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();}
 function gmaps(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function amaps(s){return "https://maps.apple.com/?daddr="+encodeURIComponent(s.address);}
 
-let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
+let here=null,nearOn=false,sheetOnly=false,selected=null,activeRegion=null;
 const map=L.map("map").setView([32.9,-83.5],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
 fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json").then(r=>r.json()).then(geo=>L.geoJSON(geo,{interactive:false,style:{color:"#d4af37",weight:1.6,fillColor:"#2a332a",fillOpacity:0.35}}).addTo(map));
 const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48}).addTo(map);
 const regionLayer=L.layerGroup().addTo(map);
-let youMarker=null, radiusCircle=null;
+let youMarker=null,radiusCircle=null;
 
 function baseFilter(s){
   const q=document.getElementById("q").value.toLowerCase();
@@ -571,31 +571,12 @@ function baseFilter(s){
   if(sheetOnly&&!hasSheet(s)) return false;
   return true;
 }
-function pool(){
-  return schools.filter(baseFilter).map(s=>({...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null,region:regionOf(s.county)}));
-}
-function regionStats(){
-  const list=pool();
-  return Object.keys(REGION_CENTER).map(name=>{
-    const kids=list.filter(s=>s.region===name);
-    const [lat,lng]=REGION_CENTER[name];
-    return {name,lat,lng,count:kids.length,sheets:kids.filter(hasSheet).length};
-  }).filter(r=>r.count>0);
-}
-function pinFor(s){
-  const on=hasSheet(s);
-  const m=L.circleMarker([s.lat,s.lng],{radius:on?8:6,color:on?"#d4af37":"#6b6554",fillColor:on?"#f0d56a":"#4a463c",fillOpacity:on?.95:.7,weight:1});
-  m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));
-  m.on("click",()=>showSchool(s));
-  return m;
-}
-function clearPins(){
-  clusters.clearLayers();
-  regionLayer.clearLayers();
-  if(radiusCircle){map.removeLayer(radiusCircle);radiusCircle=null;}
-}
+function pool(){return schools.filter(baseFilter).map(s=>({...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null,region:regionOf(s.county)}));}
+function regionStats(){const list=pool();return Object.keys(REGION_CENTER).map(name=>{const kids=list.filter(s=>s.region===name);const [lat,lng]=REGION_CENTER[name];return {name,lat,lng,count:kids.length,sheets:kids.filter(hasSheet).length};}).filter(r=>r.count>0);}
+function pinFor(s){const on=hasSheet(s);const m=L.circleMarker([s.lat,s.lng],{radius:on?8:6,color:on?"#d4af37":"#6b6554",fillColor:on?"#f0d56a":"#4a463c",fillOpacity:on?.95:.7,weight:1});m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));m.on("click",()=>showSchool(s));return m;}
+function clearPins(){clusters.clearLayers();regionLayer.clearLayers();if(radiusCircle){map.removeLayer(radiusCircle);radiusCircle=null;}}
 function showRegions(){
-  activeRegion=null; selected=null; nearOn=false;
+  activeRegion=null;selected=null;nearOn=false;
   document.getElementById("nearBtn").classList.remove("on");
   document.getElementById("regionsBtn").classList.add("on");
   clearPins();
@@ -603,85 +584,35 @@ function showRegions(){
   regs.forEach(r=>{
     const icon=L.divIcon({className:"",html:`<div class="region-pin">${r.count}</div>`,iconSize:[46,46],iconAnchor:[23,23]});
     const m=L.marker([r.lat,r.lng],{icon}).bindTooltip(r.name+" · "+r.count+" schools");
-    m.on("click",()=>openRegion(r.name));
-    regionLayer.addLayer(m);
+    m.on("click",()=>openRegion(r.name));regionLayer.addLayer(m);
   });
   map.setView([32.9,-83.5],7);
-  document.getElementById("drawer").innerHTML=`
-    <div class="kicker">GEORGIA REGIONS</div>
-    <div class="count">${regs.reduce((n,r)=>n+r.count,0)} schools · ${regs.length} regions</div>
-    ${regs.map(r=>`<div class="region" onclick='openRegion(${JSON.stringify(r.name)})'>
-      <div><div class="n">${r.name}</div><div class="sub">${r.sheets} with prospect sheets</div></div>
-      <div class="mi">${r.count}</div>
-    </div>`).join("")}`;
+  document.getElementById("drawer").innerHTML=`<div class="kicker">GEORGIA REGIONS</div><div class="count">${regs.reduce((n,r)=>n+r.count,0)} schools · ${regs.length} regions</div>${regs.map(r=>`<div class="region" onclick='openRegion(${JSON.stringify(r.name)})'><div><div class="n">${r.name}</div><div class="sub">${r.sheets} with prospect sheets</div></div><div class="mi">${r.count}</div></div>`).join("")}`;
 }
 function openRegion(name){
-  activeRegion=name; selected=null;
-  document.getElementById("regionsBtn").classList.remove("on");
+  activeRegion=name;selected=null;document.getElementById("regionsBtn").classList.remove("on");
   const list=pool().filter(s=>s.region===name);
-  if(nearOn&&here) list.sort((a,b)=>a.mi-b.mi);
-  else list.sort((a,b)=>a.name.localeCompare(b.name));
-  clearPins();
-  list.forEach(s=>clusters.addLayer(pinFor(s)));
-  if(list.length){
-    const b=L.latLngBounds(list.map(s=>[s.lat,s.lng]));
-    map.fitBounds(b.pad(0.18));
-  }
+  if(nearOn&&here) list.sort((a,b)=>a.mi-b.mi); else list.sort((a,b)=>a.name.localeCompare(b.name));
+  clearPins();list.forEach(s=>clusters.addLayer(pinFor(s)));
+  if(list.length) map.fitBounds(L.latLngBounds(list.map(s=>[s.lat,s.lng])).pad(0.18));
   const withN=list.filter(hasSheet).length;
-  document.getElementById("drawer").innerHTML=`
-    <button class="back" type="button" onclick="showRegions()">‹ All regions</button>
-    <div class="kicker" style="margin-top:.7rem">${name.toUpperCase()}</div>
-    <div class="count">${list.length} school${list.length===1?"":"s"} · ${withN} with sheets</div>
-    <div class="legend"><span><i class="dot yes"></i>Sheet on file</span><span><i class="dot no"></i>No sheet yet</span></div>
-    ${list.length?list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'>
-      <div><div class="n">${s.name}</div><div class="sub">${s.city} · ${s.county} · Class ${s.cls}</div></div>
-      <div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":""}<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div>
-    </div>`).join(""):`<p class="empty">No schools in this region match those filters.</p>`}`;
+  document.getElementById("drawer").innerHTML=`<button class="back" type="button" onclick="showRegions()">‹ All regions</button><div class="kicker" style="margin-top:.7rem">${name.toUpperCase()}</div><div class="count">${list.length} school${list.length===1?"":"s"} · ${withN} with sheets</div><div class="legend"><span><i class="dot yes"></i>Sheet on file</span><span><i class="dot no"></i>No sheet yet</span></div>${list.length?list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'><div><div class="n">${s.name}</div><div class="sub">${s.city} · ${s.county} · Class ${s.cls}</div></div><div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":""}<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join(""):`<p class="empty">No schools in this region match those filters.</p>`}`;
 }
-function openNamed(name){
-  const s=schools.find(x=>x.name===name);
-  if(s) showSchool({...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null,region:regionOf(s.county)});
-}
+function openNamed(name){const s=schools.find(x=>x.name===name);if(s) showSchool({...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null,region:regionOf(s.county)});}
 function showSchool(s){
-  selected=s;
-  if(!activeRegion) openRegion(s.region||regionOf(s.county));
+  selected=s;if(!activeRegion) openRegion(s.region||regionOf(s.county));
   map.setView([s.lat,s.lng],Math.max(map.getZoom(),10));
-  document.getElementById("drawer").innerHTML=`<button class="back" type="button" onclick="openRegion('${(s.region||regionOf(s.county)).replace(/'/g,"\\'")}')">‹ ${s.region||regionOf(s.county)}</button>
-    <article class="card" style="margin-top:.7rem">
-      <div class="top"><div class="mono">${mono(s.name)}</div><div class="badge">${s.cls}</div></div>
-      <h2 class="title">${s.name}</h2>
-      <div class="muted" style="margin-bottom:.4rem">${s.region||regionOf(s.county)}</div>
-      <div class="row"><span class="muted">HEAD COACH</span><div>${s.coach}</div></div>
-      <div class="row">${s.stadium}</div>
-      <div class="row">${s.address}<div class="muted">${s.city} · ${s.county} County${s.mi!=null?" · "+s.mi.toFixed(1)+" miles":""}</div></div>
-      <div class="actions">
-        <a href="${gmaps(s)}" target="_blank" rel="noopener">Google Maps</a>
-        <a href="${amaps(s)}" target="_blank" rel="noopener">Apple Maps</a>
-        ${hasSheet(s)?`<a href="${sheets[s.name]}" target="_blank" rel="noopener">Prospect sheet</a>`:`<span class="muted">No prospect sheet yet</span>`}
-      </div>
-    </article>`;
+  document.getElementById("drawer").innerHTML=`<button class="back" type="button" onclick="openRegion('${(s.region||regionOf(s.county)).replace(/'/g,"\\'")}')">‹ ${s.region||regionOf(s.county)}</button><article class="card" style="margin-top:.7rem"><div class="top"><div class="mono">${mono(s.name)}</div><div class="badge">${s.cls}</div></div><h2 class="title">${s.name}</h2><div class="muted" style="margin-bottom:.4rem">${s.region||regionOf(s.county)}</div><div class="row"><span class="muted">HEAD COACH</span><div>${s.coach}</div></div><div class="row">${s.stadium}</div><div class="row">${s.address}<div class="muted">${s.city} · ${s.county} County${s.mi!=null?" · "+s.mi.toFixed(1)+" miles":""}</div></div><div class="actions"><a href="${gmaps(s)}" target="_blank" rel="noopener">Google Maps</a><a href="${amaps(s)}" target="_blank" rel="noopener">Apple Maps</a>${hasSheet(s)?`<a href="${sheets[s.name]}" target="_blank" rel="noopener">Prospect sheet</a>`:`<span class="muted">No prospect sheet yet</span>`}</div></article>`;
 }
 function apply(){
   if(nearOn&&here){
-    activeRegion=null;
-    const list=pool().sort((a,b)=>a.mi-b.mi);
-    clearPins();
-    list.forEach(s=>clusters.addLayer(pinFor(s)));
-    if(radiusCircle) map.removeLayer(radiusCircle);
+    activeRegion=null;const list=pool().sort((a,b)=>a.mi-b.mi);clearPins();list.forEach(s=>clusters.addLayer(pinFor(s)));
     radiusCircle=L.circle([here.lat,here.lng],{radius:parseFloat(document.getElementById("radius").value)*1609.34,color:"#d4af37",weight:1.2,fillColor:"#d4af37",fillOpacity:.08}).addTo(map);
     const withN=list.filter(hasSheet).length;
-    document.getElementById("drawer").innerHTML=`
-      <button class="back" type="button" onclick="showRegions()">‹ All regions</button>
-      <div class="kicker" style="margin-top:.7rem">NEAR YOU · ${document.getElementById("radius").value} MILES</div>
-      <div class="count">${list.length} schools · ${withN} with sheets</div>
-      ${list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'>
-        <div><div class="n">${s.name}</div><div class="sub">${s.region} · ${s.city} · Class ${s.cls}</div></div>
-        <div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div>
-      </div>`).join("")||'<p class="empty">No schools in that radius.</p>'}`;
+    document.getElementById("drawer").innerHTML=`<button class="back" type="button" onclick="showRegions()">‹ All regions</button><div class="kicker" style="margin-top:.7rem">NEAR YOU · ${document.getElementById("radius").value} MILES</div><div class="count">${list.length} schools · ${withN} with sheets</div>${list.map(s=>`<div class="school" onclick='openNamed(${JSON.stringify(s.name)})'><div><div class="n">${s.name}</div><div class="sub">${s.region} · ${s.city} · Class ${s.cls}</div></div><div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")||'<p class="empty">No schools in that radius.</p>'}`;
     return;
   }
-  if(activeRegion) openRegion(activeRegion);
-  else showRegions();
+  if(activeRegion) openRegion(activeRegion); else showRegions();
 }
 document.getElementById("regionsBtn").onclick=()=>showRegions();
 document.getElementById("nearBtn").onclick=()=>{
@@ -692,19 +623,14 @@ document.getElementById("nearBtn").onclick=()=>{
     here={lat:pos.coords.latitude,lng:pos.coords.longitude};
     if(youMarker) map.removeLayer(youMarker);
     youMarker=L.circleMarker([here.lat,here.lng],{radius:8,color:"#fff4c2",fillColor:"#d4af37",fillOpacity:1,weight:2}).bindTooltip("You").addTo(map);
-    map.setView([here.lat,here.lng],9);
-    apply();
+    map.setView([here.lat,here.lng],9);apply();
   },()=>alert("Could not read your location. Allow location access and try again."),{enableHighAccuracy:true,timeout:10000});
 };
-document.getElementById("sheetBtn").onclick=()=>{
-  sheetOnly=!sheetOnly;
-  document.getElementById("sheetBtn").classList.toggle("on",sheetOnly);
-  apply();
-};
-["q","cls","cty","radius"].forEach(id=>{
-  const el=document.getElementById(id);
-  el.addEventListener(id==="q"?"input":"change",apply);
-});
+document.getElementById("sheetBtn").onclick=()=>{sheetOnly=!sheetOnly;document.getElementById("sheetBtn").classList.toggle("on",sheetOnly);apply();};
+const filterBtn=document.getElementById("filterBtn"),filterBox=document.getElementById("filterBox");
+filterBtn.onclick=e=>{e.stopPropagation();filterBox.classList.toggle("on");filterBtn.classList.toggle("on",filterBox.classList.contains("on"));};
+document.addEventListener("click",e=>{if(!filterBox.contains(e.target)&&e.target!==filterBtn){filterBox.classList.remove("on");filterBtn.classList.remove("on");}});
+["q","cls","cty","radius"].forEach(id=>{const el=document.getElementById(id);el.addEventListener(id==="q"?"input":"change",apply);});
 showRegions();
 </script>
 </body>
