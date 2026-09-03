@@ -20,103 +20,68 @@ header.site{display:block}
 .logo h1{font-size:.74rem;letter-spacing:.16em;color:var(--line)}
 .logo p{font-size:.6rem;letter-spacing:.08em;color:var(--muted)}
 .search{flex:1;max-width:520px;background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.48rem .7rem;font:inherit}
-select{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.42rem .5rem;font:inherit}
-.btn{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--muted);padding:.42rem .55rem;font:inherit;letter-spacing:.1em;font-size:.62rem;cursor:pointer}
-.btn.on{color:#1a1608;background:var(--line);border-color:var(--line)}
-a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem;white-space:nowrap}
-.modes,.tools{display:flex;align-items:center;gap:.45rem}
-.short{display:none}
-.filter-box{position:absolute;right:1rem;top:calc(100% + 6px);z-index:5000;min-width:220px;background:#0d130d;border:1px solid var(--line);padding:.75rem;display:none}
-.filter-box.on{display:block}
-.filter-box label{display:flex;flex-direction:column;gap:.25rem;font-size:.58rem;letter-spacing:.12em;color:var(--muted);margin-bottom:.55rem}
-.filter-box select{width:100%}
-#filterBtn{display:none}
-main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
-#map{height:100%;background:#0a0d0a}
-.leaflet-tile-pane{filter:brightness(1.28) contrast(1.12) saturate(.9)}
-.leaflet-overlay-pane img{filter:brightness(1.45) contrast(1.2)}
-.drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%);position:relative}
-.kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.35rem}
-.count{color:var(--muted);font-size:.72rem;margin-bottom:.7rem}
-.school,.region{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.7rem 0;border-bottom:1px dashed rgba(212,175,55,.28);cursor:pointer}
-.school:hover .n,.region:hover .n{color:var(--line)}
+.btns{display:flex;gap:.4rem;flex-wrap:wrap}
+button,.chip{background:#101510;color:var(--text);border:1px solid rgba(212,175,55,.35);padding:.4rem .65rem;font:inherit;cursor:pointer}
+button.on,.chip.on{background:var(--line);color:#111}
+#wrap{display:grid;grid-template-columns:1fr 340px;height:calc(100% - 86px)}
+#map{height:100%;background:#e8e8e8}
+#drawer{background:var(--panel);border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem}
+.school{padding:.55rem 0;border-bottom:1px solid rgba(212,175,55,.12);cursor:pointer}
+.school.hot .n{color:var(--line)}
 .n{font-size:.92rem}
-.sub{color:var(--muted);font-size:.72rem;margin-top:.15rem}
-.mi{color:var(--line);font-size:.78rem;white-space:nowrap}
-.legend{display:flex;gap:1rem;font-size:.68rem;color:var(--muted);margin:0 0 .8rem}
-.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:.35rem;vertical-align:middle}
-.dot.yes{background:#f0d56a}.dot.no{background:#5c5748}
-.tag{display:inline-block;border:1px solid var(--line);color:var(--line);font-size:.55rem;letter-spacing:.12em;padding:.12rem .32rem;margin-left:.35rem}
-.tag.off{border-color:#5c5748;color:#5c5748}
-.card{border:1px solid var(--line);padding:1.05rem 1rem;background:linear-gradient(180deg,rgba(212,175,55,.06),transparent 28%),#0d130d}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem}
-.mono{width:54px;height:54px;border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
-.badge{border:1px solid var(--line);color:var(--line);font-size:.62rem;letter-spacing:.16em;padding:.25rem .4rem}
-.title{font-size:1.2rem;margin:.35rem 0 .55rem}
-.row{margin:.38rem 0;font-size:.86rem;color:#efe6c8}
-.muted{color:var(--muted);font-size:.74rem}
-.actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem;align-items:center}
-.actions a,.back{color:var(--line);text-decoration:none;border:1px solid rgba(212,175,55,.35);padding:.4rem .55rem;font-size:.72rem;background:none;font:inherit;cursor:pointer}
-.back{position:sticky;top:0;z-index:2;display:inline-block;background:var(--panel);margin-bottom:.35rem}
-.empty{color:var(--muted);padding:1rem 0}
-.leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
-.region-pin{background:#d4af37;color:#1a1608;border:2px solid #f3ead1;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font:700 13px Georgia,serif;box-shadow:0 0 0 6px rgba(212,175,55,.25)}
-.marker-cluster-small{background-color:rgba(240,213,106,.28)}
-.marker-cluster-small div{background-color:rgba(240,213,106,.85);color:#1a1608}
-.marker-cluster-medium{background-color:rgba(212,175,55,.32)}
-.marker-cluster-medium div{background-color:rgba(212,175,55,.92);color:#1a1608}
-.marker-cluster-large{background-color:rgba(139,105,20,.38)}
-.marker-cluster-large div{background-color:rgba(139,105,20,.95);color:#f3ead1}
-.marker-cluster{border:1px solid rgba(212,175,55,.55)}
+.m{color:var(--muted);font-size:.72rem}
+#filterBox{display:none;position:absolute;right:1rem;top:100%;background:#101510;border:1px solid var(--line);padding:.8rem;z-index:500;min-width:220px}
+#filterBox.on{display:block}
+.abnb-tiles{filter:saturate(.35) brightness(1.06) contrast(.92)}
+.abnb-pill{
+  background:#fff;color:#222;border-radius:20px;padding:6px 10px;
+  font:700 12px/1 system-ui,Arial,sans-serif;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);white-space:nowrap
+}
+.abnb-pill.on{background:#222;color:#fff;transform:scale(1.08)}
+.abnb-cluster{
+  background:#fff;color:#222;border-radius:50%;width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  font:700 13px system-ui,Arial,sans-serif;
+  box-shadow:0 2px 8px rgba(0,0,0,.18)
+}
+.leaflet-tooltip{font:12px system-ui,Arial,sans-serif}
 @media(max-width:900px){
-  main{grid-template-rows:1fr 46%;grid-template-columns:1fr;height:calc(100% - 156px)}
-  .drawer{border-left:0;border-top:1px solid rgba(212,175,55,.22)}
-  .bar1{flex-wrap:wrap}
-  .bar2{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0}
-  .modes,.tools{display:contents}
-  .bar2 .btn{width:100%;border:0;border-right:1px solid rgba(212,175,55,.18);border-radius:0;padding:.75rem .2rem;font-size:.55rem;letter-spacing:.12em}
-  .full{display:none}
-  .short{display:inline}
-  #filterBtn{display:block}
-  #radius,#cls,#cty{width:100%}
-  .back{padding:.55rem .7rem}
+  #wrap{grid-template-columns:1fr;grid-template-rows:55% 45%}
 }
 </style>
 </head>
 <body>
 <header class="site">
   <div class="bar1">
-    <div class="logo"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></div>
-    <input id="q" class="search" placeholder="Search school, city, or county"/>
-    <a class="board" href="our-recruits.html">OUR RECRUITING BOARD</a>
+    <div class="logo">
+      <div class="ga">GA</div>
+      <div>
+        <h1>MAPPEDRECRUITING</h1>
+        <p>Georgia Football · GHSA 2026–28</p>
+      </div>
+    </div>
+    <input class="search" id="q" placeholder="Search school, city, coach…"/>
   </div>
   <div class="bar2">
-    <div class="modes">
-      <button class="btn on" id="regionsBtn" type="button">REGIONS</button>
-      <button class="btn" id="nearBtn" type="button">NEAR ME</button>
-      <select id="radius">
-        <option value="25">25 mi</option>
-        <option value="50" selected>50 mi</option>
-        <option value="100">100 mi</option>
-      </select>
+    <div class="btns">
+      <button id="regionsBtn" class="on">Regions</button>
+      <button id="nearBtn">Near me</button>
+      <button id="sheetBtn">Sheets</button>
+      <button id="filterBtn">Filters</button>
     </div>
-    <div class="tools">
-      <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
-      <select id="cty"><option value="">All counties</option></select>
-      <button class="btn" id="sheetBtn" type="button"><span class="full">HAS PROSPECT INFO</span><span class="short">SHEETS</span></button>
-      <button class="btn" id="filterBtn" type="button">FILTER</button>
-      <div class="filter-box" id="filterBox">
-        <label>Radius</label>
-        <label>Class</label>
-        <label>County</label>
-      </div>
+    <div id="filterBox">
+      <label>Class<br><select id="cls"></select></label><br><br>
+      <label>County<br><select id="cty"></select></label><br><br>
+      <label>Radius (mi)<br><input id="radius" type="number" value="25" min="1" max="200"/></label>
     </div>
   </div>
 </header>
-<main>
+<div id="wrap">
   <div id="map"></div>
-  <aside class="drawer" id="drawer"></aside>
-</main>
+  <aside id="drawer"></aside>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
@@ -538,331 +503,201 @@ S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton,
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
 ];
 
-const sheets = {};
-function hasSheet(s){ return Boolean(sheets[s.id]); }
-
-(function separateStackedPins(){
-  const seen = new Map();
-  schools.forEach(s=>{
-    const key = s.lat.toFixed(4)+","+s.lng.toFixed(4);
-    const n = seen.get(key) || 0;
-    if(n){
-      const ang = n * 0.9;
-      s.lat += 0.006 * Math.cos(ang);
-      s.lng += 0.006 * Math.sin(ang);
-    }
-    seen.set(key, n+1);
-  });
-})();
-
-const byId = Object.fromEntries(schools.map(s=>[s.id,s]));
-
+const sheets={};
 const REGION_COUNTIES={
-  "Northwest Georgia":["Bartow","Catoosa","Chattooga","Dade","Fannin","Floyd","Gilmer","Gordon","Haralson","Murray","Paulding","Pickens","Polk","Walker","Whitfield"],
-  "Northeast Georgia":["Banks","Dawson","Forsyth","Franklin","Habersham","Hall","Hart","Lumpkin","Rabun","Stephens","Towns","Union","White"],
-  "Metro Atlanta":["Cherokee","Clayton","Cobb","DeKalb","Douglas","Fayette","Fulton","Gwinnett","Henry","Rockdale"],
-  "West Central Georgia":["Butts","Carroll","Coweta","Heard","Lamar","Meriwether","Pike","Spalding","Troup","Upson"],
-  "East Central Georgia":["Barrow","Clarke","Elbert","Greene","Jackson","Jasper","Madison","Morgan","Newton","Oconee","Oglethorpe","Walton"],
-  "Middle Georgia":["Baldwin","Bibb","Crawford","Houston","Jones","Monroe","Peach","Pulaski","Putnam","Twiggs","Wilkinson"],
+  "Northwest Georgia":["Bartow","Catoosa","Chattooga","Dade","Floyd","Gordon","Murray","Paulding","Pickens","Polk","Walker","Whitfield"],
+  "North Georgia":["Cherokee","Dawson","Fannin","Gilmer","Habersham","Lumpkin","Rabun","Stephens","Towns","Union","White"],
+  "Northeast Georgia":["Banks","Barrow","Clarke","Elbert","Franklin","Hart","Jackson","Madison","Oconee","Oglethorpe"],
+  "Metro Atlanta":["Clayton","Cobb","DeKalb","Fulton","Gwinnett","Henry"],
+  "West Metro":["Carroll","Coweta","Douglas","Fayette","Haralson","Heard"],
+  "East Metro":["Newton","Rockdale","Walton"],
+  "Middle Georgia":["Baldwin","Bibb","Crawford","Houston","Jones","Monroe","Peach","Twiggs","Wilkinson"],
   "East Georgia":["Burke","Columbia","Glascock","Hancock","Jefferson","Jenkins","Lincoln","McDuffie","Richmond","Taliaferro","Warren","Washington","Wilkes"],
-  "West Georgia":["Chattahoochee","Clay","Crisp","Dooly","Harris","Macon","Marion","Muscogee","Quitman","Randolph","Schley","Stewart","Sumter","Talbot","Taylor","Webster"],
-  "South Georgia":["Appling","Bleckley","Candler","Dodge","Emanuel","Evans","Jeff Davis","Johnson","Laurens","Montgomery","Tattnall","Telfair","Toombs","Treutlen","Wayne","Wheeler","Wilcox"],
-  "Southwest Georgia":["Baker","Calhoun","Colquitt","Decatur","Dougherty","Early","Grady","Lee","Miller","Mitchell","Seminole","Terrell","Thomas","Worth"],
-  "Southeast Georgia":["Atkinson","Bacon","Ben Hill","Berrien","Brantley","Brooks","Charlton","Clinch","Coffee","Cook","Echols","Irwin","Lanier","Lowndes","Pierce","Tift","Turner","Ware"],
-  "Coastal Georgia":["Bryan","Bulloch","Camden","Chatham","Effingham","Glynn","Liberty","Long","McIntosh","Screven"]
+  "West Georgia":["Chattahoochee","Harris","Marion","Meriwether","Muscogee","Pike","Spalding","Talbot","Taylor","Troup","Upson"],
+  "South Georgia":["Ben Hill","Berrien","Brooks","Colquitt","Cook","Irwin","Lanier","Lowndes","Tift","Turner"],
+  "Southeast Georgia":["Appling","Bacon","Brantley","Bryan","Bulloch","Camden","Candler","Charlton","Chatham","Effingham","Evans","Glynn","Jeff Davis","Liberty","Long","McIntosh","Pierce","Screven","Tattnall","Toombs","Ware","Wayne"],
+  "Southwest Georgia":["Baker","Calhoun","Clay","Decatur","Dougherty","Early","Grady","Lee","Miller","Mitchell","Quitman","Randolph","Seminole","Stewart","Sumter","Terrell","Thomas","Webster"]
 };
 const REGION_CENTER={
-  "Northwest Georgia":[34.52,-85.05],"Northeast Georgia":[34.55,-83.62],"Metro Atlanta":[33.78,-84.39],
-  "West Central Georgia":[33.18,-84.82],"East Central Georgia":[33.92,-83.42],"Middle Georgia":[32.84,-83.63],
-  "East Georgia":[33.40,-82.25],"West Georgia":[32.35,-84.55],"South Georgia":[32.25,-82.55],
-  "Southwest Georgia":[31.35,-84.25],"Southeast Georgia":[31.22,-82.95],"Coastal Georgia":[31.75,-81.45]
+  "Northwest Georgia":[34.45,-85.05],
+  "North Georgia":[34.65,-83.85],
+  "Northeast Georgia":[34.12,-83.35],
+  "Metro Atlanta":[33.75,-84.28],
+  "West Metro":[33.45,-84.85],
+  "East Metro":[33.65,-83.95],
+  "Middle Georgia":[32.70,-83.65],
+  "East Georgia":[33.25,-82.35],
+  "West Georgia":[32.70,-84.80],
+  "South Georgia":[31.20,-83.35],
+  "Southeast Georgia":[31.55,-81.70],
+  "Southwest Georgia":[31.40,-84.35]
 };
+
+function esc(t){return String(t||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function miles(a,b){
+  const R=3958.8,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));
+}
 function regionOf(county){
-  for(const [r,list] of Object.entries(REGION_COUNTIES)) if(list.includes(county)) return r;
+  for(const [r,list] of Object.entries(REGION_COUNTIES)){
+    if(list.includes(county)) return r;
+  }
   return "Other";
 }
-
-[...new Set(schools.map(s=>s.county))].sort().forEach(c=>{
-  const o=document.createElement("option");
-  o.value=c; o.textContent=c;
-  document.getElementById("cty").appendChild(o);
+schools.forEach(s=>{
+  s.region=regionOf(s.county);
+  s.hasSheet=!!sheets[s.id];
 });
+const byId=Object.fromEntries(schools.map(s=>[s.id,s]));
 
-function miles(aLat,aLng,bLat,bLng){
-  const R=3958.8, toR=d=>d*Math.PI/180;
-  const dLat=toR(bLat-aLat), dLng=toR(bLng-aLng);
-  const m=Math.sin(dLat/2)**2+Math.cos(toR(aLat))*Math.cos(toR(bLat))*Math.sin(dLng/2)**2;
-  return 2*R*Math.asin(Math.min(1,Math.sqrt(m)));
-}
-function mono(name){
-  const parts=name.replace(/[()]/g,"").split(/\s+/).filter(w=>!/high|school|academy|catholic|military|county|charter|institute|comprehensive|preparatory|episcopal|christian|collegiate/i.test(w));
-  return (parts.slice(0,2).map(w=>w[0]).join("")||name.slice(0,2)).toUpperCase();
-}
-function gmaps(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
-function amaps(s){return "https://maps.apple.com/?daddr="+encodeURIComponent(s.address);}
-function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function resetDrawer(){ document.getElementById("drawer").scrollTop=0; }
-
-function placeFilters(){
-  const phone=window.matchMedia("(max-width:900px)").matches;
-  const box=document.getElementById("filterBox");
-  const modes=document.querySelector(".modes");
-  const tools=document.querySelector(".tools");
-  const radius=document.getElementById("radius");
-  const cls=document.getElementById("cls");
-  const cty=document.getElementById("cty");
-  const sheetBtn=document.getElementById("sheetBtn");
-  const labels=box.querySelectorAll("label");
-  if(phone){
-    labels[0].appendChild(radius);
-    labels[1].appendChild(cls);
-    labels[2].appendChild(cty);
-  }else{
-    modes.appendChild(radius);
-    tools.insertBefore(cls, sheetBtn);
-    tools.insertBefore(cty, sheetBtn);
-    box.classList.remove("on");
-    document.getElementById("filterBtn").classList.remove("on");
-  }
-}
-
-let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
 const map=L.map("map").setView([32.9,-83.5],7);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",{
-  attribution:"© OpenStreetMap © CARTO",
-  maxZoom:19
-}).addTo(map);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png",{
-  attribution:"",
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  attribution:"© OpenStreetMap",
   maxZoom:19,
-  pane:"overlayPane"
+  className:"abnb-tiles"
 }).addTo(map);
-
-const regionBoundsLayer=L.layerGroup();
-
-function countyName(props){
-  const raw=props.NAME||props.NAME10||props.name||props.NAMELSAD||"";
-  return raw.replace(/\s+County$/i,"").trim();
-}
-function showRegionOutlines(on){
-  if(on){
-    if(!map.hasLayer(regionBoundsLayer)) regionBoundsLayer.addTo(map);
-  } else if(map.hasLayer(regionBoundsLayer)){
-    map.removeLayer(regionBoundsLayer);
-  }
-}
-
-fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
-  .then(r=>r.json())
-  .then(geo=>L.geoJSON(geo,{
-    interactive:false,
-    style:{color:"#d4af37",weight:1.8,fillColor:"#2a332a",fillOpacity:0.22}
-  }).addTo(map))
-  .catch(()=>{});
-
-fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
-  .then(r=>r.json())
-  .then(all=>{
-    const gaFeats=all.features.filter(f=>{
-      const id=String(f.id||f.properties.GEO_ID||"");
-      const st=String(f.properties.STATE||f.properties.STATEFP||f.properties.STATEFP10||"");
-      return id.startsWith("13")||st==="13";
-    });
-    const byRegion={};
-    gaFeats.forEach(f=>{
-      const region=regionOf(countyName(f.properties));
-      if(!region||region==="Other") return;
-      (byRegion[region]||=[]).push(f);
-    });
-    Object.entries(byRegion).forEach(([name,feats])=>{
-      let merged=null;
-      feats.forEach(f=>{
-        try{ merged = merged ? turf.union(merged, f) : f; }catch(e){}
-      });
-      if(!merged) return;
-      const layer=L.geoJSON(merged,{
-        style:{color:"#d4af37",weight:2.4,fillColor:"#d4af37",fillOpacity:0.06}
-      });
-      layer.bindTooltip(name);
-      layer.on("click",()=>openRegion(name));
-      regionBoundsLayer.addLayer(layer);
-    });
-    showRegionOutlines(true);
-  })
-  .catch(()=>{});
 
 const clusters=L.markerClusterGroup({
   showCoverageOnHover:false,
-  maxClusterRadius:32,
-  disableClusteringAtZoom:11
+  maxClusterRadius:48,
+  disableClusteringAtZoom:12,
+  iconCreateFunction(c){
+    return L.divIcon({
+      html:`<div class="abnb-cluster">${c.getChildCount()}</div>`,
+      className:"",
+      iconSize:[36,36]
+    });
+  }
 }).addTo(map);
-const regionLayer=L.layerGroup().addTo(map);
-let youMarker=null, radiusCircle=null;
 
-function enrich(s){
-  return {...s, mi:here?miles(here.lat,here.lng,s.lat,s.lng):null, region:regionOf(s.county)};
-}
-function baseFilter(s){
-  const q=document.getElementById("q").value.toLowerCase().trim();
-  const cl=document.getElementById("cls").value;
-  const co=document.getElementById("cty").value;
-  const rad=parseFloat(document.getElementById("radius").value);
-  const region=regionOf(s.county);
-  const text=!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q)||region.toLowerCase().includes(q);
-  if(!(text&&(!cl||s.cls===cl)&&(!co||s.county===co))) return false;
-  if(nearOn&&here&&miles(here.lat,here.lng,s.lat,s.lng)>rad) return false;
-  if(sheetOnly&&!hasSheet(s)) return false;
-  return true;
-}
-function pool(){ return schools.filter(baseFilter).map(enrich); }
-function regionStats(){
-  const list=pool();
-  return Object.keys(REGION_CENTER).map(name=>{
-    const kids=list.filter(s=>s.region===name);
-    const [lat,lng]=REGION_CENTER[name];
-    return {name,lat,lng,count:kids.length,sheets:kids.filter(hasSheet).length};
-  }).filter(r=>r.count>0);
-}
+let selected=null, nearOn=false, sheetOnly=false, here=null, youMarker=null, radiusCircle=null;
+let regionLayer=L.layerGroup().addTo(map);
+
 function pinFor(s){
-  const on=hasSheet(s);
-  const m=L.circleMarker([s.lat,s.lng],{
-    radius: on ? 10 : 8,
-    color: on ? "#fff4c2" : "#e6d7a2",
-    fillColor: on ? "#f0d56a" : "#c4a94a",
-    fillOpacity: on ? 0.98 : 0.9,
-    weight: on ? 3 : 2,
-    opacity: 1
+  const on=selected&&selected.id===s.id;
+  const icon=L.divIcon({
+    className:"",
+    html:`<div class="abnb-pill${on?" on":""}" data-id="${esc(s.id)}">${esc(s.cls||"HS")}</div>`,
+    iconSize:[44,28],
+    iconAnchor:[22,14]
   });
-  m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));
+  const m=L.marker([s.lat,s.lng],{icon,riseOnHover:true});
+  m.bindTooltip(s.name+" · "+s.city,{direction:"top",offset:[0,-12]});
   m.on("click",()=>showSchool(s.id));
   return m;
 }
-function clearPins(){
-  clusters.clearLayers();
-  regionLayer.clearLayers();
-  if(radiusCircle){ map.removeLayer(radiusCircle); radiusCircle=null; }
-}
 
-function showRegions(){
-  activeRegion=null; selected=null; nearOn=false;
-  document.getElementById("nearBtn").classList.remove("on");
-  document.getElementById("regionsBtn").classList.add("on");
-  clearPins();
-  showRegionOutlines(true);
-  const regs=regionStats();
-  regs.forEach(r=>{
-    const icon=L.divIcon({className:"",html:`<div class="region-pin">${r.count}</div>`,iconSize:[46,46],iconAnchor:[23,23]});
-    const m=L.marker([r.lat,r.lng],{icon}).bindTooltip(r.name+" · "+r.count+" schools");
-    m.on("click",()=>openRegion(r.name));
-    regionLayer.addLayer(m);
+function pool(){
+  const q=(document.getElementById("q").value||"").toLowerCase().trim();
+  const cls=document.getElementById("cls").value;
+  const cty=document.getElementById("cty").value;
+  const r=Number(document.getElementById("radius").value)||25;
+  return schools.filter(s=>{
+    if(sheetOnly&&!s.hasSheet) return false;
+    if(cls&&s.cls!==cls) return false;
+    if(cty&&s.county!==cty) return false;
+    if(q){
+      const hay=(s.name+" "+s.city+" "+s.county+" "+(s.coach||"")+" "+s.cls).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    if(nearOn&&here){
+      s.dist=miles(here,{lat:s.lat,lng:s.lng});
+      if(s.dist>r) return false;
+    }
+    return true;
   });
-  map.setView([32.9,-83.5],7);
-  document.getElementById("drawer").innerHTML=
-    `<div class="kicker">GEORGIA REGIONS</div>
-     <div class="count">${regs.reduce((n,r)=>n+r.count,0)} schools · ${regs.length} regions</div>`+
-    regs.map(r=>`<div class="region" data-region="${esc(r.name)}"><div><div class="n">${esc(r.name)}</div><div class="sub">${r.sheets} with prospect sheets</div></div><div class="mi">${r.count}</div></div>`).join("");
-  resetDrawer();
-}
-
-function openRegion(name){
-  activeRegion=name; selected=null;
-  document.getElementById("regionsBtn").classList.remove("on");
-  showRegionOutlines(false);
-  const list=pool().filter(s=>s.region===name);
-  if(nearOn&&here) list.sort((a,b)=>a.mi-b.mi);
-  else list.sort((a,b)=>a.name.localeCompare(b.name));
-  clearPins();
-  list.forEach(s=>clusters.addLayer(pinFor(s)));
-  if(list.length) map.fitBounds(L.latLngBounds(list.map(s=>[s.lat,s.lng])).pad(0.18));
-  const withN=list.filter(hasSheet).length;
-  document.getElementById("drawer").innerHTML=
-    `<button class="back" type="button" data-action="regions">‹ All regions</button>
-     <div class="kicker" style="margin-top:.7rem">${esc(name.toUpperCase())}</div>
-     <div class="count">${list.length} school${list.length===1?"":"s"} · ${withN} with sheets</div>
-     <div class="legend"><span><i class="dot yes"></i>Sheet on file</span><span><i class="dot no"></i>No sheet yet</span></div>`+
-    (list.length
-      ? list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.city)} · ${esc(s.county)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi!=null?s.mi.toFixed(0)+" mi":""}<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")
-      : `<p class="empty">No schools in this region match those filters.</p>`);
-  resetDrawer();
-}
-
-function showSchool(id){
-  const raw=byId[id];
-  if(!raw) return;
-  const s=enrich(raw);
-  selected=s;
-  if(!activeRegion) openRegion(s.region);
-  map.setView([s.lat,s.lng],Math.max(map.getZoom(),10));
-  const sheetLink=hasSheet(s)
-    ? `<a href="${esc(sheets[s.id])}" target="_blank" rel="noopener">Prospect sheet</a>`
-    : `<span class="muted">No prospect sheet yet</span>`;
-  document.getElementById("drawer").innerHTML=
-    `<button class="back" type="button" data-action="region" data-region="${esc(s.region)}">‹ ${esc(s.region)}</button>
-     <article class="card" style="margin-top:.7rem">
-       <div class="top"><div class="mono">${esc(mono(s.name))}</div><div class="badge">${esc(s.cls)}</div></div>
-       <h2 class="title">${esc(s.name)}</h2>
-       <div class="muted" style="margin-bottom:.4rem">${esc(s.region)}</div>
-       <div class="row"><span class="muted">HEAD COACH</span><div>${esc(s.coach)}</div></div>
-       <div class="row">${esc(s.stadium)}</div>
-       <div class="row">${esc(s.address)}<div class="muted">${esc(s.city)} · ${esc(s.county)} County${s.mi!=null?" · "+s.mi.toFixed(1)+" miles":""}</div></div>
-       <div class="actions">
-         <a href="${gmaps(s)}" target="_blank" rel="noopener">Google Maps</a>
-         <a href="${amaps(s)}" target="_blank" rel="noopener">Apple Maps</a>
-         ${sheetLink}
-       </div>
-     </article>`;
-  resetDrawer();
 }
 
 function apply(){
+  clusters.clearLayers();
+  if(radiusCircle){map.removeLayer(radiusCircle);radiusCircle=null}
+  const list=pool();
+  list.forEach(s=>clusters.addLayer(pinFor(s)));
   if(nearOn&&here){
-    activeRegion=null;
-    showRegionOutlines(false);
-    const list=pool().sort((a,b)=>a.mi-b.mi);
-    clearPins();
-    list.forEach(s=>clusters.addLayer(pinFor(s)));
-    radiusCircle=L.circle([here.lat,here.lng],{
-      radius:parseFloat(document.getElementById("radius").value)*1609.34,
-      color:"#d4af37",weight:1.2,fillColor:"#d4af37",fillOpacity:.08
-    }).addTo(map);
-    const withN=list.filter(hasSheet).length;
-    document.getElementById("drawer").innerHTML=
-      `<button class="back" type="button" data-action="regions">‹ All regions</button>
-       <div class="kicker" style="margin-top:.7rem">NEAR YOU · ${esc(document.getElementById("radius").value)} MILES</div>
-       <div class="count">${list.length} schools · ${withN} with sheets</div>`+
-      (list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.region)} · ${esc(s.city)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")
-        || '<p class="empty">No schools in that radius.</p>');
-    resetDrawer();
-    return;
+    const r=Number(document.getElementById("radius").value)||25;
+    radiusCircle=L.circle([here.lat,here.lng],{radius:r*1609.34,color:"#222",weight:1,fillOpacity:.06}).addTo(map);
   }
-  if(activeRegion) openRegion(activeRegion);
-  else showRegions();
+  if(selected){
+    const still=list.find(s=>s.id===selected.id);
+    if(!still) selected=null;
+  }
 }
 
-document.getElementById("drawer").addEventListener("click",e=>{
-  const back=e.target.closest("[data-action]");
-  if(back){
-    if(back.dataset.action==="regions") showRegions();
-    else if(back.dataset.action==="region") openRegion(back.dataset.region);
-    return;
-  }
-  const regionEl=e.target.closest("[data-region].region");
-  if(regionEl){ openRegion(regionEl.dataset.region); return; }
-  const schoolEl=e.target.closest("[data-school]");
-  if(schoolEl) showSchool(schoolEl.dataset.school);
-});
+function showRegions(){
+  nearOn=false;
+  document.getElementById("nearBtn").classList.remove("on");
+  document.getElementById("regionsBtn").classList.add("on");
+  selected=null;
+  regionLayer.clearLayers();
+  const html=Object.keys(REGION_CENTER).map(r=>{
+    const n=schools.filter(s=>s.region===r).length;
+    const c=REGION_CENTER[r];
+    const icon=L.divIcon({
+      className:"",
+      html:`<div class="abnb-pill">${esc(r.split(" ")[0])} · ${n}</div>`,
+      iconSize:[90,28], iconAnchor:[45,14]
+    });
+    L.marker(c,{icon}).on("click",()=>openRegion(r)).addTo(regionLayer);
+    return `<div class="school" data-region="${esc(r)}"><div class="n">${esc(r)}</div><div class="m">${n} schools</div></div>`;
+  }).join("");
+  document.getElementById("drawer").innerHTML=`<h3>Regions</h3>${html}`;
+  document.getElementById("drawer").onclick=e=>{
+    const row=e.target.closest("[data-region]");
+    if(row) openRegion(row.dataset.region);
+  };
+  apply();
+}
 
-document.getElementById("regionsBtn").onclick=()=>showRegions();
+function openRegion(name){
+  document.getElementById("regionsBtn").classList.remove("on");
+  const list=pool().filter(s=>s.region===name).sort((a,b)=>a.name.localeCompare(b.name));
+  const c=REGION_CENTER[name];
+  if(c) map.setView(c,9);
+  document.getElementById("drawer").innerHTML=
+    `<button id="back">← Regions</button><h3>${esc(name)}</h3>`+
+    list.map(s=>`<div class="school" data-school="${s.id}"><div class="n">${esc(s.name)}</div><div class="m">${esc(s.cls)} · ${esc(s.city)} · ${esc(s.county)}</div></div>`).join("");
+  document.getElementById("back").onclick=showRegions;
+  document.getElementById("drawer").onclick=e=>{
+    if(e.target.id==="back") return;
+    const row=e.target.closest("[data-school]");
+    if(row) showSchool(row.dataset.school);
+  };
+}
+
+function showSchool(id){
+  const s=byId[id]; if(!s) return;
+  selected=s;
+  apply();
+  map.setView([s.lat,s.lng],13);
+  document.getElementById("drawer").innerHTML=`
+    <button id="back">← Back</button>
+    <h3>${esc(s.name)}</h3>
+    <p class="m">${esc(s.cls)} · ${esc(s.city)}, ${esc(s.county)}</p>
+    <p>${esc(s.address||"")}</p>
+    <p class="m">Stadium: ${esc(s.stadium||"—")}<br>Coach: ${esc(s.coach||"—")}</p>
+    ${s.hasSheet?"<p>Prospect sheet on file</p>":""}
+  `;
+  document.getElementById("back").onclick=()=>s.region?openRegion(s.region):showRegions();
+}
+
+(function fillFilters(){
+  const classes=[...new Set(schools.map(s=>s.cls))].sort();
+  const counties=[...new Set(schools.map(s=>s.county))].sort();
+  document.getElementById("cls").innerHTML=`<option value="">All classes</option>`+classes.map(c=>`<option>${esc(c)}</option>`).join("");
+  document.getElementById("cty").innerHTML=`<option value="">All counties</option>`+counties.map(c=>`<option>${esc(c)}</option>`).join("");
+})();
+
+document.getElementById("regionsBtn").onclick=showRegions;
 document.getElementById("nearBtn").onclick=()=>{
-  if(nearOn){ nearOn=false; document.getElementById("nearBtn").classList.remove("on"); showRegions(); return; }
-  if(!navigator.geolocation){ alert("Location is not available in this browser."); return; }
+  if(!navigator.geolocation){alert("Location not available in this browser.");return}
   navigator.geolocation.getCurrentPosition(pos=>{
     nearOn=true;
     document.getElementById("nearBtn").classList.add("on");
     document.getElementById("regionsBtn").classList.remove("on");
     here={lat:pos.coords.latitude,lng:pos.coords.longitude};
     if(youMarker) map.removeLayer(youMarker);
-    youMarker=L.circleMarker([here.lat,here.lng],{radius:8,color:"#fff4c2",fillColor:"#d4af37",fillOpacity:1,weight:2}).bindTooltip("You").addTo(map);
+    youMarker=L.circleMarker([here.lat,here.lng],{radius:8,color:"#fff",fillColor:"#222",fillOpacity:1,weight:2}).bindTooltip("You").addTo(map);
     map.setView([here.lat,here.lng],9);
     apply();
   },()=>alert("Could not read your location. Allow location access and try again."),{enableHighAccuracy:true,timeout:10000});
@@ -887,8 +722,7 @@ document.addEventListener("click",e=>{
 ["q","cls","cty","radius"].forEach(id=>{
   document.getElementById(id).addEventListener(id==="q"?"input":"change",apply);
 });
-window.addEventListener("resize",placeFilters);
-placeFilters();
+
 showRegions();
 </script>
 </body>
