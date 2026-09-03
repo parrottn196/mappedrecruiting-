@@ -33,6 +33,8 @@ a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.6
 #filterBtn{display:none}
 main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 #map{height:100%;background:#0a0d0a}
+.leaflet-tile-pane{filter:brightness(1.28) contrast(1.12) saturate(.9)}
+.leaflet-overlay-pane img{filter:brightness(1.45) contrast(1.2)}
 .drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%);position:relative}
 .kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.35rem}
 .count{color:var(--muted);font-size:.72rem;margin-bottom:.7rem}
@@ -626,7 +628,15 @@ function placeFilters(){
 
 let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
 const map=L.map("map").setView([32.9,-83.5],7);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}).addTo(map);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",{
+  attribution:"© OpenStreetMap © CARTO",
+  maxZoom:19
+}).addTo(map);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png",{
+  attribution:"",
+  maxZoom:19,
+  pane:"overlayPane"
+}).addTo(map);
 
 const regionBoundsLayer=L.layerGroup();
 
