@@ -32,9 +32,9 @@ a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.6
 .filter-box select{width:100%}
 #filterBtn{display:none}
 main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
-#map{height:100%;background:#0a0d0a}
-.leaflet-tile-pane{filter:brightness(1.28) contrast(1.12) saturate(.9)}
-.leaflet-overlay-pane img{filter:brightness(1.45) contrast(1.2)}
+#map{height:100%;background:#050605}
+.leaflet-tile-pane{filter:brightness(1.12) contrast(1.08) saturate(.85)}
+.leaflet-overlay-pane img{filter:brightness(1.2) contrast(1.1)}
 .drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%);position:relative}
 .kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.35rem}
 .count{color:var(--muted);font-size:.72rem;margin-bottom:.7rem}
@@ -627,19 +627,39 @@ function placeFilters(){
 }
 
 let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
-const map=L.map("map").setView([32.9,-83.5],7);
+const GA_BOUNDS=L.latLngBounds([30.25,-85.85],[35.15,-80.70]);
+const map=L.map("map",{minZoom:6,maxBoundsViscosity:0.7}).setView([32.65,-83.5],7);
+map.setMaxBounds(GA_BOUNDS.pad(0.35));
+
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",{
   attribution:"© OpenStreetMap © CARTO",
   maxZoom:19
 }).addTo(map);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png",{
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png",{
   attribution:"",
   maxZoom:19,
   pane:"overlayPane"
 }).addTo(map);
 
-const regionBoundsLayer=L.layerGroup();
+function georgiaMask(geo){
+  const feat=geo.type==="FeatureCollection"?geo.features[0]:geo;
+  const g=feat.geometry;
+  const holes=[];
+  if(g.type==="Polygon") holes.push(g.coordinates[0]);
+  else if(g.type==="MultiPolygon") g.coordinates.forEach(poly=>holes.push(poly[0]));
+  return {
+    type:"Feature",
+    geometry:{
+      type:"Polygon",
+      coordinates:[
+        [[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]],
+        ...holes
+      ]
+    }
+  };
+}
 
+const regionBoundsLayer=L.layerGroup();
 function countyName(props){
   const raw=props.NAME||props.NAME10||props.name||props.NAMELSAD||"";
   return raw.replace(/\s+County$/i,"").trim();
@@ -654,10 +674,16 @@ function showRegionOutlines(on){
 
 fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
   .then(r=>r.json())
-  .then(geo=>L.geoJSON(geo,{
-    interactive:false,
-    style:{color:"#d4af37",weight:1.8,fillColor:"#2a332a",fillOpacity:0.22}
-  }).addTo(map))
+  .then(geo=>{
+    L.geoJSON(georgiaMask(geo),{
+      interactive:false,
+      style:{color:"#000",weight:0,fillColor:"#000",fillOpacity:0.72}
+    }).addTo(map);
+    L.geoJSON(geo,{
+      interactive:false,
+      style:{color:"#d4af37",weight:2.2,fillColor:"#d4af37",fillOpacity:0.04}
+    }).addTo(map);
+  })
   .catch(()=>{});
 
 fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
@@ -756,7 +782,7 @@ function showRegions(){
     m.on("click",()=>openRegion(r.name));
     regionLayer.addLayer(m);
   });
-  map.setView([32.9,-83.5],7);
+  map.fitBounds(GA_BOUNDS,{padding:[20,20]});
   document.getElementById("drawer").innerHTML=
     `<div class="kicker">GEORGIA REGIONS</div>
      <div class="count">${regs.reduce((n,r)=>n+r.count,0)} schools · ${regs.length} regions</div>`+
