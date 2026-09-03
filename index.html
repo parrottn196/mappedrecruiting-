@@ -14,7 +14,7 @@ html,body{height:100%;overflow:hidden;font-family:Georgia,serif;background:var(-
 header.site{display:block}
 .bar1,.bar2{display:flex;align-items:center;gap:.7rem;padding:.55rem 1rem}
 .bar1{justify-content:space-between;border-bottom:1px solid rgba(212,175,55,.22)}
-.bar2{justify-content:flex-start;background:#0a0e0a;border-bottom:1px solid rgba(212,175,55,.18);position:relative}
+.bar2{justify-content:space-between;background:#0a0e0a;border-bottom:1px solid rgba(212,175,55,.18);position:relative}
 .logo{display:flex;align-items:center;gap:.6rem;flex:0 0 auto}
 .ga{width:34px;height:34px;border:1.5px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--line);font-size:.7rem}
 .logo h1{font-size:.74rem;letter-spacing:.16em;color:var(--line)}
@@ -24,14 +24,13 @@ select{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text
 .btn{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--muted);padding:.42rem .55rem;font:inherit;letter-spacing:.1em;font-size:.62rem;cursor:pointer}
 .btn.on{color:#1a1608;background:var(--line);border-color:var(--line)}
 a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem;white-space:nowrap}
-.near-group{display:flex;align-items:stretch}
-.near-group .btn{border-right:0}
-.near-group select{border-left:0}
-.grow{flex:1}
+.modes,.tools{display:flex;align-items:center;gap:.45rem}
+.short{display:none}
 .filter-box{position:absolute;right:1rem;top:calc(100% + 6px);z-index:5000;min-width:220px;background:#0d130d;border:1px solid var(--line);padding:.75rem;display:none}
 .filter-box.on{display:block}
 .filter-box label{display:flex;flex-direction:column;gap:.25rem;font-size:.58rem;letter-spacing:.12em;color:var(--muted);margin-bottom:.55rem}
 .filter-box select{width:100%}
+#filterBtn{display:none}
 main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 #map{height:100%;background:#0a0d0a}
 .drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%);position:relative}
@@ -56,14 +55,7 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 .muted{color:var(--muted);font-size:.74rem}
 .actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem;align-items:center}
 .actions a,.back{color:var(--line);text-decoration:none;border:1px solid rgba(212,175,55,.35);padding:.4rem .55rem;font-size:.72rem;background:none;font:inherit;cursor:pointer}
-.back{
-  position:sticky;
-  top:0;
-  z-index:2;
-  display:inline-block;
-  background:var(--panel);
-  margin-bottom:.35rem;
-}
+.back{position:sticky;top:0;z-index:2;display:inline-block;background:var(--panel);margin-bottom:.35rem}
 .empty{color:var(--muted);padding:1rem 0}
 .leaflet-tooltip{background:#0d130d;color:#f3ead1;border:1px solid #d4af37}
 .region-pin{background:#d4af37;color:#1a1608;border:2px solid #f3ead1;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font:700 13px Georgia,serif;box-shadow:0 0 0 6px rgba(212,175,55,.25)}
@@ -75,9 +67,16 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 .marker-cluster-large div{background-color:rgba(139,105,20,.95);color:#f3ead1}
 .marker-cluster{border:1px solid rgba(212,175,55,.55)}
 @media(max-width:900px){
-  main{grid-template-rows:1fr 46%;grid-template-columns:1fr;height:calc(100% - 148px)}
+  main{grid-template-rows:1fr 46%;grid-template-columns:1fr;height:calc(100% - 156px)}
   .drawer{border-left:0;border-top:1px solid rgba(212,175,55,.22)}
-  .bar1,.bar2{flex-wrap:wrap}
+  .bar1{flex-wrap:wrap}
+  .bar2{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0}
+  .modes,.tools{display:contents}
+  .bar2 .btn{width:100%;border:0;border-right:1px solid rgba(212,175,55,.18);border-radius:0;padding:.75rem .2rem;font-size:.55rem;letter-spacing:.12em}
+  .full{display:none}
+  .short{display:inline}
+  #filterBtn{display:block}
+  #radius,#cls,#cty{width:100%}
   .back{padding:.55rem .7rem}
 }
 </style>
@@ -90,21 +89,25 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
     <a class="board" href="our-recruits.html">OUR RECRUITING BOARD</a>
   </div>
   <div class="bar2">
-    <button class="btn on" id="regionsBtn" type="button">REGIONS</button>
-    <div class="near-group">
+    <div class="modes">
+      <button class="btn on" id="regionsBtn" type="button">REGIONS</button>
       <button class="btn" id="nearBtn" type="button">NEAR ME</button>
-      <select id="radius"><option value="25">25 mi</option><option value="50" selected>50 mi</option><option value="100">100 mi</option></select>
+      <select id="radius">
+        <option value="25">25 mi</option>
+        <option value="50" selected>50 mi</option>
+        <option value="100">100 mi</option>
+      </select>
     </div>
-    <button class="btn" id="sheetBtn" type="button">HAS PROSPECT INFO</button>
-    <span class="grow"></span>
-    <button class="btn" id="filterBtn" type="button">FILTER</button>
-    <div class="filter-box" id="filterBox">
-      <label>Class
-        <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
-      </label>
-      <label>County
-        <select id="cty"><option value="">All counties</option></select>
-      </label>
+    <div class="tools">
+      <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
+      <select id="cty"><option value="">All counties</option></select>
+      <button class="btn" id="sheetBtn" type="button"><span class="full">HAS PROSPECT INFO</span><span class="short">SHEETS</span></button>
+      <button class="btn" id="filterBtn" type="button">FILTER</button>
+      <div class="filter-box" id="filterBox">
+        <label>Radius</label>
+        <label>Class</label>
+        <label>County</label>
+      </div>
     </div>
   </div>
 </header>
@@ -596,8 +599,29 @@ function mono(name){
 function gmaps(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function amaps(s){return "https://maps.apple.com/?daddr="+encodeURIComponent(s.address);}
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function resetDrawer(){
-  document.getElementById("drawer").scrollTop = 0;
+function resetDrawer(){ document.getElementById("drawer").scrollTop=0; }
+
+function placeFilters(){
+  const phone=window.matchMedia("(max-width:900px)").matches;
+  const box=document.getElementById("filterBox");
+  const modes=document.querySelector(".modes");
+  const tools=document.querySelector(".tools");
+  const radius=document.getElementById("radius");
+  const cls=document.getElementById("cls");
+  const cty=document.getElementById("cty");
+  const sheetBtn=document.getElementById("sheetBtn");
+  const labels=box.querySelectorAll("label");
+  if(phone){
+    labels[0].appendChild(radius);
+    labels[1].appendChild(cls);
+    labels[2].appendChild(cty);
+  }else{
+    modes.appendChild(radius);
+    tools.insertBefore(cls, sheetBtn);
+    tools.insertBefore(cty, sheetBtn);
+    box.classList.remove("on");
+    document.getElementById("filterBtn").classList.remove("on");
+  }
 }
 
 let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
@@ -657,7 +681,11 @@ fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties
   })
   .catch(()=>{});
 
-const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:48}).addTo(map);
+const clusters=L.markerClusterGroup({
+  showCoverageOnHover:false,
+  maxClusterRadius:32,
+  disableClusteringAtZoom:11
+}).addTo(map);
 const regionLayer=L.layerGroup().addTo(map);
 let youMarker=null, radiusCircle=null;
 
@@ -687,7 +715,14 @@ function regionStats(){
 }
 function pinFor(s){
   const on=hasSheet(s);
-  const m=L.circleMarker([s.lat,s.lng],{radius:on?8:6,color:on?"#d4af37":"#6b6554",fillColor:on?"#f0d56a":"#4a463c",fillOpacity:on?.95:.7,weight:1});
+  const m=L.circleMarker([s.lat,s.lng],{
+    radius: on ? 10 : 8,
+    color: on ? "#fff4c2" : "#e6d7a2",
+    fillColor: on ? "#f0d56a" : "#c4a94a",
+    fillOpacity: on ? 0.98 : 0.9,
+    weight: on ? 3 : 2,
+    opacity: 1
+  });
   m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));
   m.on("click",()=>showSchool(s.id));
   return m;
@@ -840,11 +875,11 @@ document.addEventListener("click",e=>{
   }
 });
 ["q","cls","cty","radius"].forEach(id=>{
-  const el=document.getElementById(id);
-  el.addEventListener(id==="q"?"input":"change",apply);
+  document.getElementById(id).addEventListener(id==="q"?"input":"change",apply);
 });
+window.addEventListener("resize",placeFilters);
+placeFilters();
 showRegions();
 </script>
 </body>
-</html>
 </html>
