@@ -11,11 +11,10 @@
 :root{--bg:#070907;--panel:#0c110c;--line:#d4af37;--text:#f3ead1;--muted:#9a9178}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:Georgia,serif;background:var(--bg);color:var(--text)}
-header.site{display:block}
 .bar1,.bar2{display:flex;align-items:center;gap:.7rem;padding:.55rem 1rem}
 .bar1{justify-content:space-between;border-bottom:1px solid rgba(212,175,55,.22)}
 .bar2{justify-content:space-between;background:#0a0e0a;border-bottom:1px solid rgba(212,175,55,.18);position:relative}
-.logo{display:flex;align-items:center;gap:.6rem;flex:0 0 auto}
+.logo{display:flex;align-items:center;gap:.6rem}
 .ga{width:34px;height:34px;border:1.5px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--line);font-size:.7rem}
 .logo h1{font-size:.74rem;letter-spacing:.16em;color:var(--line)}
 .logo p{font-size:.6rem;letter-spacing:.08em;color:var(--muted)}
@@ -32,10 +31,8 @@ a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.6
 .filter-box select{width:100%}
 #filterBtn{display:none}
 main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
-#map{height:100%;background:#050605}
-.leaflet-tile-pane{filter:brightness(1.12) contrast(1.08) saturate(.85)}
-.leaflet-overlay-pane img{filter:brightness(1.2) contrast(1.1)}
-.drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%);position:relative}
+#map{height:100%;background:#070907}
+.drawer{border-left:1px solid rgba(212,175,55,.22);overflow:auto;padding:1rem;background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%)}
 .kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.35rem}
 .count{color:var(--muted);font-size:.72rem;margin-bottom:.7rem}
 .school,.region{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.7rem 0;border-bottom:1px dashed rgba(212,175,55,.28);cursor:pointer}
@@ -55,7 +52,7 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 .title{font-size:1.2rem;margin:.35rem 0 .55rem}
 .row{margin:.38rem 0;font-size:.86rem;color:#efe6c8}
 .muted{color:var(--muted);font-size:.74rem}
-.actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem;align-items:center}
+.actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem}
 .actions a,.back{color:var(--line);text-decoration:none;border:1px solid rgba(212,175,55,.35);padding:.4rem .55rem;font-size:.72rem;background:none;font:inherit;cursor:pointer}
 .back{position:sticky;top:0;z-index:2;display:inline-block;background:var(--panel);margin-bottom:.35rem}
 .empty{color:var(--muted);padding:1rem 0}
@@ -78,17 +75,15 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
   .bar1{flex-wrap:wrap}
   .bar2{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0}
   .modes,.tools{display:contents}
-  .bar2 .btn{width:100%;border:0;border-right:1px solid rgba(212,175,55,.18);border-radius:0;padding:.75rem .2rem;font-size:.55rem;letter-spacing:.12em}
-  .full{display:none}
-  .short{display:inline}
+  .bar2 .btn{width:100%;border:0;border-right:1px solid rgba(212,175,55,.18);border-radius:0;padding:.75rem .2rem;font-size:.55rem}
+  .full{display:none}.short{display:inline}
   #filterBtn{display:block}
   #radius,#cls,#cty{width:100%}
-  .back{padding:.55rem .7rem}
 }
 </style>
 </head>
 <body>
-<header class="site">
+<header>
   <div class="bar1">
     <div class="logo"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></div>
     <input id="q" class="search" placeholder="Search school, city, or county"/>
@@ -125,7 +120,9 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
 <script>
-
+const slug=(name,city)=>(name+" "+city).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const S=(name,city,county,address,stadium,cls,coach,lat,lng)=>({id:slug(name,city),name,city,county,address,stadium,cls,coach,lat,lng});
+const schools=[
 S("Camden County High School","Kingsland","Camden","6300 Laurel Island Pkwy, Kingsland, GA 31548","Camden County Stadium","7A","Tucker Pruitt",30.832,-81.650),
 S("Lowndes High School","Valdosta","Lowndes","1606 Norman Dr, Valdosta, GA 31601","Lowndes Stadium","7A","Adam Carter",30.848,-83.302),
 S("Colquitt County High School","Moultrie","Colquitt","1800 Park Ave SE, Moultrie, GA 31768","Mack Tharpe Stadium","7A","Sean Calhoun",31.165,-83.771),
@@ -538,25 +535,26 @@ S("Lincoln County High School","Lincolnton","Lincoln","200 Charles Ward Way, Lin
 S("Towns County High School","Hiawassee","Towns","1400 Hwy 76 E, Hiawassee, GA 30546","Towns County Stadium","A","To be listed",34.949,-83.757),
 S("Warren County High School","Warrenton","Warren","1273 Atlanta Hwy, Warrenton, GA 30828","Warren County Stadium","A","To be listed",33.407,-82.662),
 S("Washington-Wilkes Comprehensive High School","Washington","Wilkes","1180 Tignall Rd, Washington, GA 30673","Washington-Wilkes Stadium","A","To be listed",33.737,-82.739)
-const sheets = {};
-function hasSheet(s){ return Boolean(sheets[s.id]); }
+];
+
+const sheets={};
+function hasSheet(s){return Boolean(sheets[s.id]);}
 
 (function separateStackedPins(){
-  const seen = new Map();
+  const seen=new Map();
   schools.forEach(s=>{
-    const key = s.lat.toFixed(4)+","+s.lng.toFixed(4);
-    const n = seen.get(key) || 0;
+    const key=s.lat.toFixed(4)+","+s.lng.toFixed(4);
+    const n=seen.get(key)||0;
     if(n){
-      const ang = n * 0.9;
-      s.lat += 0.006 * Math.cos(ang);
-      s.lng += 0.006 * Math.sin(ang);
+      const ang=n*0.9;
+      s.lat+=0.006*Math.cos(ang);
+      s.lng+=0.006*Math.sin(ang);
     }
-    seen.set(key, n+1);
+    seen.set(key,n+1);
   });
 })();
 
-const byId = Object.fromEntries(schools.map(s=>[s.id,s]));
-
+const byId=Object.fromEntries(schools.map(s=>[s.id,s]));
 const REGION_COUNTIES={
   "Northwest Georgia":["Bartow","Catoosa","Chattooga","Dade","Fannin","Floyd","Gilmer","Gordon","Haralson","Murray","Paulding","Pickens","Polk","Walker","Whitfield"],
   "Northeast Georgia":["Banks","Dawson","Forsyth","Franklin","Habersham","Hall","Hart","Lumpkin","Rabun","Stephens","Towns","Union","White"],
@@ -581,16 +579,14 @@ function regionOf(county){
   for(const [r,list] of Object.entries(REGION_COUNTIES)) if(list.includes(county)) return r;
   return "Other";
 }
-
 [...new Set(schools.map(s=>s.county))].sort().forEach(c=>{
   const o=document.createElement("option");
   o.value=c; o.textContent=c;
   document.getElementById("cty").appendChild(o);
 });
-
 function miles(aLat,aLng,bLat,bLng){
-  const R=3958.8, toR=d=>d*Math.PI/180;
-  const dLat=toR(bLat-aLat), dLng=toR(bLng-aLng);
+  const R=3958.8,toR=d=>d*Math.PI/180;
+  const dLat=toR(bLat-aLat),dLng=toR(bLng-aLng);
   const m=Math.sin(dLat/2)**2+Math.cos(toR(aLat))*Math.cos(toR(bLat))*Math.sin(dLng/2)**2;
   return 2*R*Math.asin(Math.min(1,Math.sqrt(m)));
 }
@@ -601,8 +597,7 @@ function mono(name){
 function gmaps(s){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(s.address);}
 function amaps(s){return "https://maps.apple.com/?daddr="+encodeURIComponent(s.address);}
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function resetDrawer(){ document.getElementById("drawer").scrollTop=0; }
-
+function resetDrawer(){document.getElementById("drawer").scrollTop=0;}
 function placeFilters(){
   const phone=window.matchMedia("(max-width:900px)").matches;
   const box=document.getElementById("filterBox");
@@ -619,14 +614,14 @@ function placeFilters(){
     labels[2].appendChild(cty);
   }else{
     modes.appendChild(radius);
-    tools.insertBefore(cls, sheetBtn);
-    tools.insertBefore(cty, sheetBtn);
+    tools.insertBefore(cls,sheetBtn);
+    tools.insertBefore(cty,sheetBtn);
     box.classList.remove("on");
     document.getElementById("filterBtn").classList.remove("on");
   }
 }
 
-let here=null, nearOn=false, sheetOnly=false, selected=null, activeRegion=null;
+let here=null,nearOn=false,sheetOnly=false,selected=null,activeRegion=null;
 const GA_BOUNDS=L.latLngBounds([30.25,-85.85],[35.15,-80.70]);
 const map=L.map("map",{minZoom:6,maxBoundsViscosity:0.7}).setView([32.65,-83.5],7);
 map.setMaxBounds(GA_BOUNDS.pad(0.35));
@@ -641,23 +636,29 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
   pane:"overlayPane"
 }).addTo(map);
 
-function georgiaMask(geo){
+function latlngRing(ring){return ring.map(c=>[c[1],c[0]]);}
+function addGeorgiaFocus(geo){
   const feat=geo.type==="FeatureCollection"?geo.features[0]:geo;
   const g=feat.geometry;
   const holes=[];
-  if(g.type==="Polygon") holes.push(g.coordinates[0]);
-  else if(g.type==="MultiPolygon") g.coordinates.forEach(poly=>holes.push(poly[0]));
-  return {
-    type:"Feature",
-    geometry:{
-      type:"Polygon",
-      coordinates:[
-        [[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]],
-        ...holes
-      ]
-    }
-  };
+  if(g.type==="Polygon") holes.push(latlngRing(g.coordinates[0]).reverse());
+  else if(g.type==="MultiPolygon") g.coordinates.forEach(poly=>holes.push(latlngRing(poly[0]).reverse()));
+  const world=[[90,-180],[90,180],[-90,180],[-90,-180]];
+  L.polygon([world,...holes],{
+    interactive:false,
+    stroke:false,
+    fillColor:"#000",
+    fillOpacity:0.62
+  }).addTo(map);
+  L.geoJSON(geo,{
+    interactive:false,
+    style:{color:"#d4af37",weight:2.2,fill:false}
+  }).addTo(map);
 }
+fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
+  .then(r=>r.json())
+  .then(addGeorgiaFocus)
+  .catch(()=>{});
 
 const regionBoundsLayer=L.layerGroup();
 function countyName(props){
@@ -665,27 +666,9 @@ function countyName(props){
   return raw.replace(/\s+County$/i,"").trim();
 }
 function showRegionOutlines(on){
-  if(on){
-    if(!map.hasLayer(regionBoundsLayer)) regionBoundsLayer.addTo(map);
-  } else if(map.hasLayer(regionBoundsLayer)){
-    map.removeLayer(regionBoundsLayer);
-  }
+  if(on){ if(!map.hasLayer(regionBoundsLayer)) regionBoundsLayer.addTo(map); }
+  else if(map.hasLayer(regionBoundsLayer)) map.removeLayer(regionBoundsLayer);
 }
-
-fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/GA.geo.json")
-  .then(r=>r.json())
-  .then(geo=>{
-    L.geoJSON(georgiaMask(geo),{
-      interactive:false,
-      style:{color:"#000",weight:0,fillColor:"#000",fillOpacity:0.72}
-    }).addTo(map);
-    L.geoJSON(geo,{
-      interactive:false,
-      style:{color:"#d4af37",weight:2.2,fillColor:"#d4af37",fillOpacity:0.04}
-    }).addTo(map);
-  })
-  .catch(()=>{});
-
 fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
   .then(r=>r.json())
   .then(all=>{
@@ -702,13 +685,9 @@ fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties
     });
     Object.entries(byRegion).forEach(([name,feats])=>{
       let merged=null;
-      feats.forEach(f=>{
-        try{ merged = merged ? turf.union(merged, f) : f; }catch(e){}
-      });
+      feats.forEach(f=>{ try{ merged=merged?turf.union(merged,f):f; }catch(e){} });
       if(!merged) return;
-      const layer=L.geoJSON(merged,{
-        style:{color:"#d4af37",weight:2.4,fillColor:"#d4af37",fillOpacity:0.06}
-      });
+      const layer=L.geoJSON(merged,{style:{color:"#d4af37",weight:2.4,fillColor:"#d4af37",fillOpacity:0.06}});
       layer.bindTooltip(name);
       layer.on("click",()=>openRegion(name));
       regionBoundsLayer.addLayer(layer);
@@ -717,17 +696,11 @@ fetch("https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties
   })
   .catch(()=>{});
 
-const clusters=L.markerClusterGroup({
-  showCoverageOnHover:false,
-  maxClusterRadius:32,
-  disableClusteringAtZoom:11
-}).addTo(map);
+const clusters=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:32,disableClusteringAtZoom:11}).addTo(map);
 const regionLayer=L.layerGroup().addTo(map);
-let youMarker=null, radiusCircle=null;
+let youMarker=null,radiusCircle=null;
 
-function enrich(s){
-  return {...s, mi:here?miles(here.lat,here.lng,s.lat,s.lng):null, region:regionOf(s.county)};
-}
+function enrich(s){return {...s,mi:here?miles(here.lat,here.lng,s.lat,s.lng):null,region:regionOf(s.county)};}
 function baseFilter(s){
   const q=document.getElementById("q").value.toLowerCase().trim();
   const cl=document.getElementById("cls").value;
@@ -740,7 +713,7 @@ function baseFilter(s){
   if(sheetOnly&&!hasSheet(s)) return false;
   return true;
 }
-function pool(){ return schools.filter(baseFilter).map(enrich); }
+function pool(){return schools.filter(baseFilter).map(enrich);}
 function regionStats(){
   const list=pool();
   return Object.keys(REGION_CENTER).map(name=>{
@@ -751,15 +724,9 @@ function regionStats(){
 }
 function pinFor(s){
   const on=hasSheet(s);
-  const isSel=selected && selected.id===s.id;
-  if(isSel){
+  if(selected&&selected.id===s.id){
     const m=L.marker([s.lat,s.lng],{
-      icon:L.divIcon({
-        className:"",
-        html:`<div class="sel-wrap"><div class="sel-ring"></div><div class="sel-dot"></div></div>`,
-        iconSize:[28,28],
-        iconAnchor:[14,14]
-      }),
+      icon:L.divIcon({className:"",html:`<div class="sel-wrap"><div class="sel-ring"></div><div class="sel-dot"></div></div>`,iconSize:[28,28],iconAnchor:[14,14]}),
       zIndexOffset:1000
     });
     m.bindTooltip(s.name+" · selected");
@@ -767,12 +734,11 @@ function pinFor(s){
     return m;
   }
   const m=L.circleMarker([s.lat,s.lng],{
-    radius: on ? 10 : 8,
-    color: on ? "#fff4c2" : "#e6d7a2",
-    fillColor: on ? "#f0d56a" : "#c4a94a",
-    fillOpacity: on ? 0.98 : 0.9,
-    weight: on ? 3 : 2,
-    opacity: 1
+    radius:on?10:8,
+    color:on?"#fff4c2":"#e6d7a2",
+    fillColor:on?"#f0d56a":"#c4a94a",
+    fillOpacity:on?0.98:0.9,
+    weight:on?3:2
   });
   m.bindTooltip(s.name+" · "+s.cls+(on?" · Sheet":"")+(s.mi!=null?" · "+s.mi.toFixed(0)+" mi":""));
   m.on("click",()=>showSchool(s.id));
@@ -781,11 +747,10 @@ function pinFor(s){
 function clearPins(){
   clusters.clearLayers();
   regionLayer.clearLayers();
-  if(radiusCircle){ map.removeLayer(radiusCircle); radiusCircle=null; }
+  if(radiusCircle){map.removeLayer(radiusCircle);radiusCircle=null;}
 }
-
 function showRegions(){
-  activeRegion=null; selected=null; nearOn=false;
+  activeRegion=null;selected=null;nearOn=false;
   document.getElementById("nearBtn").classList.remove("on");
   document.getElementById("regionsBtn").classList.add("on");
   clearPins();
@@ -804,9 +769,8 @@ function showRegions(){
     regs.map(r=>`<div class="region" data-region="${esc(r.name)}"><div><div class="n">${esc(r.name)}</div><div class="sub">${r.sheets} with prospect sheets</div></div><div class="mi">${r.count}</div></div>`).join("");
   resetDrawer();
 }
-
 function openRegion(name){
-  activeRegion=name; selected=null;
+  activeRegion=name;selected=null;
   document.getElementById("regionsBtn").classList.remove("on");
   showRegionOutlines(false);
   const list=pool().filter(s=>s.region===name);
@@ -826,7 +790,6 @@ function openRegion(name){
       : `<p class="empty">No schools in this region match those filters.</p>`);
   resetDrawer();
 }
-
 function showSchool(id){
   const raw=byId[id];
   if(!raw) return;
@@ -835,7 +798,7 @@ function showSchool(id){
   activeRegion=s.region;
   document.getElementById("regionsBtn").classList.remove("on");
   showRegionOutlines(false);
-  const list=nearOn ? pool().sort((a,b)=>a.mi-b.mi) : pool().filter(x=>x.region===s.region).sort((a,b)=>a.name.localeCompare(b.name));
+  const list=nearOn?pool().sort((a,b)=>a.mi-b.mi):pool().filter(x=>x.region===s.region).sort((a,b)=>a.name.localeCompare(b.name));
   clearPins();
   list.forEach(x=>clusters.addLayer(pinFor(x)));
   map.setView([s.lat,s.lng],Math.max(map.getZoom(),11));
@@ -859,33 +822,25 @@ function showSchool(id){
      </article>`;
   resetDrawer();
 }
-
 function apply(){
   if(nearOn&&here){
-    activeRegion=null;
-    selected=null;
-    showRegionOutlines(false);
+    activeRegion=null;selected=null;showRegionOutlines(false);
     const list=pool().sort((a,b)=>a.mi-b.mi);
     clearPins();
     list.forEach(s=>clusters.addLayer(pinFor(s)));
-    radiusCircle=L.circle([here.lat,here.lng],{
-      radius:parseFloat(document.getElementById("radius").value)*1609.34,
-      color:"#d4af37",weight:1.2,fillColor:"#d4af37",fillOpacity:.08
-    }).addTo(map);
+    radiusCircle=L.circle([here.lat,here.lng],{radius:parseFloat(document.getElementById("radius").value)*1609.34,color:"#d4af37",weight:1.2,fillColor:"#d4af37",fillOpacity:.08}).addTo(map);
     const withN=list.filter(hasSheet).length;
     document.getElementById("drawer").innerHTML=
       `<button class="back" type="button" data-action="regions">‹ All regions</button>
        <div class="kicker" style="margin-top:.7rem">NEAR YOU · ${esc(document.getElementById("radius").value)} MILES</div>
        <div class="count">${list.length} schools · ${withN} with sheets</div>`+
-      (list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.region)} · ${esc(s.city)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")
-        || '<p class="empty">No schools in that radius.</p>');
+      (list.map(s=>`<div class="school" data-school="${esc(s.id)}"><div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.region)} · ${esc(s.city)} · Class ${esc(s.cls)}</div></div><div class="mi">${s.mi.toFixed(0)} mi<span class="tag ${hasSheet(s)?"":"off"}">${hasSheet(s)?"SHEET":"—"}</span></div></div>`).join("")||'<p class="empty">No schools in that radius.</p>');
     resetDrawer();
     return;
   }
   if(activeRegion) openRegion(activeRegion);
   else showRegions();
 }
-
 document.getElementById("drawer").addEventListener("click",e=>{
   const back=e.target.closest("[data-action]");
   if(back){
@@ -894,15 +849,14 @@ document.getElementById("drawer").addEventListener("click",e=>{
     return;
   }
   const regionEl=e.target.closest("[data-region].region");
-  if(regionEl){ openRegion(regionEl.dataset.region); return; }
+  if(regionEl){openRegion(regionEl.dataset.region);return;}
   const schoolEl=e.target.closest("[data-school]");
   if(schoolEl) showSchool(schoolEl.dataset.school);
 });
-
 document.getElementById("regionsBtn").onclick=()=>showRegions();
 document.getElementById("nearBtn").onclick=()=>{
-  if(nearOn){ nearOn=false; document.getElementById("nearBtn").classList.remove("on"); showRegions(); return; }
-  if(!navigator.geolocation){ alert("Location is not available in this browser."); return; }
+  if(nearOn){nearOn=false;document.getElementById("nearBtn").classList.remove("on");showRegions();return;}
+  if(!navigator.geolocation){alert("Location is not available in this browser.");return;}
   navigator.geolocation.getCurrentPosition(pos=>{
     nearOn=true;
     document.getElementById("nearBtn").classList.add("on");
@@ -919,7 +873,7 @@ document.getElementById("sheetBtn").onclick=()=>{
   document.getElementById("sheetBtn").classList.toggle("on",sheetOnly);
   apply();
 };
-const filterBtn=document.getElementById("filterBtn"), filterBox=document.getElementById("filterBox");
+const filterBtn=document.getElementById("filterBtn"),filterBox=document.getElementById("filterBox");
 filterBtn.onclick=e=>{
   e.stopPropagation();
   filterBox.classList.toggle("on");
