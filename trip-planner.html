@@ -21,15 +21,16 @@ a.board.on{color:#1a1608;background:var(--line);border-color:var(--line)}
 main{display:grid;grid-template-columns:minmax(280px,420px) 1fr;min-height:calc(100vh - 62px)}
 .left,.right{padding:1rem;overflow:auto}
 .right{border-left:1px solid rgba(212,175,55,.22);background:radial-gradient(circle at 20% 0%,#162016,var(--panel) 55%)}
-.kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin-bottom:.45rem}
+.kicker{font-size:.62rem;letter-spacing:.18em;color:var(--line);margin:.7rem 0 .45rem}
+.kicker:first-child{margin-top:0}
 .search,select,input[type=text]{width:100%;background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.48rem .7rem;font:inherit}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin:.55rem 0 .7rem}
-.school{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.7rem 0;border-bottom:1px dashed rgba(212,175,55,.28)}
+.school{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.7rem 0;border-bottom:1px dashed rgba(212,175,55,.28);align-items:center}
 .n{font-size:.92rem}
 .sub{color:var(--muted);font-size:.72rem;margin-top:.15rem}
 .btn{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--muted);padding:.38rem .5rem;font:inherit;letter-spacing:.1em;font-size:.62rem;cursor:pointer}
 .btn.on{color:#1a1608;background:var(--line);border-color:var(--line)}
-.title{font-size:1.35rem;letter-spacing:.08em;margin:.15rem 0 .8rem}
+.title{font-size:1.2rem;letter-spacing:.08em;margin:.15rem 0 .8rem}
 .start{display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem}
 .start .pin{width:28px;height:28px;border-radius:50%;background:var(--line);color:#1a1608;display:grid;place-items:center;font-size:.8rem;flex:none}
 .loop{margin-left:auto;display:flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.72rem;letter-spacing:.08em;white-space:nowrap}
@@ -42,7 +43,7 @@ main{display:grid;grid-template-columns:minmax(280px,420px) 1fr;min-height:calc(
 .summary p{font-size:.86rem;margin-bottom:.65rem}
 .actions{display:flex;flex-wrap:wrap;gap:.45rem}
 .actions a,.actions button{color:var(--line);text-decoration:none;border:1px solid rgba(212,175,55,.35);padding:.4rem .55rem;font-size:.72rem;background:none;font:inherit;cursor:pointer}
-.empty{color:var(--muted);padding:1rem 0}
+.empty{color:var(--muted);padding:.6rem 0;font-size:.8rem}
 .warn{color:#e2c56a;font-size:.72rem;margin:.35rem 0}
 @media(max-width:900px){
   main{grid-template-columns:1fr}
@@ -72,6 +73,9 @@ main{display:grid;grid-template-columns:minmax(280px,420px) 1fr;min-height:calc(
       <select id="cls"><option value="">All classes</option><option>7A</option><option>6A</option><option>5A</option><option>4A</option><option>3A</option><option>2A</option><option>A</option></select>
       <select id="cty"><option value="">All counties</option></select>
     </div>
+    <div class="kicker" id="nearKicker">CLOSEST SCHOOLS</div>
+    <div id="nearby"></div>
+    <div class="kicker">ALL SCHOOLS</div>
     <div id="results"></div>
   </section>
   <section class="right">
@@ -578,6 +582,24 @@ const layer=L.layerGroup().addTo(map);
 
 function stops(){return trip.ids.map(id=>byId[id]).filter(Boolean);}
 
+function fromPoint(){
+  const list=stops();
+  if(list.length) return {lat:list[list.length-1].lat,lng:list[list.length-1].lng,label:list[list.length-1].name};
+  if(trip.here) return {lat:trip.here.lat,lng:trip.here.lng,label:"your location"};
+  return null;
+}
+
+function schoolRow(s,extra){
+  const on=trip.ids.includes(s.id);
+  return `<div class="school">
+    <div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.city)} · ${esc(s.county)} · Class ${esc(s.cls)}</div></div>
+    <div>
+      ${extra?`<div class="mi">${extra}</div>`:""}
+      <button class="btn ${on?"on":""}" data-add="${esc(s.id)}" ${on?"disabled":""}>${on?"ON TRIP":"+ ADD"}</button>
+    </div>
+  </div>`;
+}
+
 function renderResults(){
   const q=document.getElementById("q").value.toLowerCase().trim();
   const cl=document.getElementById("cls").value;
@@ -586,13 +608,25 @@ function renderResults(){
     const text=!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q)||s.county.toLowerCase().includes(q);
     return text&&(!cl||s.cls===cl)&&(!co||s.county===co);
   }).slice(0,60);
-  document.getElementById("results").innerHTML=list.map(s=>{
-    const on=trip.ids.includes(s.id);
-    return `<div class="school">
-      <div><div class="n">${esc(s.name)}</div><div class="sub">${esc(s.city)} · ${esc(s.county)} · Class ${esc(s.cls)}</div></div>
-      <button class="btn ${on?"on":""}" data-add="${esc(s.id)}" ${on?"disabled":""}>${on?"ON TRIP":"+ ADD"}</button>
-    </div>`;
-  }).join("")||'<p class="empty">No schools match.</p>';
+  document.getElementById("results").innerHTML=list.map(s=>schoolRow(s)).join("")||'<p class="empty">No schools match.</p>';
+}
+
+function renderNearby(){
+  const origin=fromPoint();
+  const box=document.getElementById("nearby");
+  const kicker=document.getElementById("nearKicker");
+  if(!origin){
+    kicker.textContent="CLOSEST SCHOOLS";
+    box.innerHTML='<p class="empty">Add a school or use my location to see nearby stops.</p>';
+    return;
+  }
+  kicker.textContent="CLOSEST TO "+origin.label.toUpperCase();
+  const near=schools
+    .filter(s=>!trip.ids.includes(s.id))
+    .map(s=>({...s,d:miles(origin.lat,origin.lng,s.lat,s.lng)}))
+    .sort((a,b)=>a.d-b.d)
+    .slice(0,8);
+  box.innerHTML=near.map(s=>schoolRow(s,s.d.toFixed(0)+" mi")).join("")||'<p class="empty">Every nearby school is already on the trip.</p>';
 }
 
 function renderTrip(){
@@ -669,13 +703,21 @@ function drawMap(list){
   setTimeout(()=>map.invalidateSize(),200);
 }
 
-function render(){save();renderResults();renderTrip();}
+function render(){save();renderResults();renderNearby();renderTrip();}
 
+function addSchool(id){
+  if(!id||trip.ids.includes(id)||!byId[id]) return;
+  trip.ids.push(id);
+  render();
+}
+
+document.getElementById("nearby").addEventListener("click",e=>{
+  const b=e.target.closest("[data-add]");
+  if(b) addSchool(b.dataset.add);
+});
 document.getElementById("results").addEventListener("click",e=>{
   const b=e.target.closest("[data-add]");
-  if(!b||b.disabled) return;
-  trip.ids.push(b.dataset.add);
-  render();
+  if(b) addSchool(b.dataset.add);
 });
 document.getElementById("stops").addEventListener("click",e=>{
   const rm=e.target.closest("[data-rm]");
