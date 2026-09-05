@@ -22,6 +22,7 @@ html,body{height:100%;overflow:hidden;font-family:Georgia,serif;background:var(-
 select{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--text);padding:.42rem .5rem;font:inherit}
 .btn{background:#101510;border:1px solid rgba(212,175,55,.35);color:var(--muted);padding:.42rem .55rem;font:inherit;letter-spacing:.1em;font-size:.62rem;cursor:pointer}
 .btn.on{color:#1a1608;background:var(--line);border-color:var(--line)}
+.nav{display:flex;gap:.45rem;flex-wrap:wrap}
 a.board{color:var(--line);text-decoration:none;letter-spacing:.12em;font-size:.62rem;border:1px solid rgba(212,175,55,.35);padding:.42rem .55rem;white-space:nowrap}
 .modes,.tools{display:flex;align-items:center;gap:.45rem}
 .short{display:none}
@@ -87,7 +88,10 @@ main{height:calc(100% - 108px);display:grid;grid-template-columns:1fr 400px}
   <div class="bar1">
     <div class="logo"><div class="ga">GA</div><div><h1>MAPPEDRECRUITING</h1><p>GHSA 2026–28</p></div></div>
     <input id="q" class="search" placeholder="Search school, city, or county"/>
-    <a class="board" href="our-recruits.html">OUR RECRUITING BOARD</a>
+    <nav class="nav">
+      <a class="board" href="our-recruits.html">OUR RECRUITING BOARD</a>
+      <a class="board" href="trip-planner.html">TRIP PLANNER</a>
+    </nav>
   </div>
   <div class="bar2">
     <div class="modes">
@@ -817,6 +821,7 @@ function showSchool(id){
        <div class="actions">
          <a href="${gmaps(s)}" target="_blank" rel="noopener">Google Maps</a>
          <a href="${amaps(s)}" target="_blank" rel="noopener">Apple Maps</a>
+         <a href="trip-planner.html?add=${esc(s.id)}">Add to trip</a>
          ${sheetLink}
        </div>
      </article>`;
